@@ -505,17 +505,19 @@
                   <td>luffy@strawhat.com</td>
                   <td>Member</td>
                   <td>RFID_A1B2C3</td>
-                  <td class="wifi-cell" data-customer-id="1" data-current-hours="5">5 hr(s) <button
-                      class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Monkey D. Luffy', 5)"><i
-                        class="fa-solid fa-pen"></i></button></td>
+                  <td class="wifi-cell" data-customer-id="1" data-current-hours="5">5 hr(s)</td>
                   <td>AA:BB:CC:11:22:33</td>
                   <td><span class="badge badge-green">Active</span></td>
                   <td>
                     <div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm"
-                        onclick="viewCustomer(this)"><i class="fa-solid fa-eye"></i></button><button
-                        class="btn btn-ghost btn-sm" onclick="openEditCustomerModal(this)"><i
-                          class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm"
-                        onclick="removeCustomer(this)"><i class="fa-solid fa-trash"></i></button></div>
+                        onclick="viewCustomer(this)" title="View Details"><i class="fa-solid fa-eye"></i></button><button
+                        class="btn btn-ghost btn-sm" onclick="openEditCustomerModal(this)" title="Edit Customer"><i
+                          class="fa-solid fa-pen"></i></button><button class="btn btn-ghost btn-sm"
+                        onclick="openWifiEditModal(this, 'Monkey D. Luffy', 5)" title="Add Time"><i
+                          class="fa-solid fa-clock"></i></button><button class="btn btn-ghost btn-sm"
+                        onclick="terminateWifiSession(this, 'Monkey D. Luffy')" title="Terminate Session"><i
+                          class="fa-solid fa-wifi-slash"></i></button><button class="btn btn-danger btn-sm"
+                        onclick="removeCustomer(this)" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
                   </td>
                 </tr>
                 <tr data-status="Active" data-type="Member">
@@ -524,17 +526,18 @@
                   <td>zoro@strawhat.com</td>
                   <td>Member</td>
                   <td>RFID_9Z8X7Y</td>
-                  <td class="wifi-cell" data-customer-id="2" data-current-hours="3">3 hr(s) <button
-                      class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Roronoa Zoro', 3)"><i
-                        class="fa-solid fa-pen"></i></button></td>
+                  <td class="wifi-cell" data-customer-id="2" data-current-hours="3">3 hr(s)</td>
                   <td>AA:BB:CC:44:55:66</td>
                   <td><span class="badge badge-green">Active</span></td>
                   <td>
-                    <div><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)"><i
+                    <div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)" title="View Details"><i
                           class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm"
-                        onclick="openEditCustomerModal(this)"><i class="fa-solid fa-pen"></i></button><button
-                        class="btn btn-danger btn-sm" onclick="removeCustomer(this)"><i
-                          class="fa-solid fa-trash"></i></button></div>
+                        onclick="openEditCustomerModal(this)" title="Edit Customer"><i class="fa-solid fa-pen"></i></button><button
+                        class="btn btn-ghost btn-sm" onclick="openWifiEditModal(this, 'Roronoa Zoro', 3)" title="Add Time"><i
+                          class="fa-solid fa-clock"></i></button><button class="btn btn-ghost btn-sm"
+                        onclick="terminateWifiSession(this, 'Roronoa Zoro')" title="Terminate Session"><i
+                          class="fa-solid fa-wifi-slash"></i></button><button class="btn btn-danger btn-sm"
+                        onclick="removeCustomer(this)" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
                   </td>
                 </tr>
                 <tr data-status="Idle" data-type="Member">
@@ -543,17 +546,18 @@
                   <td>nami@weather.com</td>
                   <td>Member</td>
                   <td>RFID_NA789</td>
-                  <td class="wifi-cell" data-customer-id="3" data-current-hours="2">2 hr(s) <button
-                      class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Nami Catburglar', 2)"><i
-                        class="fa-solid fa-pen"></i></button></td>
+                  <td class="wifi-cell" data-customer-id="3" data-current-hours="2">2 hr(s)</td>
                   <td>AA:BB:CC:77:88:99<br>AA:BB:CC:77:88:AA</td>
                   <td><span class="badge badge-orange">Idle</span></td>
                   <td>
-                    <div><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)"><i
+                    <div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)" title="View Details"><i
                           class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm"
-                        onclick="openEditCustomerModal(this)"><i class="fa-solid fa-pen"></i></button><button
-                        class="btn btn-danger btn-sm" onclick="removeCustomer(this)"><i
-                          class="fa-solid fa-trash"></i></button></div>
+                        onclick="openEditCustomerModal(this)" title="Edit Customer"><i class="fa-solid fa-pen"></i></button><button
+                        class="btn btn-ghost btn-sm" onclick="openWifiEditModal(this, 'Nami Catburglar', 2)" title="Add Time"><i
+                          class="fa-solid fa-clock"></i></button><button class="btn btn-ghost btn-sm"
+                        onclick="terminateWifiSession(this, 'Nami Catburglar')" title="Terminate Session"><i
+                          class="fa-solid fa-wifi-slash"></i></button><button class="btn btn-danger btn-sm"
+                        onclick="removeCustomer(this)" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
                   </td>
                 </tr>
                 <tr data-status="Inactive" data-type="Member">
@@ -562,17 +566,18 @@
                   <td>sanji@allblue.com</td>
                   <td>Member</td>
                   <td>RFID_SJ42</td>
-                  <td class="wifi-cell" data-customer-id="4" data-current-hours="2">2 hr(s) <button
-                      class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Sanji Vinsmoke', 2)"><i
-                        class="fa-solid fa-pen"></i></button></td>
+                  <td class="wifi-cell" data-customer-id="4" data-current-hours="2">2 hr(s)</td>
                   <td>AA:BB:CC:AA:BB:CC</td>
                   <td><span class="badge badge-red">Inactive</span></td>
                   <td>
-                    <div><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)"><i
+                    <div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)" title="View Details"><i
                           class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm"
-                        onclick="openEditCustomerModal(this)"><i class="fa-solid fa-pen"></i></button><button
-                        class="btn btn-danger btn-sm" onclick="removeCustomer(this)"><i
-                          class="fa-solid fa-trash"></i></button></div>
+                        onclick="openEditCustomerModal(this)" title="Edit Customer"><i class="fa-solid fa-pen"></i></button><button
+                        class="btn btn-ghost btn-sm" onclick="openWifiEditModal(this, 'Sanji Vinsmoke', 2)" title="Add Time"><i
+                          class="fa-solid fa-clock"></i></button><button class="btn btn-ghost btn-sm"
+                        onclick="terminateWifiSession(this, 'Sanji Vinsmoke')" title="Terminate Session"><i
+                          class="fa-solid fa-wifi-slash"></i></button><button class="btn btn-danger btn-sm"
+                        onclick="removeCustomer(this)" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
                   </td>
                 </tr>
                 <tr data-status="Active" data-type="Member">
@@ -581,17 +586,18 @@
                   <td>chopper@dr.com</td>
                   <td>Member</td>
                   <td>RFID_CHOP</td>
-                  <td class="wifi-cell" data-customer-id="5" data-current-hours="2">2 hr(s) <button
-                      class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Tony Chopper', 2)"><i
-                        class="fa-solid fa-pen"></i></button></td>
+                  <td class="wifi-cell" data-customer-id="5" data-current-hours="2">2 hr(s)</td>
                   <td>AA:BB:CC:DD:EE:01</td>
                   <td><span class="badge badge-green">Active</span></td>
                   <td>
-                    <div><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)"><i
+                    <div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)" title="View Details"><i
                           class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm"
-                        onclick="openEditCustomerModal(this)"><i class="fa-solid fa-pen"></i></button><button
-                        class="btn btn-danger btn-sm" onclick="removeCustomer(this)"><i
-                          class="fa-solid fa-trash"></i></button></div>
+                        onclick="openEditCustomerModal(this)" title="Edit Customer"><i class="fa-solid fa-pen"></i></button><button
+                        class="btn btn-ghost btn-sm" onclick="openWifiEditModal(this, 'Tony Chopper', 2)" title="Add Time"><i
+                          class="fa-solid fa-clock"></i></button><button class="btn btn-ghost btn-sm"
+                        onclick="terminateWifiSession(this, 'Tony Chopper')" title="Terminate Session"><i
+                          class="fa-solid fa-wifi-slash"></i></button><button class="btn btn-danger btn-sm"
+                        onclick="removeCustomer(this)" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
                   </td>
                 </tr>
                 <tr data-status="Active" data-type="Premium">
@@ -600,17 +606,18 @@
                   <td>vivi@alabasta.com</td>
                   <td>Premium</td>
                   <td>RFID_VIVI</td>
-                  <td class="wifi-cell" data-customer-id="6" data-current-hours="8">8 hr(s) <button
-                      class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Vivi Nefertari', 8)"><i
-                        class="fa-solid fa-pen"></i></button></td>
+                  <td class="wifi-cell" data-customer-id="6" data-current-hours="8">8 hr(s)</td>
                   <td>AA:BB:CC:DD:EE:04</td>
                   <td><span class="badge badge-green">Active</span></td>
                   <td>
-                    <div><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)"><i
+                    <div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)" title="View Details"><i
                           class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm"
-                        onclick="openEditCustomerModal(this)"><i class="fa-solid fa-pen"></i></button><button
-                        class="btn btn-danger btn-sm" onclick="removeCustomer(this)"><i
-                          class="fa-solid fa-trash"></i></button></div>
+                        onclick="openEditCustomerModal(this)" title="Edit Customer"><i class="fa-solid fa-pen"></i></button><button
+                        class="btn btn-ghost btn-sm" onclick="openWifiEditModal(this, 'Vivi Nefertari', 8)" title="Add Time"><i
+                          class="fa-solid fa-clock"></i></button><button class="btn btn-ghost btn-sm"
+                        onclick="terminateWifiSession(this, 'Vivi Nefertari')" title="Terminate Session"><i
+                          class="fa-solid fa-wifi-slash"></i></button><button class="btn btn-danger btn-sm"
+                        onclick="removeCustomer(this)" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
                   </td>
                 </tr>
               </tbody>
@@ -655,17 +662,18 @@
                   <td>chopper@dr.com</td>
                   <td>Walk-in</td>
                   <td>-</td>
-                  <td class="wifi-cell" data-customer-id="w1" data-current-hours="5">5 hr(s) <button
-                      class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Tony Chopper', 5)"><i
-                        class="fa-solid fa-pen"></i></button></td>
+                  <td class="wifi-cell" data-customer-id="w1" data-current-hours="5">5 hr(s)</td>
                   <td>AA:BB:CC:D0:EE:01</td>
                   <td><span class="badge badge-green">Active</span></td>
                   <td>
-                    <div><button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)"><i
+                    <div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)" title="View Details"><i
                           class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm"
-                        onclick="openEditWalkinModal(this)"><i class="fa-solid fa-pen"></i></button><button
-                        class="btn btn-danger btn-sm" onclick="removeWalkin(this)"><i
-                          class="fa-solid fa-trash"></i></button></div>
+                        onclick="openEditWalkinModal(this)" title="Edit Walk-in"><i class="fa-solid fa-pen"></i></button><button
+                        class="btn btn-ghost btn-sm" onclick="openWifiEditModal(this, 'Tony Chopper', 5)" title="Add Time"><i
+                          class="fa-solid fa-clock"></i></button><button class="btn btn-ghost btn-sm"
+                        onclick="terminateWifiSession(this, 'Tony Chopper')" title="Terminate Session"><i
+                          class="fa-solid fa-wifi-slash"></i></button><button class="btn btn-danger btn-sm"
+                        onclick="removeWalkin(this)" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
                   </td>
                 </tr>
                 <tr data-status="Inactive">
@@ -674,17 +682,18 @@
                   <td>vivi@alabasta.com</td>
                   <td>Walk-in</td>
                   <td>-</td>
-                  <td class="wifi-cell" data-customer-id="w2" data-current-hours="2">2 hr(s) <button
-                      class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Vivi Nefertari', 2)"><i
-                        class="fa-solid fa-pen"></i></button></td>
+                  <td class="wifi-cell" data-customer-id="w2" data-current-hours="2">2 hr(s)</td>
                   <td>AA:BB:CC:D0:EE:04</td>
                   <td><span class="badge badge-red">Inactive</span></td>
                   <td>
-                    <div><button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)"><i
+                    <div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)" title="View Details"><i
                           class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm"
-                        onclick="openEditWalkinModal(this)"><i class="fa-solid fa-pen"></i></button><button
-                        class="btn btn-danger btn-sm" onclick="removeWalkin(this)"><i
-                          class="fa-solid fa-trash"></i></button></div>
+                        onclick="openEditWalkinModal(this)" title="Edit Walk-in"><i class="fa-solid fa-pen"></i></button><button
+                        class="btn btn-ghost btn-sm" onclick="openWifiEditModal(this, 'Tony Chopper', 5)" title="Add Time"><i
+                          class="fa-solid fa-clock"></i></button><button class="btn btn-ghost btn-sm"
+                        onclick="terminateWifiSession(this, 'Tony Chopper')" title="Terminate Session"><i
+                          class="fa-solid fa-wifi-slash"></i></button><button class="btn btn-danger btn-sm"
+                        onclick="removeWalkin(this)" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
                   </td>
                 </tr>
                 <tr data-status="Active">
@@ -693,17 +702,18 @@
                   <td>brook@walkin.com</td>
                   <td>Walk-in</td>
                   <td>-</td>
-                  <td class="wifi-cell" data-customer-id="w3" data-current-hours="3">3 hr(s) <button
-                      class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Brook', 3)"><i
-                        class="fa-solid fa-pen"></i></button></td>
+                  <td class="wifi-cell" data-customer-id="w3" data-current-hours="3">3 hr(s)</td>
                   <td>AA:BB:CC:DD:EE:02</td>
                   <td><span class="badge badge-green">Active</span></td>
                   <td>
-                    <div><button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)"><i
+                    <div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)" title="View Details"><i
                           class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm"
-                        onclick="openEditWalkinModal(this)"><i class="fa-solid fa-pen"></i></button><button
-                        class="btn btn-danger btn-sm" onclick="removeWalkin(this)"><i
-                          class="fa-solid fa-trash"></i></button></div>
+                        onclick="openEditWalkinModal(this)" title="Edit Walk-in"><i class="fa-solid fa-pen"></i></button><button
+                        class="btn btn-ghost btn-sm" onclick="openWifiEditModal(this, 'Tony Chopper', 5)" title="Add Time"><i
+                          class="fa-solid fa-clock"></i></button><button class="btn btn-ghost btn-sm"
+                        onclick="terminateWifiSession(this, 'Tony Chopper')" title="Terminate Session"><i
+                          class="fa-solid fa-wifi-slash"></i></button><button class="btn btn-danger btn-sm"
+                        onclick="removeWalkin(this)" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
                   </td>
                 </tr>
               </tbody>
@@ -847,7 +857,7 @@
       <div class="modal-overlay" id="wifiEditModal">
         <div class="modal">
           <div class="modal-header">
-            <div class="modal-title"><i class="fa-solid fa-wifi"></i> Adjust WiFi Hours</div><button class="modal-close"
+            <div class="modal-title"><i class="fa-solid fa-clock"></i> Add WiFi Time</div><button class="modal-close"
               onclick="closeModal('wifiEditModal')">&times;</button>
           </div>
           <div class="modal-body">
@@ -982,10 +992,18 @@
       <td>${escapeHtml(email)}</td>
       <td>Walk-in</td>
       <td>${escapeHtml(rfid)}</td>
-      <td class="wifi-cell" data-current-hours="${wifiHours}">${wifiHours} hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, '${escapeHtml(fullName)}', ${wifiHours})"><i class="fa-solid fa-pen"></i></button></td>
+      <td class="wifi-cell" data-current-hours="${wifiHours}">${wifiHours} hr(s)</td>
       <td style="font-size:11px">${escapeHtml(macDisplay)}</td>
       <td><span class="badge ${badgeClass}">${displayStatus}</span></td>
-      <td><div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)"><i class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm" onclick="openEditWalkinModal(this)"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm" onclick="removeWalkin(this)"><i class="fa-solid fa-trash"></i></button></div></td>
+      <td>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)" title="View Details"><i class="fa-solid fa-eye"></i></button>
+          <button class="btn btn-ghost btn-sm" onclick="openEditWalkinModal(this)" title="Edit Walk-in"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn btn-ghost btn-sm" onclick="openWifiEditModal(this, '${escapeHtml(fullName)}', ${wifiHours})" title="Add Time"><i class="fa-solid fa-clock"></i></button>
+          <button class="btn btn-ghost btn-sm" onclick="terminateWifiSession(this, '${escapeHtml(fullName)}')" title="Terminate Session"><i class="fa-solid fa-wifi-slash"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="removeWalkin(this)" title="Delete"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>
     </tr>
   `;
       tbody.appendChild(newRow);
@@ -1097,22 +1115,49 @@
     }
 
     function openWifiEditModal(btn, customerName, currentHours) {
-      currentWifiCell = btn.closest('.wifi-cell');
+      currentWifiCell = btn.closest('tr').querySelector('.wifi-cell');
       currentCustomerName = customerName;
       document.getElementById('wifiCustomerName').value = customerName;
       document.getElementById('wifiCurrentHours').value = currentHours + ' hr(s)';
-      document.getElementById('wifiNewHours').value = currentHours;
+      document.getElementById('wifiNewHours').value = '';
+      document.getElementById('wifiNewHours').placeholder = "Enter additional hours";
       openModal('wifiEditModal');
     }
 
     function updateWifiHours() {
       if (!currentWifiCell) return;
-      const newHours = parseFloat(document.getElementById('wifiNewHours').value);
-      if (isNaN(newHours) || newHours < 0) { toast('Please enter a valid number of hours', 'error'); return; }
-      currentWifiCell.innerHTML = newHours + ' hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, \'' + escapeHtml(currentCustomerName) + '\', ' + newHours + ')"><i class="fa-solid fa-pen"></i></button>';
-      currentWifiCell.setAttribute('data-current-hours', newHours);
+      const addHours = parseFloat(document.getElementById('wifiNewHours').value);
+      if (isNaN(addHours) || addHours < 0) { toast('Please enter a valid number of hours', 'error'); return; }
+      
+      const currentHours = parseFloat(currentWifiCell.getAttribute('data-current-hours')) || 0;
+      const newTotal = currentHours + addHours;
+      
+      currentWifiCell.innerHTML = newTotal + ' hr(s)';
+      currentWifiCell.setAttribute('data-current-hours', newTotal);
+      
+      // Update the button in the action column as well
+      const actionBtn = currentWifiCell.closest('tr').querySelector('button[title="Add Time"]');
+      if (actionBtn) {
+        actionBtn.setAttribute('onclick', `openWifiEditModal(this, '${currentCustomerName.replace(/'/g, "\\'")}', ${newTotal})`);
+      }
+      
       closeModal('wifiEditModal');
-      toast(`WiFi hours updated to ${newHours} hr(s) for ${currentCustomerName}`, 'success');
+      toast(`Added ${addHours} hr(s). New total: ${newTotal} hr(s) for ${currentCustomerName}`, 'success');
+    }
+
+    function terminateWifiSession(btn, customerName) {
+      if (confirm(`Are you sure you want to terminate the WiFi session for ${customerName}?`)) {
+        const row = btn.closest('tr');
+        const wifiCell = row.querySelector('.wifi-cell');
+        if (wifiCell) {
+          wifiCell.innerHTML = '0 hr(s)';
+          wifiCell.setAttribute('data-current-hours', '0');
+          // Update Add Time button to 0
+          const actionBtn = row.querySelector('button[title="Add Time"]');
+          if (actionBtn) actionBtn.setAttribute('onclick', `openWifiEditModal(this, '${customerName.replace(/'/g, "\\'")}', 0)`);
+        }
+        toast(`WiFi session terminated for ${customerName}`, 'info');
+      }
     }
 
     function viewCustomer(btn) {
