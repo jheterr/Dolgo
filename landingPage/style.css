@@ -835,7 +835,7 @@ img {
 }
 
 .night-owl-features li::before {
-  content: '\f186';
+  content: '\f00c';
   font-family: 'Font Awesome 6 Free';
   font-weight: 900;
   font-size: 0.8rem;
