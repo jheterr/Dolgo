@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Last Muster | Staff - Analytics</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+  <style>
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .an-card { background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .an-icon { font-size: 1.6rem; margin-bottom: 8px; }
+    .an-val { font-size: 2.4rem; font-weight: 800; margin: 8px 0 4px; }
+    .an-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; }
+
+    .chart-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 24px; }
+    .chart-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .chart-box { height: 260px; }
+
+    .seat-util-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .seat-status-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .seat-status-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
+    .seat-status-row:last-child { border-bottom: none; }
+
+    .top-customers-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .top-list { max-height: 280px; overflow-y: auto; }
+    .top-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+    .top-item:last-child { border-bottom: none; }
+
+    .activity-table { width: 100%; border-collapse: collapse; }
+    .activity-table th, .activity-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+    .activity-table th { background: #f8fafc; font-weight: 700; color: #475569; }
+
+    @media (max-width: 900px) {
+      .stat-grid, .seat-util-section, .top-customers-section { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="The_Last_Muster_logo1.png" alt="The Last Muster" class="logo-img">
+        <div class="logo-info"><div class="logo-sub">Staff Panel</div></div>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="staff_dashboard.html" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+          <li><a href="staff_door.html" class="nav-link"><i class="fa-solid fa-door-open"></i> Door Management</a></li>
+          <li><a href="staff_seat.html" class="nav-link"><i class="fa-solid fa-couch"></i> Seat Management</a></li>
+          <li><a href="staff_reservation.html" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Reservation</a></li>
+          <li><a href="staff_customers.html" class="nav-link"><i class="fa-solid fa-users"></i> Customers</a></li>
+          <li><a href="staff_analytics.html" class="nav-link active"><i class="fa-solid fa-chart-line"></i> Analytics & Reports</a></li>
+          <li><a href="staff_events.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Events</a></li>
+          <li><a href="staff_notification.html" class="nav-link"><i class="fa-solid fa-bell"></i> Notification</a></li>
+          <li><a href="staff_profile.html" class="nav-link"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn-logout" onclick="confirmLogout()"><i class="fa-solid fa-power-off"></i> Logout</button>
+      </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
+    <main class="content">
+      <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+
+      <div class="page-header">
+        <h1 class="page-title">Analytics & Reports</h1>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="generateReport()" style="padding:8px 16px;"><i class="fa-solid fa-file-arrow-down"></i> Generate Report</button>
+        </div>
+      </div>
+
+      <!-- Top Stats -->
+      <div class="stat-grid">
+        <div class="an-card"><div class="an-icon" style="color:#8b5cf6"><i class="fa-solid fa-arrow-trend-up"></i></div><div class="an-val">42</div><div class="an-lbl">Today's Visitors</div></div>
+        <div class="an-card"><div class="an-icon" style="color:#ef4444"><i class="fa-solid fa-couch"></i></div><div class="an-val">12</div><div class="an-lbl">Occupied Seats</div></div>
+        <div class="an-card"><div class="an-icon" style="color:#3b82f6"><i class="fa-solid fa-clock"></i></div><div class="an-val">122</div><div class="an-lbl">Avg Session (min)</div></div>
+        <div class="an-card"><div class="an-icon" style="color:#eab308"><i class="fa-solid fa-users"></i></div><div class="an-val">32</div><div class="an-lbl">Peak Hour Customers</div></div>
+      </div>
+
+      <!-- Customer Traffic -->
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-chart-line"></i> Customer Traffic</div>
+        <div class="chart-box"><canvas id="trafficChart"></canvas></div>
+      </div>
+
+      <!-- Seat Utilization - Side by Side -->
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-couch"></i> Seat Utilization</div>
+        <div class="seat-util-section">
+          <!-- Current Seat Status -->
+          <div class="seat-status-card">
+            <strong>Current Seat Status</strong>
+            <div class="seat-status-row"><span>Available Seats</span><span><strong>10</strong></span></div>
+            <div class="seat-status-row"><span>Occupied Seats</span><span><strong>16</strong></span></div>
+            <div class="seat-status-row"><span>Idle Seats</span><span><strong>2</strong></span></div>
+            <div class="seat-status-row"><span>Reserved Seats</span><span><strong>2</strong></span></div>
+          </div>
+
+          <!-- Hourly Occupancy Trend -->
+          <div class="seat-status-card">
+            <strong>Hourly Occupancy Trend</strong>
+            <div class="chart-box" style="height: 240px;"><canvas id="occupancyChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today's Top Customers - Below Seat Utilization -->
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-crown"></i> Today's Top Customers</div>
+        <div class="top-customers-section">
+          <!-- Top Members -->
+          <div class="seat-status-card">
+            <div style="margin-bottom:12px; font-weight:600;">
+              <i class="fa-solid fa-star" style="color:#eab308;"></i> Top Members by Hours
+            </div>
+            <div class="top-list" id="topMembersList"></div>
+          </div>
+
+          <!-- Top Walk-ins -->
+          <div class="seat-status-card">
+            <div style="margin-bottom:12px; font-weight:600;">
+              <i class="fa-solid fa-person-walking" style="color:#3b82f6;"></i> Top Walk-ins by Hours
+            </div>
+            <div class="top-list" id="topWalkinsList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activities -->
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Activities</div>
+        <table class="activity-table">
+          <thead>
+            <tr>
+              <th>TIMESTAMP</th>
+              <th>USER</th>
+              <th>ACTION</th>
+              <th>DETAILS</th>
+            </tr>
+          </thead>
+          <tbody id="activityTable"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+<script>
+// Sidebar Controls
+function confirmLogout(){ if(confirm('Are you sure you want to logout?')) location.reload(); }
+function openSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+function generateReport(){ alert('📊 Report exported successfully!\nThe report has been saved to your downloads folder.'); }
+
+// Charts
+let trafficChart, occupancyChart;
+
+function initCharts() {
+  // Customer Traffic
+  trafficChart = new Chart(document.getElementById('trafficChart'), {
+    type: 'line',
+    data: {
+      labels: ['9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm'],
+      datasets: [{ label: 'Customers', data: [8,14,19,23,26,28,27,25,22,18,14,9,5], borderColor: '#ef4444', tension: 0.4, borderWidth: 3, fill: true, backgroundColor: 'rgba(239,68,68,0.05)' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }}}
+  });
+
+  // Hourly Occupancy Trend
+  occupancyChart = new Chart(document.getElementById('occupancyChart'), {
+    type: 'bar',
+    data: {
+      labels: ['9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm'],
+      datasets: [{ label: 'Occupancy', data: [12,18,22,28,32,35,30,25,20], backgroundColor: '#8b5cf6', borderRadius: 6 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }}}
+  });
+}
+
+function renderTopCustomers() {
+  const members = [
+    {rank:1, name:"Monkey D. Luffy", hours:"2.5 hrs"},
+    {rank:2, name:"Vivi Nefertari", hours:"2 hrs"},
+    {rank:3, name:"Roronoa Zoro", hours:"1.5 hrs"},
+    {rank:4, name:"Nami Catburglar", hours:"1.3 hrs"},
+    {rank:5, name:"Tony Chopper", hours:"1 hr"}
+  ];
+
+  const walkins = [
+    {rank:1, name:"Brook Musician", hours:"2.5 hrs"},
+    {rank:2, name:"Monkey D. Dragon", hours:"2 hrs"},
+    {rank:3, name:"Sabo", hours:"1.5 hrs"},
+    {rank:4, name:"Emporio Ivankov", hours:"1.3 hrs"},
+    {rank:5, name:"Bartholomew Kuma", hours:"1 hr"}
+  ];
+
+  document.getElementById('topMembersList').innerHTML = members.map(m => 
+    `<div class="top-item"><div><strong>${m.rank}.</strong> ${m.name}</div><div style="color:#ea580c;font-weight:700;">${m.hours}</div></div>`).join('');
+
+  document.getElementById('topWalkinsList').innerHTML = walkins.map(w => 
+    `<div class="top-item"><div><strong>${w.rank}.</strong> ${w.name}</div><div style="color:#ea580c;font-weight:700;">${w.hours}</div></div>`).join('');
+}
+
+function renderRecentActivities() {
+  const data = [
+    {time:"2026-04-22 09:45", user:"Main City", action:"Door Lock", details:"Door Locked"},
+    {time:"2026-04-21 15:00", user:"Admin", action:"Door Unlock", details:"RFID access granted"},
+    {time:"2026-04-21 09:30", user:"Staff Daniel", action:"Reservation Confirmed", details:"Luffy - Seat A3"},
+    {time:"2026-04-21 10:30", user:"Admin Joshua", action:"Walk-in Added", details:"Brook - Seat A7"}
+  ];
+  document.getElementById('activityTable').innerHTML = data.map(a => `
+    <tr>
+      <td>${a.time}</td>
+      <td>${a.user}</td>
+      <td><strong>${a.action}</strong></td>
+      <td>${a.details}</td>
+    </tr>
+  `).join('');
+}
+
+function init() {
+  initCharts();
+  renderTopCustomers();
+  renderRecentActivities();
+}
+window.onload = init;
+</script>
+</body>
+</html>
