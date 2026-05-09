@@ -650,7 +650,7 @@ img {
 }
 
 .feature-card {
-  background: var(--cream-lt);
+  background: var(--cream);
   border-radius: var(--radius);
   padding: 28px 24px;
   border: 1px solid rgba(0, 0, 0, 0.04);
@@ -659,17 +659,7 @@ img {
   overflow: hidden;
 }
 
-.feature-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--orange), transparent);
-  opacity: 0;
-  transition: var(--transition);
-}
+
 
 .feature-card:hover {
   transform: translateY(-4px);
@@ -677,9 +667,7 @@ img {
   box-shadow: var(--shadow-md);
 }
 
-.feature-card:hover::after {
-  opacity: 1;
-}
+
 
 .feature-icon {
   width: 48px;
