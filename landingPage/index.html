@@ -29,7 +29,7 @@
       <a href="#membership">Memberships</a>
       <a href="#how-it-works">How It Works</a>
       <a href="#mustberryfi" class="nav-item-new">MustBerryFi <span class="badge-new">NEW</span></a>
-      <a href="#terms" class="nav-terms"><i class="fas fa-lock"></i> Terms & Conditions</a>
+      <a href="javascript:void(0)" class="nav-terms" onclick="openTermsModal()">Terms & Conditions</a>
       <a href="#signin" class="nav-signin"><i class="fas fa-sign-in-alt"></i> Sign In</a>
     </div>
 
@@ -485,12 +485,60 @@
       &copy; 2026 The Last Muster Creative Hub & Coworking Space. All rights reserved.
     </div>
   </footer>
-  
+
   <!-- ═══════════════════════ IMAGE MODAL ═══════════════════════ -->
   <div id="imageModal" class="modal">
     <span class="modal-close" onclick="closeModal()">&times;</span>
     <img class="modal-content" id="modalImg">
   </div>
+
+  <!-- ═══════════════════════ TERMS MODAL ═══════════════════════ -->
+  <div id="termsModal" class="modal">
+    <div class="modal-card">
+      <span class="modal-close-card" onclick="closeTermsModal()">&times;</span>
+      <div class="modal-header">
+        <div class="section-tag tag-orange"><i class="fas fa-file-contract"></i> LEGAL</div>
+        <h2 class="modal-title">Terms & Conditions</h2>
+        <p class="modal-subtitle">House Rules for a Safe & Productive Community</p>
+      </div>
+      <div class="modal-body">
+        <ul class="rules-list">
+          <li><strong>Respect the space:</strong> Treat the furniture, and equipment with care.</li>
+          <li><strong>Privacy:</strong> Respect other members' belongings and privacy.</li>
+          <li><strong>Consideration:</strong> Keep conversations at a considerate volume.</li>
+          <li><strong>Cleanliness:</strong> Maintain cleanliness at your desk or shared area.</li>
+          <li><strong>Waste:</strong> Dispose of trash properly. We have trash bins near the pantry.</li>
+          <li><strong>Headphones:</strong> Use headphones for music, videos, and online meetings.</li>
+          <li><strong>Calls:</strong> Keep phone calls short and soft-spoken in open areas.</li>
+          <li><strong>Collaboration:</strong> Book a meeting/huddle room for group discussions.</li>
+          <li><strong>Equitable use:</strong> Do not hog desks, outlets, or equipment unnecessarily.</li>
+          <li><strong>Shared Resources:</strong> Return shared materials (board games, books, cables, etc.) after use.</li>
+          <li><strong>Reporting:</strong> Report damaged or missing items to staff immediately.</li>
+          <li><strong>Food & Drink:</strong> Outside food and drinks are welcome, but be mindful about strong-smelling meals.</li>
+          <li><strong>Spills:</strong> Clean up spills right away.</li>
+          <li><strong>Network Use:</strong> No illegal downloads, inappropriate sites, or activities that disrupt the network.</li>
+          <li><strong>Bandwidth:</strong> Respect bandwidth—avoid heavy streaming or downloads that affect others.</li>
+          <li><strong>Liability:</strong> Keep your personal items safe—management is not liable for lost or stolen belongings.</li>
+          <li><strong>Events:</strong> Respect ongoing events, workshops, or meetings.</li>
+          <li><strong>Prohibitions:</strong> Smoking and vaping are strictly prohibited indoors.</li>
+          <li><strong>Conduct:</strong> Be kind, inclusive, and mindful—harassment or discrimination will not be tolerated.</li>
+          <li><strong>Vibe:</strong> Enjoy and collaborate.</li>
+        </ul>
+
+        <div class="emergency-section">
+          <h5><i class="fas fa-exclamation-triangle"></i> Emergency Hotlines</h5>
+          <div class="emergency-grid">
+            <div class="emergency-item"><span>BFP</span> <span>299-2555 / 0918-241-7423</span></div>
+            <div class="emergency-item"><span>24/7 Emergency Hotlines</span> <span>0921-636-4018 / 0956-172-9656</span></div>
+            <div class="emergency-item"><span>CDRRM</span> <span>0921-903-3933</span></div>
+            <div class="emergency-item"><span>PNP</span> <span>0998-598-6003</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
 
   <!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
   <script>
@@ -546,6 +594,19 @@
       document.body.style.overflow = ''; // Allow scroll
     }
 
+    // Terms Modal Functions
+    function openTermsModal() {
+      const modal = document.getElementById('termsModal');
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTermsModal() {
+      const modal = document.getElementById('termsModal');
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
     // Add event listeners to gallery images
     document.querySelectorAll('.gallery-track img').forEach(img => {
       img.addEventListener('click', () => {
@@ -555,9 +616,13 @@
 
     // Close modal on click outside
     window.addEventListener('click', (event) => {
-      const modal = document.getElementById('imageModal');
-      if (event.target == modal) {
+      const imgModal = document.getElementById('imageModal');
+      const termsModal = document.getElementById('termsModal');
+      if (event.target == imgModal) {
         closeModal();
+      }
+      if (event.target == termsModal) {
+        closeTermsModal();
       }
     });
 
