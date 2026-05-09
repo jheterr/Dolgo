@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — The Last Muster</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --orange: #C06C3C;
+      --orange-dk: #a0562d;
+      --text: #34312D;
+      --text-md: #595550;
+      --text-sm: #94a3b8;
+      --white: #ffffff;
+      --radius: 20px;
+      --transition: 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(rgba(142, 149, 203, 0.4), rgba(142, 149, 203, 0.4)), 
+                  url('../landingPage/A7301232.jpg') no-repeat center center/cover;
+      overflow: hidden;
+    }
+
+    /* Back Button */
+    .back-btn {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 30px;
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+      z-index: 10;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateX(-5px);
+    }
+
+    /* Login Card */
+    .login-card {
+      background: var(--white);
+      width: 100%;
+      max-width: 420px;
+      padding: 40px;
+      border-radius: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .logo-container {
+      margin-bottom: 20px;
+    }
+
+    .logo-container img {
+      width: 60px;
+      height: auto;
+      background: #fdfbf7;
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid #eee;
+    }
+
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 5px;
+    }
+
+    .brand-name span {
+      color: var(--orange);
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-md);
+      margin-bottom: 30px;
+    }
+
+    /* Form Styles */
+    .form-group {
+      position: relative;
+      margin-bottom: 15px;
+    }
+
+    .form-group i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-sm);
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 14px 14px 14px 44px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(192, 108, 60, 0.1);
+    }
+
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--orange);
+      text-decoration: none;
+      margin-bottom: 25px;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: var(--orange);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 20px;
+    }
+
+    .btn-login:hover {
+      background: var(--orange-dk);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(192, 108, 60, 0.3);
+    }
+
+    .separator {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      color: var(--text-sm);
+      font-size: 0.75rem;
+    }
+
+    .separator::before,
+    .separator::after {
+      content: '';
+      flex: 1;
+      height: 1.5px;
+      background: #e2e8f0;
+    }
+
+    .separator span {
+      padding: 0 10px;
+    }
+
+    .btn-google {
+      width: 100%;
+      padding: 12px;
+      background: var(--white);
+      border: 1.5px solid var(--orange);
+      border-radius: 12px;
+      color: var(--orange);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 25px;
+    }
+
+    .btn-google:hover {
+      background: rgba(192, 108, 60, 0.05);
+    }
+
+    .btn-google img {
+      width: 18px;
+    }
+
+    .signup-text {
+      font-size: 0.8rem;
+      color: var(--text-md);
+    }
+
+    .signup-text a {
+      color: var(--orange);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .signup-text a:hover {
+      text-decoration: underline;
+    }
+
+    .copyright {
+      margin-top: 25px;
+      font-size: 0.65rem;
+      color: var(--text-sm);
+    }
+
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 30px 20px;
+        max-width: 90%;
+      }
+      .back-btn {
+        top: 20px;
+        left: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <a href="../landingPage/index.html" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Back to home
+  </a>
+
+  <div class="login-card">
+    <div class="logo-container">
+      <img src="../admin/The_Last_Muster_logo1.png" alt="The Last Muster Logo">
+    </div>
+    <h1 class="brand-name">The <span>Last Muster</span></h1>
+    <p class="subtitle">Sign in to your account</p>
+
+    <form>
+      <div class="form-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" class="form-control" placeholder="Email Address" required>
+      </div>
+      <div class="form-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" class="form-control" placeholder="Password" required>
+      </div>
+
+      <a href="#" class="forgot-link">Forgot password?</a>
+
+      <button type="submit" class="btn-login">Login</button>
+    </form>
+
+    <div class="separator">
+      <span>or</span>
+    </div>
+
+    <button class="btn-google">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Login with Google
+    </button>
+
+    <p class="signup-text">
+      Don't have an account? <a href="#">Sign Up</a>
+    </p>
+
+    <p class="copyright">
+      &copy; 2026 The Last Muster. All rights reserved.
+    </p>
+  </div>
+
+</body>
+
+</html>
