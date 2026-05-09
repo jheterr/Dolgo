@@ -1321,6 +1321,49 @@ img { max-width: 100%; display: block; }
 }
 
 /* ════════════════════════════════════════
+   GALLERY / MARQUEE
+════════════════════════════════════════ */
+.gallery-section {
+  background: var(--white);
+  padding: 80px 0 60px 0; /* no horizontal padding to let it bleed out */
+  overflow: hidden;
+}
+
+.gallery-marquee {
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+}
+
+.gallery-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: scrollGallery 30s linear infinite;
+  padding: 0 10px; /* offset the outer gap */
+}
+
+.gallery-track img {
+  height: 280px;
+  width: auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  object-fit: cover;
+  flex-shrink: 0;
+  transition: transform 0.4s ease;
+}
+
+.gallery-track img:hover {
+  transform: scale(1.02);
+}
+
+@keyframes scrollGallery {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 10px)); } /* 50% shift because we duplicated it + half of gap */
+}
+
+/* ════════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════════ */
 @media (max-width: 1200px) {
@@ -1391,6 +1434,8 @@ img { max-width: 100%; display: block; }
   .promo-visual { flex: none; }
 
   .footer-top { flex-direction: column; gap: 32px; }
+
+  .gallery-track img { height: 200px; }
 }
 
 @media (max-width: 480px) {
