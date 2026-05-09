@@ -1,240 +1,474 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Last Muster | Staff</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  
+
   <style>
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;}
-.modal-overlay.open{display:flex;}
-.modal{background:var(--white);border-radius:var(--radius);padding:28px;width:100%;max-width:550px;box-shadow:0 20px 60px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:16px;max-height:90vh;overflow-y:auto;}
-.modal-header{display:flex;align-items:center;justify-content:space-between;}
-.modal-title{font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:700;}
-.modal-close{background:none;border:none;font-size:1.3rem;color:var(--text-sm);cursor:pointer;transition:.2s;}
-.modal-close:hover{color:var(--orange);}
-.modal-body{display:flex;flex-direction:column;gap:14px;}
-.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:8px;}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.cal-title{font-family:'Poppins',sans-serif;font-size:1rem;font-weight:700;}
-.cal-nav{display:flex;gap:6px;}
-.cal-nav-btn{width:30px;height:30px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--white);cursor:pointer;color:var(--text-sm);font-size:12px;transition:.2s;}
-.cal-nav-btn:hover{border-color:var(--orange);color:var(--orange);}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
-.cal-head{text-align:center;font-size:10px;font-weight:700;color:var(--text-sm);padding:6px 0;letter-spacing:.04em;}
-.cal-day{min-height:65px;border:1.5px solid var(--border);border-radius:8px;padding:5px 6px;background:var(--white);font-size:12px;font-weight:700;cursor:pointer;transition:.15s;overflow:hidden;}
-.cal-day:hover{border-color:var(--orange);background:var(--cream-lt);}
-.cal-day.empty{background:var(--cream-lt);opacity:.5;pointer-events:none;}
-.cal-day.today{border-color:var(--orange);color:var(--orange);}
-.cal-tag{font-size:7.5px;font-weight:700;border-radius:3px;padding:2px 4px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cal-tag-event{background:var(--orange);color:#fff;}
-.cal-tag-reservation{background:#8A8636;color:#fff;}
-.legend{display:flex;gap:12px;justify-content:center;margin-top:12px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;}
-.legend-dot{width:10px;height:10px;display:inline-block;border-radius:2px;margin-right:4px;}
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
 
-/* Filter Controls */
-.filter-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.filter-dropdown {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.filter-select {
-  padding: 10px 20px;
-  border-radius: 40px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  font-size: 13px;
-  font-weight: 600;
-  color: #1e293b;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.2s;
-}
-.filter-select:hover {
-  border-color: #CF6322;
-}
-.filter-select:focus {
-  border-color: #CF6322;
-  box-shadow: 0 0 0 2px rgba(207,99,34,0.1);
-}
+    .modal-overlay.open {
+      display: flex;
+    }
 
-/* Cards Grid - 3 columns per row */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-top: 16px;
-}
-.event-card {
-  background: white;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-  border: 1px solid #e2e8f0;
-}
-.event-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-}
-.card-banner {
-  height: 170px;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  background-repeat: no-repeat;
-}
-.card-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: #CF6322;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-}
-.card-content {
-  padding: 20px;
-}
-.card-title {
-  font-size: 16px;
-  font-weight: 800;
-  margin-bottom: 8px;
-  color: #1e293b;
-}
-.card-meta {
-  font-size: 11px;
-  color: #64748b;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.card-location {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: #f1f5f9;
-  padding: 2px 8px;
-  border-radius: 20px;
-}
-.card-description {
-  font-size: 12px;
-  color: #475569;
-  line-height: 1.4;
-  margin-bottom: 16px;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.card-stats {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid #f1f5f9;
-  padding-top: 14px;
-  margin-top: 4px;
-}
-.stat-item {
-  text-align: center;
-}
-.stat-value {
-  font-weight: 800;
-  font-size: 18px;
-  color: #CF6322;
-}
-.stat-label {
-  font-size: 9px;
-  color: #94a3b8;
-  text-transform: uppercase;
-}
-.empty-state {
-  text-align: center;
-  padding: 60px;
-  color: #94a3b8;
-  grid-column: 1 / -1;
-}
-.reservation-detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
-.reservation-detail-row:last-child{border-bottom:none;}
-.reservation-label{font-weight:600;color:var(--text-md);}
-.reservation-value{font-weight:700;color:var(--text);}
-.event-detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
-.event-detail-row:last-child{border-bottom:none;}
-.image-preview {
-  width: 100%;
-  max-height: 150px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-top: 8px;
-  display: none;
-}
-.image-preview.show {
-  display: block;
-}
-.upload-label {
-  background: #f1f5f9;
-  padding: 10px;
-  border-radius: 8px;
-  text-align: center;
-  cursor: pointer;
-  margin-top: 5px;
-  font-size: 12px;
-}
-.upload-label:hover {
-  background: #e2e8f0;
-}
-@media(max-width:1024px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:700px){.cards-grid{grid-template-columns:1fr;}.filter-controls{flex-direction:column;align-items:stretch;}}
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px;
+      width: 100%;
+      max-width: 550px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: var(--text-sm);
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .modal-close:hover {
+      color: var(--orange);
+    }
+
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .cal-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .cal-nav {
+      display: flex;
+      gap: 6px;
+    }
+
+    .cal-nav-btn {
+      width: 30px;
+      height: 30px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      cursor: pointer;
+      color: var(--text-sm);
+      font-size: 12px;
+      transition: .2s;
+    }
+
+    .cal-nav-btn:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .cal-head {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-sm);
+      padding: 6px 0;
+      letter-spacing: .04em;
+    }
+
+    .cal-day {
+      min-height: 65px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 6px;
+      background: var(--white);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .15s;
+      overflow: hidden;
+    }
+
+    .cal-day:hover {
+      border-color: var(--orange);
+      background: var(--cream-lt);
+    }
+
+    .cal-day.empty {
+      background: var(--cream-lt);
+      opacity: .5;
+      pointer-events: none;
+    }
+
+    .cal-day.today {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .cal-tag {
+      font-size: 7.5px;
+      font-weight: 700;
+      border-radius: 3px;
+      padding: 2px 4px;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cal-tag-event {
+      background: var(--orange);
+      color: #fff;
+    }
+
+    .cal-tag-reservation {
+      background: #8A8636;
+      color: #fff;
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      font-size: 10px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      display: inline-block;
+      border-radius: 2px;
+      margin-right: 4px;
+    }
+
+    /* Filter Controls */
+    .filter-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .filter-dropdown {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 10px 20px;
+      border-radius: 40px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .filter-select:hover {
+      border-color: #CF6322;
+    }
+
+    .filter-select:focus {
+      border-color: #CF6322;
+      box-shadow: 0 0 0 2px rgba(207, 99, 34, 0.1);
+    }
+
+    /* Cards Grid - 3 columns per row */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .event-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      border: 1px solid #e2e8f0;
+    }
+
+    .event-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-banner {
+      height: 170px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      background-repeat: no-repeat;
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #CF6322;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #1e293b;
+    }
+
+    .card-meta {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-location {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .card-description {
+      font-size: 12px;
+      color: #475569;
+      line-height: 1.4;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 14px;
+      margin-top: 4px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-weight: 800;
+      font-size: 18px;
+      color: #CF6322;
+    }
+
+    .stat-label {
+      font-size: 9px;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px;
+      color: #94a3b8;
+      grid-column: 1 / -1;
+    }
+
+    .reservation-detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .reservation-detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .reservation-label {
+      font-weight: 600;
+      color: var(--text-md);
+    }
+
+    .reservation-value {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .event-detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .event-detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .image-preview {
+      width: 100%;
+      max-height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .image-preview.show {
+      display: block;
+    }
+
+    .upload-label {
+      background: #f1f5f9;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      margin-top: 5px;
+      font-size: 12px;
+    }
+
+    .upload-label:hover {
+      background: #e2e8f0;
+    }
+
+    @media(max-width:1024px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media(max-width:700px) {
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
   </style>
 </head>
+
 <body>
 
   <div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <img src="The_Last_Muster_logo1.png" alt="The Last Muster" class="logo-img">
-      <div class="logo-info">
-        <div class="logo-sub">Staff Panel</div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="The_Last_Muster_logo1.png" alt="The Last Muster" class="logo-img">
+        <div class="logo-info">
+          <div class="logo-sub">Staff Panel</div>
+        </div>
       </div>
-    </div>
-    <nav class="sidebar-nav">
-      <ul>
-        <li><a href="staff_dashboard.html" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a></li>
-        <li><a href="staff_door_management.html" class="nav-link"><i class="fa-solid fa-door-open"></i> Door Management</a></li>
-        <li><a href="staff_seat_management.html" class="nav-link"><i class="fa-solid fa-couch"></i> Seat Management</a></li>
-        <li><a href="staff_reservation.html" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Reservation</a></li>
-        <li><a href="staff_customers.html" class="nav-link"><i class="fa-solid fa-users"></i> Customers</a></li>
-        <li><a href="staff_analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics</a></li>
-        <li><a href="staff_events.html" class="nav-link active"><i class="fa-solid fa-calendar-days"></i> Event</a></li>
-        <li><a href="staff_notification.html" class="nav-link"><i class="fa-solid fa-bell"></i> Notification</a></li>
-        <li><a href="staff_profile.html" class="nav-link"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
-      </ul>
-    </nav>
-    <div class="sidebar-footer"><button class="btn-logout" onclick="confirmLogout()"><i class="fa-solid fa-power-off"></i> Logout</button></div>
-  </aside>
-  <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="staff_dashboard.html" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+          <li><a href="staff_door_management.html" class="nav-link"><i class="fa-solid fa-door-open"></i> Door
+              Management</a></li>
+          <li><a href="staff_seat_management.html" class="nav-link"><i class="fa-solid fa-couch"></i> Seat
+              Management</a></li>
+          <li><a href="staff_reservation.html" class="nav-link"><i class="fa-solid fa-calendar-check"></i>
+              Reservation</a></li>
+          <li><a href="staff_customers.html" class="nav-link"><i class="fa-solid fa-users"></i> Customers</a></li>
+          <li><a href="staff_analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics</a></li>
+          <li><a href="staff_events.html" class="nav-link active"><i class="fa-solid fa-calendar-days"></i> Event</a>
+          </li>
+          <li><a href="staff_notification.html" class="nav-link"><i class="fa-solid fa-bell"></i> Notification</a></li>
+          <li><a href="staff_profile.html" class="nav-link"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer"><button class="btn-logout" onclick="confirmLogout()"><i
+            class="fa-solid fa-power-off"></i> Logout</button></div>
+    </aside>
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
     <main class="content">
       <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
 
       <div class="page-header">
         <h1 class="page-title">Events & Reservations</h1>
       </div>
-      
+
       <div class="card">
         <div class="cal-header">
           <div class="cal-title" id="calTitle">April 2026</div>
@@ -247,10 +481,11 @@
         <div class="legend">
           <span><span class="legend-dot" style="background:var(--orange);"></span> Event</span>
           <span><span class="legend-dot" style="background:#8A8636;"></span> Reservation</span>
-          <span><span class="legend-dot" style="background:var(--orange);border:1px solid var(--orange);"></span> Today</span>
+          <span><span class="legend-dot" style="background:var(--orange);border:1px solid var(--orange);"></span>
+            Today</span>
         </div>
       </div>
-      
+
       <div class="filter-controls">
         <div class="filter-dropdown">
           <select id="viewSelect" class="filter-select" onchange="switchView()">
@@ -267,194 +502,211 @@
           </select>
         </div>
       </div>
-      
+
       <div id="cardsContainer" class="cards-grid"></div>
-      
+
       <!-- Edit Reservation Image Modal -->
       <div class="modal-overlay" id="editSeatImageModal">
-        <div class="modal"><div class="modal-header"><div class="modal-title"><i class="fa-solid fa-image"></i> Change Seat Image</div><button class="modal-close" onclick="closeModal('editSeatImageModal')">&times;</button></div>
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title"><i class="fa-solid fa-image"></i> Change Seat Image</div><button
+              class="modal-close" onclick="closeModal('editSeatImageModal')">&times;</button>
+          </div>
           <div class="modal-body">
             <div class="form-group"><label class="form-label">Upload New Image for Seat</label>
               <input type="file" id="seat-image-file" accept="image/*" style="display:none;">
-              <div class="upload-label" onclick="document.getElementById('seat-image-file').click()"><i class="fa-solid fa-upload"></i> Choose Image</div>
+              <div class="upload-label" onclick="document.getElementById('seat-image-file').click()"><i
+                  class="fa-solid fa-upload"></i> Choose Image</div>
               <img id="seat-image-preview" class="image-preview">
             </div>
           </div>
-          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('editSeatImageModal')">Cancel</button><button class="btn btn-primary" onclick="saveSeatImage()">Save Image</button></div>
+          <div class="modal-footer"><button class="btn btn-ghost"
+              onclick="closeModal('editSeatImageModal')">Cancel</button><button class="btn btn-primary"
+              onclick="saveSeatImage()">Save Image</button></div>
         </div>
       </div>
-      
+
       <!-- Reservation Detail Modal -->
       <div class="modal-overlay" id="reservationDetailModal">
-        <div class="modal"><div class="modal-header"><div class="modal-title"><i class="fa-solid fa-calendar-check"></i> Reservation Details</div><button class="modal-close" onclick="closeModal('reservationDetailModal')">&times;</button></div>
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title"><i class="fa-solid fa-calendar-check"></i> Reservation Details</div><button
+              class="modal-close" onclick="closeModal('reservationDetailModal')">&times;</button>
+          </div>
           <div class="modal-body" id="reservationDetailBody"></div>
-          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('reservationDetailModal')">Close</button></div>
+          <div class="modal-footer"><button class="btn btn-ghost"
+              onclick="closeModal('reservationDetailModal')">Close</button></div>
         </div>
       </div>
-      
+
       <!-- Event Detail Modal -->
       <div class="modal-overlay" id="eventDetailModal">
-        <div class="modal"><div class="modal-header"><div class="modal-title"><i class="fa-solid fa-calendar-star"></i> Event Details</div><button class="modal-close" onclick="closeModal('eventDetailModal')">&times;</button></div>
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title"><i class="fa-solid fa-calendar-star"></i> Event Details</div><button
+              class="modal-close" onclick="closeModal('eventDetailModal')">&times;</button>
+          </div>
           <div class="modal-body" id="eventDetailBody"></div>
-          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('eventDetailModal')">Close</button></div>
+          <div class="modal-footer"><button class="btn btn-ghost"
+              onclick="closeModal('eventDetailModal')">Close</button></div>
         </div>
       </div>
-      
+
     </main>
   </div>
-  
+
   <script>
-// Store custom images per seat and event banner
-let seatCustomImages = JSON.parse(localStorage.getItem('seatCustomImages') || '{}');
-let eventCustomBanners = JSON.parse(localStorage.getItem('eventCustomBanners') || '{}');
+    // Store custom images per seat and event banner
+    let seatCustomImages = JSON.parse(localStorage.getItem('seatCustomImages') || '{}');
+    let eventCustomBanners = JSON.parse(localStorage.getItem('eventCustomBanners') || '{}');
 
-function getSeatImage(seatId) {
-  return seatCustomImages[seatId] || null;
-}
+    function getSeatImage(seatId) {
+      return seatCustomImages[seatId] || null;
+    }
 
-function getEventBanner(eventId) {
-  return eventCustomBanners[eventId] || null;
-}
+    function getEventBanner(eventId) {
+      return eventCustomBanners[eventId] || null;
+    }
 
-function setSeatImage(seatId, imageData) {
-  if(imageData) {
-    seatCustomImages[seatId] = imageData;
-  } else {
-    delete seatCustomImages[seatId];
-  }
-  localStorage.setItem('seatCustomImages', JSON.stringify(seatCustomImages));
-}
+    function setSeatImage(seatId, imageData) {
+      if (imageData) {
+        seatCustomImages[seatId] = imageData;
+      } else {
+        delete seatCustomImages[seatId];
+      }
+      localStorage.setItem('seatCustomImages', JSON.stringify(seatCustomImages));
+    }
 
-function confirmLogout(){
-  if(confirm('Are you sure you want to logout?')){
-    alert('Logging out...');
-    setTimeout(()=>location.reload(),1500);
-  }
-}
+    function confirmLogout() {
+      if (confirm('Are you sure you want to logout?')) {
+        alert('Logging out...');
+        setTimeout(() => location.reload(), 1500);
+      }
+    }
 
-function openSidebar(){
-  document.getElementById('sidebar').classList.add('mobile-open');
-  document.getElementById('mobileOverlay').classList.add('show');
-}
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('mobile-open');
+      document.getElementById('mobileOverlay').classList.add('show');
+    }
 
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('mobile-open');
-  document.getElementById('mobileOverlay').classList.remove('show');
-}
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('mobile-open');
+      document.getElementById('mobileOverlay').classList.remove('show');
+    }
 
-function openModal(id){
-  document.getElementById(id).classList.add('open');
-}
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+    }
 
-function closeModal(id){
-  document.getElementById(id).classList.remove('open');
-}
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
 
-let yr=2026,mo=3;
-const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    let yr = 2026, mo = 3;
+    const MN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-// Default seat colors
-const defaultSeatColors = {
-  "A3": "#CF6322", "B2": "#8A8636", "C5": "#4A7C59", "C1": "#CF6322",
-  "A7": "#8A8636", "A2": "#4A7C59", "D3": "#CF6322", "B4": "#8A8636",
-  "D6": "#4A7C59", "B3": "#CF6322", "C3": "#8A8636", "A5": "#4A7C59"
-};
+    // Default seat colors
+    const defaultSeatColors = {
+      "A3": "#CF6322", "B2": "#8A8636", "C5": "#4A7C59", "C1": "#CF6322",
+      "A7": "#8A8636", "A2": "#4A7C59", "D3": "#CF6322", "B4": "#8A8636",
+      "D6": "#4A7C59", "B3": "#CF6322", "C3": "#8A8636", "A5": "#4A7C59"
+    };
 
-function getDefaultSeatColor(seatId){
-  return defaultSeatColors[seatId] || "#CF6322";
-}
+    function getDefaultSeatColor(seatId) {
+      return defaultSeatColors[seatId] || "#CF6322";
+    }
 
-let events = [
-  { id: 1, name: "The Last Muster 2nd Anniversary", date: "2026-04-19", time: "11:11 PM", location: "Whole Room", description: "Celebration event with free snacks and drinks for all members. Join us for an unforgettable night!" },
-  { id: 2, name: "Staff Meeting", date: "2026-04-12", time: "11:11 PM", location: "Meeting Room", description: "Monthly staff meeting to discuss operations and new initiatives." },
-  { id: 3, name: "WiFi Security Workshop", date: "2026-04-25", time: "02:00 PM", location: "Meeting Room", description: "Learn about network security best practices and protect your data." },
-  { id: 4, name: "Summer Art Club - Week 1", date: "2026-04-28", time: "10:00 AM", location: "Art Room", description: "Creative art workshops for all skill levels. Materials provided." },
-  { id: 5, name: "Bocca Food Festival", date: "2026-04-30", time: "06:00 PM", location: "Cafeteria", description: "Italian and Mediterranean cuisine tasting event." }
-];
+    let events = [
+      { id: 1, name: "The Last Muster 2nd Anniversary", date: "2026-04-19", time: "11:11 PM", location: "Whole Room", description: "Celebration event with free snacks and drinks for all members. Join us for an unforgettable night!" },
+      { id: 2, name: "Staff Meeting", date: "2026-04-12", time: "11:11 PM", location: "Meeting Room", description: "Monthly staff meeting to discuss operations and new initiatives." },
+      { id: 3, name: "WiFi Security Workshop", date: "2026-04-25", time: "02:00 PM", location: "Meeting Room", description: "Learn about network security best practices and protect your data." },
+      { id: 4, name: "Summer Art Club - Week 1", date: "2026-04-28", time: "10:00 AM", location: "Art Room", description: "Creative art workshops for all skill levels. Materials provided." },
+      { id: 5, name: "Bocca Food Festival", date: "2026-04-30", time: "06:00 PM", location: "Cafeteria", description: "Italian and Mediterranean cuisine tasting event." }
+    ];
 
-let customerReservations = [
-  { id: 1, customerName: "Monkey D. Luffy", date: "2026-04-23", time: "10:00 AM", seat: "A3", hours: 2, status: "confirmed", phone: "+63 912 3456 789", email: "luffy@strawhat.com" },
-  { id: 2, customerName: "Roronoa Zoro", date: "2026-04-17", time: "09:00 AM", seat: "B2", hours: 3, status: "confirmed", phone: "+63 912 3456 790", email: "zoro@strawhat.com" },
-  { id: 3, customerName: "Nami Catburglar", date: "2026-04-18", time: "02:00 PM", seat: "C5", hours: 2, status: "confirmed", phone: "+63 912 3456 791", email: "nami@weather.com" },
-  { id: 4, customerName: "Sanji Vinsmoke", date: "2026-04-19", time: "11:00 AM", seat: "B4", hours: 2, status: "pending", phone: "+63 912 3456 792", email: "sanji@allblue.com" },
-  { id: 5, customerName: "Tony Chopper", date: "2026-04-24", time: "01:30 PM", seat: "C1", hours: 2, status: "confirmed", phone: "+63 912 3456 793", email: "chopper@dr.com" },
-  { id: 6, customerName: "Brook", date: "2026-04-25", time: "03:00 PM", seat: "A7", hours: 1, status: "confirmed", phone: "+63 912 3456 794", email: "brook@walkin.com" },
-  { id: 7, customerName: "Jinbe", date: "2026-04-21", time: "10:00 AM", seat: "A2", hours: 2, status: "pending", phone: "+63 912 3456 795", email: "jinbe@temp.com" },
-  { id: 8, customerName: "Vivi Nefertari", date: "2026-04-22", time: "09:00 AM", seat: "D3", hours: 4, status: "confirmed", phone: "+63 912 3456 796", email: "vivi@alabasta.com" },
-  { id: 9, customerName: "Franky", date: "2026-04-26", time: "11:00 AM", seat: "D6", hours: 3, status: "confirmed", phone: "+63 912 3456 797", email: "franky@example.com" },
-  { id: 10, customerName: "Usopp", date: "2026-04-27", time: "01:00 PM", seat: "B3", hours: 2, status: "pending", phone: "+63 912 3456 798", email: "usopp@example.com" }
-];
+    let customerReservations = [
+      { id: 1, customerName: "Monkey D. Luffy", date: "2026-04-23", time: "10:00 AM", seat: "A3", hours: 2, status: "confirmed", phone: "+63 912 3456 789", email: "luffy@strawhat.com" },
+      { id: 2, customerName: "Roronoa Zoro", date: "2026-04-17", time: "09:00 AM", seat: "B2", hours: 3, status: "confirmed", phone: "+63 912 3456 790", email: "zoro@strawhat.com" },
+      { id: 3, customerName: "Nami Catburglar", date: "2026-04-18", time: "02:00 PM", seat: "C5", hours: 2, status: "confirmed", phone: "+63 912 3456 791", email: "nami@weather.com" },
+      { id: 4, customerName: "Sanji Vinsmoke", date: "2026-04-19", time: "11:00 AM", seat: "B4", hours: 2, status: "pending", phone: "+63 912 3456 792", email: "sanji@allblue.com" },
+      { id: 5, customerName: "Tony Chopper", date: "2026-04-24", time: "01:30 PM", seat: "C1", hours: 2, status: "confirmed", phone: "+63 912 3456 793", email: "chopper@dr.com" },
+      { id: 6, customerName: "Brook", date: "2026-04-25", time: "03:00 PM", seat: "A7", hours: 1, status: "confirmed", phone: "+63 912 3456 794", email: "brook@walkin.com" },
+      { id: 7, customerName: "Jinbe", date: "2026-04-21", time: "10:00 AM", seat: "A2", hours: 2, status: "pending", phone: "+63 912 3456 795", email: "jinbe@temp.com" },
+      { id: 8, customerName: "Vivi Nefertari", date: "2026-04-22", time: "09:00 AM", seat: "D3", hours: 4, status: "confirmed", phone: "+63 912 3456 796", email: "vivi@alabasta.com" },
+      { id: 9, customerName: "Franky", date: "2026-04-26", time: "11:00 AM", seat: "D6", hours: 3, status: "confirmed", phone: "+63 912 3456 797", email: "franky@example.com" },
+      { id: 10, customerName: "Usopp", date: "2026-04-27", time: "01:00 PM", seat: "B3", hours: 2, status: "pending", phone: "+63 912 3456 798", email: "usopp@example.com" }
+    ];
 
-function getEventsByDate(dateStr){ return events.filter(e => e.date === dateStr); }
-function getReservationsByDate(dateStr){ return customerReservations.filter(r => r.date === dateStr); }
-function isToday(dateStr){
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  return dateStr === todayStr;
-}
-function getTodayReservations(){
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  return customerReservations.filter(r => r.date === todayStr);
-}
-function getUpcomingReservations(){
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  return customerReservations.filter(r => r.date > todayStr);
-}
-function getUpcomingEvents(){
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  return events.filter(e => e.date >= todayStr);
-}
-function getPastEvents(){
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  return events.filter(e => e.date < todayStr);
-}
+    function getEventsByDate(dateStr) { return events.filter(e => e.date === dateStr); }
+    function getReservationsByDate(dateStr) { return customerReservations.filter(r => r.date === dateStr); }
+    function isToday(dateStr) {
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      return dateStr === todayStr;
+    }
+    function getTodayReservations() {
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      return customerReservations.filter(r => r.date === todayStr);
+    }
+    function getUpcomingReservations() {
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      return customerReservations.filter(r => r.date > todayStr);
+    }
+    function getUpcomingEvents() {
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      return events.filter(e => e.date >= todayStr);
+    }
+    function getPastEvents() {
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      return events.filter(e => e.date < todayStr);
+    }
 
-function sortItems(items, isEvent){
-  const sortType = document.getElementById('sortSelect').value;
-  if(sortType === 'date_asc') return [...items].sort((a,b)=>a.date.localeCompare(b.date));
-  if(sortType === 'date_desc') return [...items].sort((a,b)=>b.date.localeCompare(a.date));
-  if(sortType === 'name_asc') return [...items].sort((a,b)=>a.name.localeCompare(b.name));
-  if(sortType === 'name_desc') return [...items].sort((a,b)=>b.name.localeCompare(a.name));
-  return items;
-}
-function sortReservations(items){
-  const sortType = document.getElementById('sortSelect').value;
-  if(sortType === 'date_asc') return [...items].sort((a,b)=>a.date.localeCompare(b.date));
-  if(sortType === 'date_desc') return [...items].sort((a,b)=>b.date.localeCompare(a.date));
-  if(sortType === 'name_asc') return [...items].sort((a,b)=>a.customerName.localeCompare(b.customerName));
-  if(sortType === 'name_desc') return [...items].sort((a,b)=>b.customerName.localeCompare(a.customerName));
-  return items;
-}
+    function sortItems(items, isEvent) {
+      const sortType = document.getElementById('sortSelect').value;
+      if (sortType === 'date_asc') return [...items].sort((a, b) => a.date.localeCompare(b.date));
+      if (sortType === 'date_desc') return [...items].sort((a, b) => b.date.localeCompare(a.date));
+      if (sortType === 'name_asc') return [...items].sort((a, b) => a.name.localeCompare(b.name));
+      if (sortType === 'name_desc') return [...items].sort((a, b) => b.name.localeCompare(a.name));
+      return items;
+    }
+    function sortReservations(items) {
+      const sortType = document.getElementById('sortSelect').value;
+      if (sortType === 'date_asc') return [...items].sort((a, b) => a.date.localeCompare(b.date));
+      if (sortType === 'date_desc') return [...items].sort((a, b) => b.date.localeCompare(a.date));
+      if (sortType === 'name_asc') return [...items].sort((a, b) => a.customerName.localeCompare(b.customerName));
+      if (sortType === 'name_desc') return [...items].sort((a, b) => b.customerName.localeCompare(a.customerName));
+      return items;
+    }
 
-function switchView(){
-  const viewType = document.getElementById('viewSelect').value;
-  const container = document.getElementById('cardsContainer');
-  let items = [], isEvent = false;
-  switch(viewType){
-    case 'todayReservations': items = sortReservations(getTodayReservations()); break;
-    case 'upcomingReservations': items = sortReservations(getUpcomingReservations()); break;
-    case 'upcomingEvents': items = sortItems(getUpcomingEvents(), true); isEvent = true; break;
-    case 'pastEvents': items = sortItems(getPastEvents(), true); isEvent = true; break;
-    default: items = sortReservations(getTodayReservations());
-  }
-  if(items.length === 0){ container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-folder-open"></i><p>No items to display</p></div>`; return; }
-  if(isEvent){
-    container.innerHTML = items.map(ev => `
+    function switchView() {
+      const viewType = document.getElementById('viewSelect').value;
+      const container = document.getElementById('cardsContainer');
+      let items = [], isEvent = false;
+      switch (viewType) {
+        case 'todayReservations': items = sortReservations(getTodayReservations()); break;
+        case 'upcomingReservations': items = sortReservations(getUpcomingReservations()); break;
+        case 'upcomingEvents': items = sortItems(getUpcomingEvents(), true); isEvent = true; break;
+        case 'pastEvents': items = sortItems(getPastEvents(), true); isEvent = true; break;
+        default: items = sortReservations(getTodayReservations());
+      }
+      if (items.length === 0) { container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-folder-open"></i><p>No items to display</p></div>`; return; }
+      if (isEvent) {
+        container.innerHTML = items.map(ev => `
       <div class="event-card" onclick="showEventDetail(${JSON.stringify(ev).replace(/"/g, '&quot;')})">
-        <div class="card-banner" style="background-image: url('${getEventBanner(ev.id) || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 100\'%3E%3Crect width=\'200\' height=\'100\' fill=\'%23CF6322\'/%3E%3Ctext x=\'100\' y=\'55\' text-anchor=\'middle\' fill=\'white\' font-size=\'14\' font-weight=\'bold\'%3E'+ev.name.substring(0,15)+'%3C/text%3E%3C/svg%3E'}'); background-size: cover;">
+        <div class="card-banner" style="background-image: url('${getEventBanner(ev.id) || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 100\'%3E%3Crect width=\'200\' height=\'100\' fill=\'%23CF6322\'/%3E%3Ctext x=\'100\' y=\'55\' text-anchor=\'middle\' fill=\'white\' font-size=\'14\' font-weight=\'bold\'%3E' + ev.name.substring(0, 15) + '%3C/text%3E%3C/svg%3E'}'); background-size: cover;">
           <div class="card-badge">${viewType === 'upcomingEvents' ? 'Upcoming' : 'Past'}</div>
         </div>
         <div class="card-content">${escapeHtml(ev.name)}...</div>
       </div>
     `).join('');
-  } else {
-    container.innerHTML = items.map(r => `
+      } else {
+        container.innerHTML = items.map(r => `
       <div class="event-card" onclick="showReservationDetail(${JSON.stringify(r).replace(/"/g, '&quot;')})">
-        <div class="card-banner" style="background-image: url('${getSeatImage(r.seat) || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='${getDefaultSeatColor(r.seat).replace('#','%23')}'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='white' font-size='12' font-weight='bold'%3ESeat ${r.seat}%3C/text%3E%3C/svg%3E`}'); background-size: cover;">
+        <div class="card-banner" style="background-image: url('${getSeatImage(r.seat) || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='${getDefaultSeatColor(r.seat).replace('#', '%23')}'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='white' font-size='12' font-weight='bold'%3ESeat ${r.seat}%3C/text%3E%3C/svg%3E`}'); background-size: cover;">
           <div class="card-badge" style="background:#8A8636;">${r.status === 'confirmed' ? 'Confirmed' : 'Pending'}</div>
         </div>
         <div class="card-content">
@@ -464,15 +716,15 @@ function switchView(){
         </div>
       </div>
     `).join('');
-  }
-}
+      }
+    }
 
-function showReservationDetail(reservation){
-  const modalBody = document.getElementById('reservationDetailBody');
-  modalBody.innerHTML = `
+    function showReservationDetail(reservation) {
+      const modalBody = document.getElementById('reservationDetailBody');
+      modalBody.innerHTML = `
     <div style="text-align:center;margin-bottom:15px;">
       <div style="position:relative;">
-        <img src="${getSeatImage(reservation.seat) || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Crect width='200' height='100' fill='${getDefaultSeatColor(reservation.seat).replace('#','%23')}'/%3E%3Ctext x='100' y='55' text-anchor='middle' fill='white' font-size='16' font-weight='bold'%3ESeat ${reservation.seat}%3C/text%3E%3C/svg%3E`}" style="width:100%;max-width:300px;border-radius:12px;object-fit:cover;">
+        <img src="${getSeatImage(reservation.seat) || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Crect width='200' height='100' fill='${getDefaultSeatColor(reservation.seat).replace('#', '%23')}'/%3E%3Ctext x='100' y='55' text-anchor='middle' fill='white' font-size='16' font-weight='bold'%3ESeat ${reservation.seat}%3C/text%3E%3C/svg%3E`}" style="width:100%;max-width:300px;border-radius:12px;object-fit:cover;">
         <button onclick="event.stopPropagation(); openSeatImageEditor('${reservation.seat}')" style="position:absolute;bottom:10px;right:10px;background:#CF6322;color:white;border:none;border-radius:20px;padding:4px 12px;cursor:pointer;font-size:11px;"><i class="fa-solid fa-camera"></i> Change Image</button>
       </div>
     </div>
@@ -484,105 +736,106 @@ function showReservationDetail(reservation){
     <div class="reservation-detail-row"><span class="reservation-label">Seat:</span><span class="reservation-value">${reservation.seat}</span></div>
     <div class="reservation-detail-row"><span class="reservation-label">Hours:</span><span class="reservation-value">${reservation.hours} hour(s)</span></div>
     <div class="reservation-detail-row"><span class="reservation-label">Status:</span><span class="reservation-value"><span class="badge ${reservation.status === 'confirmed' ? 'badge-green' : 'badge-pending-payment'}">${reservation.status === 'confirmed' ? 'Confirmed' : 'Pending'}</span></span></div>`;
-  openModal('reservationDetailModal');
-}
+      openModal('reservationDetailModal');
+    }
 
-let currentSeatForImage = null;
-function openSeatImageEditor(seatId){
-  currentSeatForImage = seatId;
-  document.getElementById('seat-image-preview').className = 'image-preview';
-  const currentImg = getSeatImage(seatId);
-  if(currentImg){
-    document.getElementById('seat-image-preview').src = currentImg;
-    document.getElementById('seat-image-preview').classList.add('show');
-  } else {
-    document.getElementById('seat-image-preview').classList.remove('show');
-  }
-  openModal('editSeatImageModal');
-}
+    let currentSeatForImage = null;
+    function openSeatImageEditor(seatId) {
+      currentSeatForImage = seatId;
+      document.getElementById('seat-image-preview').className = 'image-preview';
+      const currentImg = getSeatImage(seatId);
+      if (currentImg) {
+        document.getElementById('seat-image-preview').src = currentImg;
+        document.getElementById('seat-image-preview').classList.add('show');
+      } else {
+        document.getElementById('seat-image-preview').classList.remove('show');
+      }
+      openModal('editSeatImageModal');
+    }
 
-function saveSeatImage(){
-  const fileInput = document.getElementById('seat-image-file');
-  if(fileInput.files && fileInput.files[0]){
-    const reader = new FileReader();
-    reader.onload = function(e){
-      setSeatImage(currentSeatForImage, e.target.result);
-      closeModal('editSeatImageModal');
-      switchView();
-    };
-    reader.readAsDataURL(fileInput.files[0]);
-  } else {
-    alert('Please select an image first');
-  }
-}
+    function saveSeatImage() {
+      const fileInput = document.getElementById('seat-image-file');
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          setSeatImage(currentSeatForImage, e.target.result);
+          closeModal('editSeatImageModal');
+          switchView();
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        alert('Please select an image first');
+      }
+    }
 
-document.getElementById('seat-image-file').addEventListener('change', function(e){
-  if(e.target.files && e.target.files[0]){
-    const reader = new FileReader();
-    reader.onload = function(ev){
-      document.getElementById('seat-image-preview').src = ev.target.result;
-      document.getElementById('seat-image-preview').classList.add('show');
-    };
-    reader.readAsDataURL(e.target.files[0]);
-  }
-});
+    document.getElementById('seat-image-file').addEventListener('change', function (e) {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          document.getElementById('seat-image-preview').src = ev.target.result;
+          document.getElementById('seat-image-preview').classList.add('show');
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
 
-function showEventDetail(event){
-  const modalBody = document.getElementById('eventDetailBody');
-  modalBody.innerHTML = `
+    function showEventDetail(event) {
+      const modalBody = document.getElementById('eventDetailBody');
+      modalBody.innerHTML = `
     <div style="text-align:center;margin-bottom:15px;">
-      <img src="${getEventBanner(event.id) || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 100\'%3E%3Crect width=\'200\' height=\'100\' fill=\'%23CF6322\'/%3E%3Ctext x=\'100\' y=\'55\' text-anchor=\'middle\' fill=\'white\' font-size=\'14\' font-weight=\'bold\'%3E'+event.name.substring(0,20)+'%3C/text%3E%3C/svg%3E'}" style="width:100%;border-radius:12px;object-fit:cover;max-height:200px;">
+      <img src="${getEventBanner(event.id) || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 100\'%3E%3Crect width=\'200\' height=\'100\' fill=\'%23CF6322\'/%3E%3Ctext x=\'100\' y=\'55\' text-anchor=\'middle\' fill=\'white\' font-size=\'14\' font-weight=\'bold\'%3E' + event.name.substring(0, 20) + '%3C/text%3E%3C/svg%3E'}" style="width:100%;border-radius:12px;object-fit:cover;max-height:200px;">
     </div>
     <div class="event-detail-row"><span class="reservation-label">Event Name:</span><span class="reservation-value">${escapeHtml(event.name)}</span></div>
     <div class="event-detail-row"><span class="reservation-label">Date:</span><span class="reservation-value">${event.date}</span></div>
     <div class="event-detail-row"><span class="reservation-label">Time:</span><span class="reservation-value">${event.time || 'All day'}</span></div>
     <div class="event-detail-row"><span class="reservation-label">Location:</span><span class="reservation-value">${event.location}</span></div>
     <div class="event-detail-row"><span class="reservation-label">Description:</span><span class="reservation-value">${escapeHtml(event.description)}</span></div>`;
-  openModal('eventDetailModal');
-}
+      openModal('eventDetailModal');
+    }
 
-function renderCal(){
-  document.getElementById('calTitle').textContent=MN[mo]+' '+yr;
-  const g=document.getElementById('calGrid');
-  g.innerHTML=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-head">${d}</div>`).join('');
-  const first=new Date(yr,mo,1).getDay(), days=new Date(yr,mo+1,0).getDate();
-  for(let i=0;i<first;i++) g.innerHTML+='<div class="cal-day empty"></div>';
-  for(let d=1;d<=days;d++){
-    const dateStr = `${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const isTodayFlag = isToday(dateStr);
-    const dayEvents = getEventsByDate(dateStr);
-    const dayReservations = getReservationsByDate(dateStr);
-    let tagsHtml = '';
-    dayEvents.slice(0,1).forEach(e => { tagsHtml += `<div class="cal-tag cal-tag-event" title="${e.name}">📅 ${e.name.length>12?e.name.substring(0,10)+'…':e.name}</div>`; });
-    if(dayEvents.length > 1) tagsHtml += `<div class="cal-tag cal-tag-event">+${dayEvents.length-1} more</div>`;
-    dayReservations.slice(0,1).forEach(r => { tagsHtml += `<div class="cal-tag cal-tag-reservation" title="${r.customerName} - Seat ${r.seat}">📖 ${r.customerName.length>12?r.customerName.substring(0,10)+'…':r.customerName}</div>`; });
-    if(dayReservations.length > 1) tagsHtml += `<div class="cal-tag cal-tag-reservation">+${dayReservations.length-1} more</div>`;
-    g.innerHTML+=`<div class="cal-day${isTodayFlag?' today':''}" data-date="${dateStr}"><strong>${d}</strong>${tagsHtml}</div>`;
-  }
-  document.querySelectorAll('.cal-day:not(.empty)').forEach(day => {
-    day.addEventListener('click', () => {
-      const date = day.getAttribute('data-date');
-      const dayReservations = getReservationsByDate(date);
-      const dayEvents = getEventsByDate(date);
-      let message = `📅 ${date}\n`;
-      if(dayEvents.length > 0) { message += `\n📌 EVENTS:\n`; dayEvents.forEach(e => message += `  - ${e.name}\n`); }
-      if(dayReservations.length > 0) { message += `\n📖 RESERVATIONS:\n`; dayReservations.forEach(r => message += `  - ${r.customerName} - Seat ${r.seat}\n`); }
-      if(dayEvents.length === 0 && dayReservations.length === 0) { message += `\nNo events or reservations on this day.`; }
-      alert(message);
-    });
-  });
-}
+    function renderCal() {
+      document.getElementById('calTitle').textContent = MN[mo] + ' ' + yr;
+      const g = document.getElementById('calGrid');
+      g.innerHTML = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => `<div class="cal-head">${d}</div>`).join('');
+      const first = new Date(yr, mo, 1).getDay(), days = new Date(yr, mo + 1, 0).getDate();
+      for (let i = 0; i < first; i++) g.innerHTML += '<div class="cal-day empty"></div>';
+      for (let d = 1; d <= days; d++) {
+        const dateStr = `${yr}-${String(mo + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isTodayFlag = isToday(dateStr);
+        const dayEvents = getEventsByDate(dateStr);
+        const dayReservations = getReservationsByDate(dateStr);
+        let tagsHtml = '';
+        dayEvents.slice(0, 1).forEach(e => { tagsHtml += `<div class="cal-tag cal-tag-event" title="${e.name}">📅 ${e.name.length > 12 ? e.name.substring(0, 10) + '…' : e.name}</div>`; });
+        if (dayEvents.length > 1) tagsHtml += `<div class="cal-tag cal-tag-event">+${dayEvents.length - 1} more</div>`;
+        dayReservations.slice(0, 1).forEach(r => { tagsHtml += `<div class="cal-tag cal-tag-reservation" title="${r.customerName} - Seat ${r.seat}">📖 ${r.customerName.length > 12 ? r.customerName.substring(0, 10) + '…' : r.customerName}</div>`; });
+        if (dayReservations.length > 1) tagsHtml += `<div class="cal-tag cal-tag-reservation">+${dayReservations.length - 1} more</div>`;
+        g.innerHTML += `<div class="cal-day${isTodayFlag ? ' today' : ''}" data-date="${dateStr}"><strong>${d}</strong>${tagsHtml}</div>`;
+      }
+      document.querySelectorAll('.cal-day:not(.empty)').forEach(day => {
+        day.addEventListener('click', () => {
+          const date = day.getAttribute('data-date');
+          const dayReservations = getReservationsByDate(date);
+          const dayEvents = getEventsByDate(date);
+          let message = `📅 ${date}\n`;
+          if (dayEvents.length > 0) { message += `\n📌 EVENTS:\n`; dayEvents.forEach(e => message += `  - ${e.name}\n`); }
+          if (dayReservations.length > 0) { message += `\n📖 RESERVATIONS:\n`; dayReservations.forEach(r => message += `  - ${r.customerName} - Seat ${r.seat}\n`); }
+          if (dayEvents.length === 0 && dayReservations.length === 0) { message += `\nNo events or reservations on this day.`; }
+          alert(message);
+        });
+      });
+    }
 
-function changeMonth(dir){
-  mo+=dir;
-  if(mo>11){mo=0;yr++;}
-  if(mo<0){mo=11;yr--;}
-  renderCal();
-}
+    function changeMonth(dir) {
+      mo += dir;
+      if (mo > 11) { mo = 0; yr++; }
+      if (mo < 0) { mo = 11; yr--; }
+      renderCal();
+    }
 
-function escapeHtml(str){ if(!str)return ''; return String(str).replace(/[&<>]/g,function(m){if(m==='&')return '&amp;';if(m==='<')return '&lt;';if(m==='>')return '&gt;';return m;}); }
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, function (m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
 
-renderCal(); switchView();
-</script>
+    renderCal(); switchView();
+  </script>
 </body>
+
 </html>
