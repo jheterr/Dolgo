@@ -29,7 +29,7 @@
       <a href="#membership">Memberships</a>
       <a href="#how-it-works">How It Works</a>
       <a href="#mustberryfi" class="nav-item-new">MustBerryFi <span class="badge-new">NEW</span></a>
-      <a href="#terms" class="nav-terms"><i class="fas fa-lock"></i> Terms & Conditions</a>
+      <a href="javascript:void(0)" class="nav-terms" onclick="openTermsModal()">Terms & Conditions</a>
       <a href="#signin" class="nav-signin"><i class="fas fa-sign-in-alt"></i> Sign In</a>
     </div>
 
@@ -109,6 +109,59 @@
         <img src="A7301232.jpg" alt="Inside the Hub 4">
         <img src="A7301286.jpg" alt="Inside the Hub 5">
         <img src="A7301379.jpg" alt="Inside the Hub 6">
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ WHAT WE OFFER ═══════════════════════ -->
+  <section class="section offerings" id="offerings">
+    <div class="animate-in" style="text-align: center; margin-bottom: 50px;">
+      <div class="section-tag tag-orange">WORK. STUDY. CREATE. CHILL.</div>
+      <h2 class="section-heading">LOOKING FOR THE PERFECT SPACE?</h2>
+      <p class="section-subtitle" style="margin: 0 auto;">Discover everything we offer at The Last Muster Creative Hub
+        and Coworking Space.</p>
+    </div>
+
+    <div class="offerings-grid animate-in">
+      <div class="offering-card">
+        <div class="offering-icon"><i class="fas fa-cube"></i></div>
+        <span>Enclosed Cubicles</span>
+      </div>
+      <div class="offering-card">
+        <div class="offering-icon"><i class="fas fa-users"></i></div>
+        <span>Shared Workspaces</span>
+      </div>
+      <div class="offering-card">
+        <div class="offering-icon"><i class="fas fa-couch"></i></div>
+        <span>Bean Bag Zone</span>
+      </div>
+      <div class="offering-card">
+        <div class="offering-icon"><i class="fas fa-comments"></i></div>
+        <span>Huddle / Meeting Room</span>
+      </div>
+      <div class="offering-card">
+        <div class="offering-icon"><i class="fas fa-book"></i></div>
+        <span>Library & Creative Corner</span>
+      </div>
+      <div class="offering-card">
+        <div class="offering-icon"><i class="fas fa-mug-hot"></i></div>
+        <span>Pantry (Free Coffee & Water)</span>
+      </div>
+      <div class="offering-card">
+        <div class="offering-icon"><i class="fas fa-print"></i></div>
+        <span>Printing Station</span>
+      </div>
+      <div class="offering-card">
+        <div class="offering-icon"><i class="fas fa-wifi"></i></div>
+        <span>High-Speed Internet</span>
+      </div>
+      <div class="offering-card">
+        <div class="offering-icon"><i class="fas fa-snowflake"></i></div>
+        <span>Air-Conditioned Rooms</span>
+      </div>
+      <div class="offering-card">
+        <div class="offering-icon"><i class="fas fa-id-card"></i></div>
+        <span>Loyalty Cards</span>
       </div>
     </div>
   </section>
@@ -386,10 +439,8 @@
   <section class="section night-owl" id="night-owl">
     <div class="night-owl-content">
       <div class="night-owl-text animate-in">
-        <div class="owl-icon-wrapper animate-in" style="font-size: 2.5rem; margin-bottom: 16px; color: var(--olive);">
-          <i class="fas fa-moon"></i>
-        </div>
-        <div class="section-tag tag-cream"><i class="fas fa-moon"></i> NIGHT OWL SESSIONS</div>
+
+        <div class="section-tag tag-cream">NIGHT OWL SESSIONS</div>
         <h2 class="section-heading">STAY PRODUCTIVE<br>AFTER HOURS.</h2>
         <p class="section-subtitle">
           We're making our space available for you from <strong>7 PM to 11 PM</strong> on Mondays to Fridays. Perfect
@@ -405,7 +456,7 @@
         <a href="#reserve" class="btn btn-primary"><i class="fas fa-calendar-check"></i> Reserve Your Spot</a>
       </div>
       <div class="night-owl-pricing animate-in">
-        <h3><i class="fas fa-moon"></i> Night Owl Rates</h3>
+        <h3>Night Owl Rates</h3>
         <div class="price-row">
           <span class="price-label">Hourly Rate</span>
           <span class="price-value">₱70/hr</span>
@@ -485,12 +536,66 @@
       &copy; 2026 The Last Muster Creative Hub & Coworking Space. All rights reserved.
     </div>
   </footer>
-  
+
   <!-- ═══════════════════════ IMAGE MODAL ═══════════════════════ -->
   <div id="imageModal" class="modal">
     <span class="modal-close" onclick="closeModal()">&times;</span>
     <img class="modal-content" id="modalImg">
   </div>
+
+  <!-- ═══════════════════════ TERMS MODAL ═══════════════════════ -->
+  <div id="termsModal" class="modal">
+    <div class="modal-card">
+      <span class="modal-close-card" onclick="closeTermsModal()">&times;</span>
+      <div class="modal-header">
+        <div class="section-tag tag-orange"><i class="fas fa-file-contract"></i> LEGAL</div>
+        <h2 class="modal-title">Terms & Conditions</h2>
+        <p class="modal-subtitle">House Rules for a Safe & Productive Community</p>
+      </div>
+      <div class="modal-body">
+        <ul class="rules-list">
+          <li><strong>Respect the space:</strong> Treat the furniture, and equipment with care.</li>
+          <li><strong>Privacy:</strong> Respect other members' belongings and privacy.</li>
+          <li><strong>Consideration:</strong> Keep conversations at a considerate volume.</li>
+          <li><strong>Cleanliness:</strong> Maintain cleanliness at your desk or shared area.</li>
+          <li><strong>Waste:</strong> Dispose of trash properly. We have trash bins near the pantry.</li>
+          <li><strong>Headphones:</strong> Use headphones for music, videos, and online meetings.</li>
+          <li><strong>Calls:</strong> Keep phone calls short and soft-spoken in open areas.</li>
+          <li><strong>Collaboration:</strong> Book a meeting/huddle room for group discussions.</li>
+          <li><strong>Equitable use:</strong> Do not hog desks, outlets, or equipment unnecessarily.</li>
+          <li><strong>Shared Resources:</strong> Return shared materials (board games, books, cables, etc.) after use.
+          </li>
+          <li><strong>Reporting:</strong> Report damaged or missing items to staff immediately.</li>
+          <li><strong>Food & Drink:</strong> Outside food and drinks are welcome, but be mindful about strong-smelling
+            meals.</li>
+          <li><strong>Spills:</strong> Clean up spills right away.</li>
+          <li><strong>Network Use:</strong> No illegal downloads, inappropriate sites, or activities that disrupt the
+            network.</li>
+          <li><strong>Bandwidth:</strong> Respect bandwidth—avoid heavy streaming or downloads that affect others.</li>
+          <li><strong>Liability:</strong> Keep your personal items safe—management is not liable for lost or stolen
+            belongings.</li>
+          <li><strong>Events:</strong> Respect ongoing events, workshops, or meetings.</li>
+          <li><strong>Prohibitions:</strong> Smoking and vaping are strictly prohibited indoors.</li>
+          <li><strong>Conduct:</strong> Be kind, inclusive, and mindful—harassment or discrimination will not be
+            tolerated.</li>
+          <li><strong>Vibe:</strong> Enjoy and collaborate.</li>
+        </ul>
+
+        <div class="emergency-section">
+          <h5><i class="fas fa-exclamation-triangle"></i> Emergency Hotlines</h5>
+          <div class="emergency-grid">
+            <div class="emergency-item"><span>BFP</span> <span>299-2555 / 0918-241-7423</span></div>
+            <div class="emergency-item"><span>24/7 Emergency Hotlines</span> <span>0921-636-4018 / 0956-172-9656</span>
+            </div>
+            <div class="emergency-item"><span>CDRRM</span> <span>0921-903-3933</span></div>
+            <div class="emergency-item"><span>PNP</span> <span>0998-598-6003</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 
   <!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
   <script>
@@ -546,6 +651,19 @@
       document.body.style.overflow = ''; // Allow scroll
     }
 
+    // Terms Modal Functions
+    function openTermsModal() {
+      const modal = document.getElementById('termsModal');
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTermsModal() {
+      const modal = document.getElementById('termsModal');
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
     // Add event listeners to gallery images
     document.querySelectorAll('.gallery-track img').forEach(img => {
       img.addEventListener('click', () => {
@@ -555,9 +673,13 @@
 
     // Close modal on click outside
     window.addEventListener('click', (event) => {
-      const modal = document.getElementById('imageModal');
-      if (event.target == modal) {
+      const imgModal = document.getElementById('imageModal');
+      const termsModal = document.getElementById('termsModal');
+      if (event.target == imgModal) {
         closeModal();
+      }
+      if (event.target == termsModal) {
+        closeTermsModal();
       }
     });
 

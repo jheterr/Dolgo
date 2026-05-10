@@ -161,7 +161,14 @@ function generateReport(){ alert('📊 Report exported successfully!\nThe report
 // Charts
 let trafficChart, occupancyChart;
 
+// Set Chart.js Defaults
+Chart.defaults.font.family = "'Montserrat', sans-serif";
+Chart.defaults.color = "#1E2A38";
+Chart.defaults.plugins.tooltip.titleFont = { family: "'Poppins', sans-serif", weight: '700' };
+Chart.defaults.plugins.tooltip.bodyFont = { family: "'Montserrat', sans-serif" };
+
 function initCharts() {
+
   // Customer Traffic
   trafficChart = new Chart(document.getElementById('trafficChart'), {
     type: 'line',

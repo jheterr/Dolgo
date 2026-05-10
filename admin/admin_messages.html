@@ -62,6 +62,14 @@
     .user-type.walkin { background: #fef3c7; color: #92400e; }
     .user-type.staff { background: #dcfce7; color: #166534; }
 
+    .char-counter {
+      font-size: 11px;
+      text-align: right;
+      color: var(--text-sm);
+      margin-top: 4px;
+    }
+    .char-counter.limit { color: #dc2626; font-weight: 700; }
+
     @media (max-width: 768px) {
       .msg-layout { grid-template-columns: 1fr; }
     }
@@ -85,9 +93,14 @@
         <li><a href="admin_door_management.html" class="nav-link"><i class="fa-solid fa-door-open"></i> Door Management</a></li>
         <li><a href="admin_seat_management.html" class="nav-link"><i class="fa-solid fa-couch"></i> Seat Management</a></li>
         <li><a href="admin_reservation.html" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Reservation</a></li>
-        <li><a href="admin_staff.html" class="nav-link"><i class="fa-solid fa-user-shield"></i> Staff</a></li>
-        <li><a href="admin_customers.html" class="nav-link"><i class="fa-solid fa-users"></i> Customers</a></li>
-        <li><a href="admin_analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics</a></li>
+        <details class="nav-details">
+          <summary class="nav-link"><i class="fa-solid fa-users-gear"></i> Users Management</summary>
+          <ul class="submenu">
+            <li><a href="admin_staff.html" class="nav-link sub-link">Staffs</a></li>
+            <li><a href="admin_customers.html" class="nav-link sub-link">Customers</a></li>
+          </ul>
+        </details>
+        <li><a href="admin_analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics & Reports</a></li>
         <li><a href="admin_events.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Event</a></li>
         <li><a href="admin_messages.html" class="nav-link active"><i class="fa-solid fa-envelope"></i> Message</a></li>
         <li><a href="admin_notification.html" class="nav-link"><i class="fa-solid fa-bell"></i> Notification</a></li>
@@ -128,15 +141,20 @@
             </select>
           </div>
           <div class="form-group">
+            <label class="form-label">Recipient(s)</label>
+            <input class="form-control" id="msg-recipients" type="text" placeholder="Enter emails or select audience...">
+          </div>
+          <div class="form-group">
             <label class="form-label">Subject</label>
             <input class="form-control" id="msg-subject" type="text" placeholder="Enter subject...">
           </div>
           <div class="form-group">
             <label class="form-label">Message</label>
-            <textarea class="form-control" id="msg-body" rows="5" placeholder="Type your message here..."></textarea>
+            <textarea class="form-control" id="msg-body" rows="4" maxlength="165" placeholder="Type your message here..." oninput="updateCharCount()"></textarea>
+            <div class="char-counter" id="char-count">0 / 165</div>
           </div>
           <button class="btn btn-primary" onclick="prepareAndSend()">
-            <i class="fa-solid fa-paper-plane"></i> Send Notification
+            <i class="fa-solid fa-paper-plane"></i> Send via Gmail
           </button>
         </div>
       </div>
@@ -183,16 +201,16 @@
 <script>
 // Same functional script as before
 const users = [
-  {id:1, name:"Sanji Vinsmoke", type:"member"},
-  {id:2, name:"Zoro Roronoa", type:"member"},
-  {id:3, name:"Nami Catburglar", type:"member"},
-  {id:4, name:"Usopp", type:"member"},
-  {id:5, name:"Monkey D. Luffy", type:"member"},
-  {id:6, name:"Tony Chopper", type:"walkin"},
-  {id:7, name:"Brook", type:"walkin"},
-  {id:8, name:"Franky", type:"walkin"},
-  {id:9, name:"Daniel Padilla", type:"staff"},
-  {id:10, name:"Joshua Garcia", type:"staff"}
+  {id:1, name:"Sanji Vinsmoke", email:"sanji@gmail.com", type:"member"},
+  {id:2, name:"Zoro Roronoa", email:"zoro@gmail.com", type:"member"},
+  {id:3, name:"Nami Catburglar", email:"nami@gmail.com", type:"member"},
+  {id:4, name:"Usopp", email:"usopp@gmail.com", type:"member"},
+  {id:5, name:"Monkey D. Luffy", email:"luffy@gmail.com", type:"member"},
+  {id:6, name:"Tony Chopper", email:"chopper@gmail.com", type:"walkin"},
+  {id:7, name:"Brook", email:"brook@gmail.com", type:"walkin"},
+  {id:8, name:"Franky", email:"franky@gmail.com", type:"walkin"},
+  {id:9, name:"Daniel Padilla", email:"daniel@gmail.com", type:"staff"},
+  {id:10, name:"Joshua Garcia", email:"joshua@gmail.com", type:"staff"}
 ];
 
 let messageHistory = [
@@ -215,7 +233,17 @@ function renderMessageHistory() {
   `).join('');
 }
 
+function updateCharCount() {
+  const body = document.getElementById('msg-body');
+  const count = body.value.length;
+  const counter = document.getElementById('char-count');
+  counter.textContent = `${count} / 165`;
+  if (count >= 150) counter.classList.add('limit');
+  else counter.classList.remove('limit');
+}
+
 function prepareAndSend() {
+  const recipients = document.getElementById('msg-recipients').value.trim();
   const subject = document.getElementById('msg-subject').value.trim();
   const body = document.getElementById('msg-body').value.trim();
   const audience = document.getElementById('msg-audience').value;
@@ -229,7 +257,15 @@ function prepareAndSend() {
     renderRecipientList();
     document.getElementById('recipientModal').classList.add('show');
   } else {
-    sendMessage(subject, body, audience);
+    // Auto-populate recipients based on audience if empty
+    let targetEmails = recipients;
+    if (!targetEmails) {
+      if (audience === 'all') targetEmails = users.map(u => u.email).join(', ');
+      else if (audience === 'members') targetEmails = users.filter(u => u.type === 'member').map(u => u.email).join(', ');
+      else if (audience === 'walkins') targetEmails = users.filter(u => u.type === 'walkin').map(u => u.email).join(', ');
+      else if (audience === 'staff') targetEmails = users.filter(u => u.type === 'staff').map(u => u.email).join(', ');
+    }
+    sendMessage(subject, body, audience, targetEmails);
   }
 }
 
@@ -256,15 +292,24 @@ function toggleRecipient(id, name, type) {
 
 function sendToSpecificRecipients() {
   if (selectedRecipients.length === 0) return alert("Please select at least one recipient");
-  sendMessage(pendingSubject, pendingBody, "Specific Customers");
+  const emails = selectedRecipients.map(r => {
+    const u = users.find(user => user.id === r.id);
+    return u ? u.email : '';
+  }).filter(e => e !== '').join(', ');
+  
+  sendMessage(pendingSubject, pendingBody, "Specific Customers", emails);
   closeRecipientModal();
 }
 
-function sendMessage(subject, body, audience) {
+function sendMessage(subject, body, audience, recipients) {
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + 
                   ', ' + now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
   
+  // Gmail mailto link
+  const mailtoLink = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailtoLink;
+
   messageHistory.unshift({
     id: Date.now(),
     audience: audience === "Specific Customers" ? selectedRecipients.map(r => r.name).join(", ") : audience,
@@ -274,7 +319,8 @@ function sendMessage(subject, body, audience) {
   renderMessageHistory();
   document.getElementById('msg-subject').value = '';
   document.getElementById('msg-body').value = '';
-  alert("Message sent successfully!");
+  document.getElementById('msg-recipients').value = '';
+  updateCharCount();
 }
 
 function closeRecipientModal() {

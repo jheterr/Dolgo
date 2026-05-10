@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Last Muster | Events</title>
+  <title>The Last Muster | Admin - Events</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   
@@ -67,6 +67,50 @@
 .filter-select:focus {
   border-color: #CF6322;
   box-shadow: 0 0 0 2px rgba(207,99,34,0.1);
+}
+
+/* Schedule Modal Styles */
+.schedule-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+.schedule-hour {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 8px 0;
+}
+.schedule-time {
+  width: 80px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #CF6322;
+}
+.schedule-customers {
+  flex: 1;
+  font-size: 12px;
+  color: #475569;
+}
+.schedule-customers span {
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 15px;
+  margin-right: 6px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+.schedule-empty {
+  color: #94a3b8;
+  font-style: italic;
+}
+.date-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e293b;
+  text-align: center;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 12px;
 }
 
 /* Cards Grid - 3 columns per row */
@@ -142,27 +186,6 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.card-stats {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid #f1f5f9;
-  padding-top: 14px;
-  margin-top: 4px;
-}
-.stat-item {
-  text-align: center;
-}
-.stat-value {
-  font-weight: 800;
-  font-size: 18px;
-  color: #CF6322;
-}
-.stat-label {
-  font-size: 9px;
-  color: #94a3b8;
-  text-transform: uppercase;
-}
 .empty-state {
   text-align: center;
   padding: 60px;
@@ -210,19 +233,26 @@
       <img src="The_Last_Muster_logo1.png" alt="The Last Muster" class="logo-img">
       <div class="logo-info"><div class="logo-sub">Admin Panel</div></div>
     </div>
-    <nav class="sidebar-nav"><ul>
+    <nav class="sidebar-nav">
+      <ul>
         <li><a href="admin_dashboard.html" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a></li>
         <li><a href="admin_door_management.html" class="nav-link"><i class="fa-solid fa-door-open"></i> Door Management</a></li>
         <li><a href="admin_seat_management.html" class="nav-link"><i class="fa-solid fa-couch"></i> Seat Management</a></li>
         <li><a href="admin_reservation.html" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Reservation</a></li>
-        <li><a href="admin_staff.html" class="nav-link"><i class="fa-solid fa-user-shield"></i> Staff</a></li>
-        <li><a href="admin_customers.html" class="nav-link"><i class="fa-solid fa-users"></i> Customers</a></li>
-        <li><a href="admin_analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics</a></li>
+        <details class="nav-details">
+          <summary class="nav-link"><i class="fa-solid fa-users-gear"></i> Users Management</summary>
+          <ul class="submenu">
+            <li><a href="admin_staff.html" class="nav-link sub-link">Staffs</a></li>
+            <li><a href="admin_customers.html" class="nav-link sub-link">Customers</a></li>
+          </ul>
+        </details>
+        <li><a href="admin_analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics & Reports</a></li>
         <li><a href="admin_events.html" class="nav-link active"><i class="fa-solid fa-calendar-days"></i> Event</a></li>
         <li><a href="admin_messages.html" class="nav-link"><i class="fa-solid fa-envelope"></i> Message</a></li>
         <li><a href="admin_notification.html" class="nav-link"><i class="fa-solid fa-bell"></i> Notification</a></li>
         <li><a href="admin_profile.html" class="nav-link"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
-    </ul></nav>
+      </ul>
+    </nav>
     <div class="sidebar-footer"><button class="btn-logout" onclick="confirmLogout()"><i class="fa-solid fa-power-off"></i> Logout</button></div>
   </aside>
   <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
@@ -288,17 +318,17 @@
         </div>
       </div>
       
-      <!-- Edit Reservation Image Modal -->
-      <div class="modal-overlay" id="editSeatImageModal">
-        <div class="modal"><div class="modal-header"><div class="modal-title"><i class="fa-solid fa-image"></i> Change Seat Image</div><button class="modal-close" onclick="closeModal('editSeatImageModal')">&times;</button></div>
-          <div class="modal-body">
-            <div class="form-group"><label class="form-label">Upload New Image for Seat</label>
-              <input type="file" id="seat-image-file" accept="image/*" style="display:none;">
-              <div class="upload-label" onclick="document.getElementById('seat-image-file').click()"><i class="fa-solid fa-upload"></i> Choose Image</div>
-              <img id="seat-image-preview" class="image-preview">
-            </div>
+      <!-- Schedule Modal (when clicking a date) -->
+      <div class="modal-overlay" id="scheduleModal">
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title"><i class="fa-solid fa-calendar-day"></i> Daily Schedule</div>
+            <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
           </div>
-          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('editSeatImageModal')">Cancel</button><button class="btn btn-primary" onclick="saveSeatImage()">Save Image</button></div>
+          <div class="modal-body" id="scheduleModalBody"></div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal('scheduleModal')">Close</button>
+          </div>
         </div>
       </div>
       
@@ -315,6 +345,20 @@
         <div class="modal"><div class="modal-header"><div class="modal-title"><i class="fa-solid fa-calendar-star"></i> Event Details</div><button class="modal-close" onclick="closeModal('eventDetailModal')">&times;</button></div>
           <div class="modal-body" id="eventDetailBody"></div>
           <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('eventDetailModal')">Close</button></div>
+        </div>
+      </div>
+      
+      <!-- Edit Reservation Image Modal -->
+      <div class="modal-overlay" id="editSeatImageModal">
+        <div class="modal"><div class="modal-header"><div class="modal-title"><i class="fa-solid fa-image"></i> Change Seat Image</div><button class="modal-close" onclick="closeModal('editSeatImageModal')">&times;</button></div>
+          <div class="modal-body">
+            <div class="form-group"><label class="form-label">Upload New Image for Seat</label>
+              <input type="file" id="seat-image-file" accept="image/*" style="display:none;">
+              <div class="upload-label" onclick="document.getElementById('seat-image-file').click()"><i class="fa-solid fa-upload"></i> Choose Image</div>
+              <img id="seat-image-preview" class="image-preview">
+            </div>
+          </div>
+          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('editSeatImageModal')">Cancel</button><button class="btn btn-primary" onclick="saveSeatImage()">Save Image</button></div>
         </div>
       </div>
       
@@ -391,11 +435,96 @@ function getDefaultSeatColor(seatId){
   return defaultSeatColors[seatId] || "#CF6322";
 }
 
+// Time slots from 8am to 11pm
+const timeSlots = [
+  "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
+  "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM",
+  "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM"
+];
+
+function getTimeHour(timeStr) {
+  const hourMap = {
+    "08:00 AM": 8, "09:00 AM": 9, "10:00 AM": 10, "11:00 AM": 11,
+    "12:00 PM": 12, "01:00 PM": 13, "02:00 PM": 14, "03:00 PM": 15,
+    "04:00 PM": 16, "05:00 PM": 17, "06:00 PM": 18, "07:00 PM": 19,
+    "08:00 PM": 20, "09:00 PM": 21, "10:00 PM": 22, "11:00 PM": 23
+  };
+  return hourMap[timeStr] || 0;
+}
+
+function getCustomersForTimeSlot(date, timeSlot) {
+  const reservations = customerReservations.filter(r => r.date === date && r.status === 'confirmed');
+  const slotHour = getTimeHour(timeSlot);
+  return reservations.filter(r => getTimeHour(r.time) === slotHour);
+}
+
+function getEventsForTimeSlot(date, timeSlot) {
+  const eventsOnDate = events.filter(e => e.date === date);
+  const slotHour = getTimeHour(timeSlot);
+  return eventsOnDate.filter(e => {
+    if (!e.time) return false;
+    return getTimeHour(e.time) === slotHour;
+  });
+}
+
+// Show schedule modal for clicked date
+function showScheduleModal(dateStr) {
+  const formattedDate = new Date(dateStr).toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+  const dayEvents = events.filter(e => e.date === dateStr);
+  
+  let scheduleHtml = `<div class="date-title">Schedule - ${formattedDate}</div>`;
+  
+  // Events section
+  if (dayEvents.length > 0) {
+    scheduleHtml += `<div style="background:#fff8f0; padding:12px; border-radius:12px; margin-bottom:16px; border-left:4px solid var(--orange);">
+      <div style="font-weight:700; margin-bottom:8px; color:var(--orange);"><i class="fa-solid fa-calendar-star"></i> Events</div>`;
+    dayEvents.forEach(e => {
+      scheduleHtml += `
+        <div style="padding:6px 0; border-bottom:1px solid #e2e8f0; cursor:pointer;" onclick="showEventDetail(${JSON.stringify(e).replace(/"/g, '&quot;')})">
+          <span style="font-weight:700;">${escapeHtml(e.name)}</span>
+          <span style="font-size:11px; color:#64748b; margin-left:8px;">${e.time || 'All day'}</span>
+          <span style="font-size:10px; color:#94a3b8; margin-left:8px;">📍 ${e.location}</span>
+        </div>
+      `;
+    });
+    scheduleHtml += `</div>`;
+  }
+  
+  // Reservations schedule
+  scheduleHtml += `<div class="schedule-list">`;
+  
+  for (const timeSlot of timeSlots) {
+    const customers = getCustomersForTimeSlot(dateStr, timeSlot);
+    let customersHtml = '';
+    
+    if (customers.length > 0) {
+      customersHtml = customers.map(c => `<span onclick="showReservationDetail(${JSON.stringify(c).replace(/"/g, '&quot;')})" style="cursor:pointer;">${escapeHtml(c.customerName)} (Seat ${c.seat})</span>`).join('');
+    } else {
+      customersHtml = '<span class="schedule-empty">No reservations</span>';
+    }
+    
+    scheduleHtml += `
+      <div class="schedule-hour">
+        <div class="schedule-time">${timeSlot}</div>
+        <div class="schedule-customers">${customersHtml}</div>
+      </div>
+    `;
+  }
+  
+  scheduleHtml += `</div>`;
+  document.getElementById('scheduleModalBody').innerHTML = scheduleHtml;
+  openModal('scheduleModal');
+}
+
 let events = [
-  { id: 1, name: "The Last Muster 2nd Anniversary", date: "2026-04-19", time: "11:11 PM", location: "Whole Room", description: "Celebration event with free snacks and drinks for all members. Join us for an unforgettable night!" },
-  { id: 2, name: "Staff Meeting", date: "2026-04-12", time: "11:11 PM", location: "Meeting Room", description: "Monthly staff meeting to discuss operations and new initiatives." },
-  { id: 3, name: "WiFi Security Workshop", date: "2026-04-25", time: "02:00 PM", location: "Meeting Room", description: "Learn about network security best practices and protect your data." },
-  { id: 4, name: "Summer Art Club - Week 1", date: "2026-04-28", time: "10:00 AM", location: "Art Room", description: "Creative art workshops for all skill levels. Materials provided." },
+  { id: 1, name: "The Last Muster 2nd Anniversary", date: "2026-04-19", time: "11:00 PM", location: "Whole Room", description: "Celebration event with free snacks and drinks for all members." },
+  { id: 2, name: "Staff Meeting", date: "2026-04-12", time: "09:00 AM", location: "Meeting Room", description: "Monthly staff meeting to discuss operations." },
+  { id: 3, name: "WiFi Security Workshop", date: "2026-04-25", time: "02:00 PM", location: "Meeting Room", description: "Learn about network security best practices." },
+  { id: 4, name: "Summer Art Club - Week 1", date: "2026-04-28", time: "10:00 AM", location: "Art Room", description: "Creative art workshops for all skill levels." },
   { id: 5, name: "Bocca Food Festival", date: "2026-04-30", time: "06:00 PM", location: "Cafeteria", description: "Italian and Mediterranean cuisine tasting event." }
 ];
 
@@ -409,7 +538,8 @@ let customerReservations = [
   { id: 7, customerName: "Jinbe", date: "2026-04-21", time: "10:00 AM", seat: "A2", hours: 2, status: "pending", phone: "+63 912 3456 795", email: "jinbe@temp.com" },
   { id: 8, customerName: "Vivi Nefertari", date: "2026-04-22", time: "09:00 AM", seat: "D3", hours: 4, status: "confirmed", phone: "+63 912 3456 796", email: "vivi@alabasta.com" },
   { id: 9, customerName: "Franky", date: "2026-04-26", time: "11:00 AM", seat: "D6", hours: 3, status: "confirmed", phone: "+63 912 3456 797", email: "franky@example.com" },
-  { id: 10, customerName: "Usopp", date: "2026-04-27", time: "01:00 PM", seat: "B3", hours: 2, status: "pending", phone: "+63 912 3456 798", email: "usopp@example.com" }
+  { id: 10, customerName: "Usopp", date: "2026-04-27", time: "01:00 PM", seat: "B3", hours: 2, status: "pending", phone: "+63 912 3456 798", email: "usopp@example.com" },
+  { id: 11, customerName: "Robin", date: "2026-04-27", time: "08:00 PM", seat: "D3", hours: 3, status: "confirmed", phone: "+63 912 3456 799", email: "robin@strawhat.com" }
 ];
 
 function getEventsByDate(dateStr){ return events.filter(e => e.date === dateStr); }
@@ -422,12 +552,12 @@ function isToday(dateStr){
 function getTodayReservations(){
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  return customerReservations.filter(r => r.date === todayStr);
+  return customerReservations.filter(r => r.date === todayStr && r.status === 'confirmed');
 }
 function getUpcomingReservations(){
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  return customerReservations.filter(r => r.date > todayStr);
+  return customerReservations.filter(r => r.date > todayStr && r.status === 'confirmed');
 }
 function getUpcomingEvents(){
   const today = new Date();
@@ -472,10 +602,14 @@ function switchView(){
   if(isEvent){
     container.innerHTML = items.map(ev => `
       <div class="event-card" onclick="showEventDetail(${JSON.stringify(ev).replace(/"/g, '&quot;')})">
-        <div class="card-banner" style="background-image: url('${getEventBanner(ev.id) || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 100\'%3E%3Crect width=\'200\' height=\'100\' fill=\'%23CF6322\'/%3E%3Ctext x=\'100\' y=\'55\' text-anchor=\'middle\' fill=\'white\' font-size=\'14\' font-weight=\'bold\'%3E${ev.name.substring(0,15)}%3C/text%3E%3C/svg%3E'}'); background-size: cover;">
+        <div class="card-banner" style="background-image: url('${getEventBanner(ev.id) || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 100\'%3E%3Crect width=\'200\' height=\'100\' fill=\'%23CF6322\'/%3E%3Ctext x=\'100\' y=\'55\' text-anchor=\'middle\' fill=\'white\' font-size=\'14\' font-weight=\'bold\'%3E'+ev.name.substring(0,15)+'%3C/text%3E%3C/svg%3E'}'); background-size: cover;">
           <div class="card-badge">${viewType === 'upcomingEvents' ? 'Upcoming' : 'Past'}</div>
         </div>
-        <div class="card-content">${escapeHtml(ev.name)}...</div>
+        <div class="card-content">
+          <div class="card-title">${escapeHtml(ev.name)}</div>
+          <div class="card-meta"><span><i class="fa-regular fa-calendar"></i> ${ev.date}</span><span><i class="fa-regular fa-clock"></i> ${ev.time || 'All day'}</span><span class="card-location"><i class="fa-solid fa-location-dot"></i> ${ev.location}</span></div>
+          <div class="card-description">${escapeHtml(ev.description.substring(0,80))}${ev.description.length>80?'...':''}</div>
+        </div>
       </div>
     `).join('');
   } else {
@@ -570,7 +704,7 @@ function showEventDetail(event){
   const modalBody = document.getElementById('eventDetailBody');
   modalBody.innerHTML = `
     <div style="text-align:center;margin-bottom:15px;">
-      <img src="${getEventBanner(event.id) || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 100\'%3E%3Crect width=\'200\' height=\'100\' fill=\'%23CF6322\'/%3E%3Ctext x=\'100\' y=\'55\' text-anchor=\'middle\' fill=\'white\' font-size=\'14\' font-weight=\'bold\'%3E${event.name.substring(0,20)}%3C/text%3E%3C/svg%3E'}" style="width:100%;border-radius:12px;object-fit:cover;max-height:200px;">
+      <img src="${getEventBanner(event.id) || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 100\'%3E%3Crect width=\'200\' height=\'100\' fill=\'%23CF6322\'/%3E%3Ctext x=\'100\' y=\'55\' text-anchor=\'middle\' fill=\'white\' font-size=\'14\' font-weight=\'bold\'%3E'+event.name.substring(0,20)+'%3C/text%3E%3C/svg%3E'}" style="width:100%;border-radius:12px;object-fit:cover;max-height:200px;">
     </div>
     <div class="event-detail-row"><span class="reservation-label">Event Name:</span><span class="reservation-value">${escapeHtml(event.name)}</span></div>
     <div class="event-detail-row"><span class="reservation-label">Date:</span><span class="reservation-value">${event.date}</span></div>
@@ -601,13 +735,7 @@ function renderCal(){
   document.querySelectorAll('.cal-day:not(.empty)').forEach(day => {
     day.addEventListener('click', () => {
       const date = day.getAttribute('data-date');
-      const dayReservations = getReservationsByDate(date);
-      const dayEvents = getEventsByDate(date);
-      let message = `📅 ${date}\n`;
-      if(dayEvents.length > 0) { message += `\n📌 EVENTS:\n`; dayEvents.forEach(e => message += `  - ${e.name}\n`); }
-      if(dayReservations.length > 0) { message += `\n📖 RESERVATIONS:\n`; dayReservations.forEach(r => message += `  - ${r.customerName} - Seat ${r.seat}\n`); }
-      if(dayEvents.length === 0 && dayReservations.length === 0) { message += `\nNo events or reservations on this day.`; }
-      alert(message);
+      showScheduleModal(date);
     });
   });
 }

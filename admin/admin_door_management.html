@@ -205,7 +205,7 @@
         background: #f1f5f9;
         padding: 2px 8px;
         border-radius: 20px;
-        font-family: monospace;
+        font-family: 'Montserrat', sans-serif;
         font-size: 0.6rem;
       }
 
@@ -276,7 +276,7 @@
     }
 
     .rfid-tag {
-      font-family: 'Courier New', monospace;
+      font-family: 'Montserrat', sans-serif;
       background: #e2e8f0;
       padding: 2px 6px;
       border-radius: 4px;
@@ -397,9 +397,14 @@
         <li><a href="admin_door_management.html" class="nav-link active"><i class="fa-solid fa-door-open"></i> Door Management</a></li>
         <li><a href="admin_seat_management.html" class="nav-link"><i class="fa-solid fa-couch"></i> Seat Management</a></li>
         <li><a href="admin_reservation.html" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Reservation</a></li>
-        <li><a href="admin_staff.html" class="nav-link"><i class="fa-solid fa-user-shield"></i> Staff</a></li>
-        <li><a href="admin_customers.html" class="nav-link"><i class="fa-solid fa-users"></i> Customers</a></li>
-        <li><a href="admin_analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics</a></li>
+        <details class="nav-details">
+          <summary class="nav-link"><i class="fa-solid fa-users-gear"></i> Users Management</summary>
+          <ul class="submenu">
+            <li><a href="admin_staff.html" class="nav-link sub-link">Staffs</a></li>
+            <li><a href="admin_customers.html" class="nav-link sub-link">Customers</a></li>
+          </ul>
+        </details>
+        <li><a href="admin_analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics & Reports</a></li>
         <li><a href="admin_events.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Event</a></li>
         <li><a href="admin_messages.html" class="nav-link"><i class="fa-solid fa-envelope"></i> Message</a></li>
         <li><a href="admin_notification.html" class="nav-link"><i class="fa-solid fa-bell"></i> Notification</a></li>
