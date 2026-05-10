@@ -190,6 +190,16 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: transform 0.2s ease, background-color 0.3s ease;
+      }
+
+      .chair-icon {
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
       }
 
       .item-label {
@@ -371,7 +381,7 @@
             <div class="stat-card sc-green">
               <div class="stat-icon"><i class="fa-solid fa-couch"></i></div>
               <div class="stat-lbl">SEAT AVAILABLE</div>
-              <div class="stat-val">20/35</div>
+              <div class="stat-val" id="statAvailable">0/0</div>
             </div>
           </div>
 
@@ -438,10 +448,10 @@
                 </button>
               </div>
               <div class="map-legend" style="margin: 0 0 12px 0">
-                <div class="legend-dot"><span style="background:#22c55e"></span>Active</div>
-                <div class="legend-dot"><span style="background:#f97316"></span>Idle</div>
-                <div class="legend-dot"><span style="background:#ef4444"></span>Inactive</div>
-                <div class="legend-dot"><span style="background:#8A8636"></span>Reserved</div>
+                <div class="legend-dot"><span style="background:#10b981"></span>Available</div>
+                <div class="legend-dot"><span style="background:#d65c29"></span>Taken</div>
+                <div class="legend-dot"><span style="background:#1e293b"></span>Reserved</div>
+                <div class="legend-dot"><span style="background:#facc15"></span>Idle</div>
               </div>
               <div class="seat-map-container" id="seatMapViewport">
                 <div id="dynamicSeatMap"></div>
@@ -675,106 +685,113 @@
         }
 
         // Dynamic Seat Map Rendering
-        function renderLiveSeatMap() {
+        async function renderLiveSeatMap() {
           const container = document.getElementById('dynamicSeatMap');
           const viewport = document.getElementById('seatMapViewport');
           if (!container) return;
 
-          const saved = localStorage.getItem('seatLayout');
-          let items = [];
-          if (saved) {
-            try { items = JSON.parse(saved); } catch (e) { console.error("Error loading layout", e); }
-          }
+          container.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-weight:600;">Loading live map...</div>';
 
-          container.innerHTML = '';
+          try {
+            const res = await fetch('/api/layout');
+            const data = await res.json();
+            let items = data.items || [];
+            
+            container.innerHTML = '';
 
-          if (items.length === 0) {
-            container.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-weight:600;">No layout found. Click to create one.</div>';
-          }
-
-          // Add click listener to navigate to management
-          container.onclick = () => {
-            window.location.href = '/admin/seat-management';
-          };
-
-          items.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'fp-item';
-            el.style.left = item.x + 'px';
-            el.style.top = item.y + 'px';
-            el.style.width = item.w + 'px';
-            el.style.height = item.h + 'px';
-            el.style.zIndex = (item.type === 'chair' || item.type === 'chair-sq') ? 5 : item.type.startsWith('block') ? 2 : 3;
-
-            const visual = document.createElement('div');
-            visual.className = 'item-visual';
-            visual.style.transform = 'rotate(' + (item.rot || 0) + 'deg)';
-
-            if (item.type === 'chair') {
-              visual.style.backgroundImage = 'url(/images/chair.png)';
-              visual.style.backgroundSize = 'contain';
-              visual.style.backgroundRepeat = 'no-repeat';
-              visual.style.backgroundPosition = 'center';
-              const status = (item.statuses && item.statuses[0]) || 'open';
-              if (status === 'taken') {
-                visual.style.backgroundColor = '#9ca3af';
-                visual.style.filter = 'grayscale(100%) brightness(80%)';
-                visual.style.borderRadius = '4px';
-              } else if (status === 'reserved') {
-                visual.style.backgroundColor = '#ef4444';
-                visual.style.filter = 'brightness(0) invert(1)';
-                visual.style.borderRadius = '4px';
-              } else {
-                visual.style.backgroundColor = 'transparent';
-                visual.style.filter = 'none';
-              }
-            } else if (item.type === 'chair-sq') {
-              const status = (item.statuses && item.statuses[0]) || 'open';
-              const sqColor = status === 'taken' ? '#9ca3af' : status === 'reserved' ? '#ef4444' : '#faecd4';
-              visual.style.background = sqColor;
-              visual.style.border = '1px solid #94a3b8';
-              visual.style.borderRadius = '4px';
-            } else if (item.type === 'round-table' || item.type === 'rect-table') {
-              visual.style.background = item.color || '#fdba74';
-              visual.style.border = '1.5px solid #f97316';
-              visual.style.borderRadius = item.type === 'round-table' ? '50%' : '6px';
-            } else if (item.type === 'room') {
-              const status = (item.statuses && item.statuses[0]) || 'open';
-              const roomColor = status === 'taken' ? '#9ca3af' : status === 'reserved' ? '#ef4444' : item.color;
-              visual.style.background = roomColor;
-              visual.style.border = '2px solid #16a34a';
-              visual.style.borderRadius = '8px';
-            } else {
-              visual.style.background = item.color || '#cbd5e1';
-              visual.style.borderRadius = '4px';
+            if (items.length === 0) {
+              container.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-weight:600;">No layout found.</div>';
+              return;
             }
-            el.appendChild(visual);
 
-            if (item.label || item.type === 'room') {
-              const lbl = document.createElement('span');
-              lbl.className = 'item-label';
-              if (item.type !== 'chair' && item.type !== 'chair-sq') {
-                lbl.classList.add('center');
+            // Update stat counter
+            const chairs = items.filter(i => (i.type === 'chair' || i.type === 'chair-sq'));
+            const openChairs = chairs.filter(i => !i.statuses || i.statuses[0] === 'open');
+            document.getElementById('statAvailable').textContent = `${openChairs.length}/${chairs.length}`;
+
+            // Add click listener to navigate to management
+            container.onclick = () => {
+              window.location.href = '/admin/seat-management';
+            };
+
+            items.forEach(item => {
+              const el = document.createElement('div');
+              el.className = 'fp-item';
+              el.style.left = item.x + 'px';
+              el.style.top = item.y + 'px';
+              el.style.width = item.w + 'px';
+              el.style.height = item.h + 'px';
+              el.style.zIndex = (item.type === 'chair' || item.type === 'chair-sq') ? 5 : item.type.startsWith('block') ? 2 : 3;
+
+              const visual = document.createElement('div');
+              visual.className = 'item-visual';
+              visual.style.transform = 'rotate(' + (item.rot || 0) + 'deg)';
+
+              if (item.type === 'chair') {
+                visual.classList.add('chair-icon');
+                visual.style.webkitMaskImage = 'url(/images/chair.png)';
+                visual.style.maskImage = 'url(/images/chair.png)';
                 const status = (item.statuses && item.statuses[0]) || 'open';
-                const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
-                lbl.style.color = isDark ? '#fff' : '#1e293b';
+                
+                if (status === 'taken') {
+                  visual.style.backgroundColor = '#d65c29'; // Orange
+                } else if (status === 'reserved') {
+                  visual.style.backgroundColor = '#1e293b'; // Dark
+                } else if (status === 'idle') {
+                  visual.style.backgroundColor = '#facc15'; // Yellow
+                } else {
+                  visual.style.backgroundColor = '#10b981'; // Green
+                }
+              } else if (item.type === 'chair-sq') {
+                const status = (item.statuses && item.statuses[0]) || 'open';
+                const sqColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981';
+                visual.style.background = sqColor;
+                visual.style.borderRadius = '4px';
+              } else if (item.type === 'round-table' || item.type === 'rect-table') {
+                visual.style.background = item.color || '#fdba74';
+                visual.style.border = '1.5px solid #f97316';
+                visual.style.borderRadius = item.type === 'round-table' ? '50%' : '6px';
+              } else if (item.type === 'room') {
+                const status = (item.statuses && item.statuses[0]) || 'open';
+                const roomColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : item.color;
+                visual.style.background = roomColor;
+                visual.style.border = '2px solid #16a34a';
+                visual.style.borderRadius = '8px';
+              } else {
+                visual.style.background = item.color || '#cbd5e1';
+                visual.style.borderRadius = '4px';
               }
-              lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
-              el.appendChild(lbl);
-            }
-            container.appendChild(el);
-          });
+              el.appendChild(visual);
 
-        // Auto-scale to fit dashboard card
-        const rect = viewport.getBoundingClientRect();
-        const vWidth = rect.width || viewport.clientWidth || viewport.offsetWidth || 600;
-        const vHeight = rect.height || viewport.clientHeight || viewport.offsetHeight || 380;
+              if (item.label || item.type === 'room') {
+                const lbl = document.createElement('span');
+                lbl.className = 'item-label';
+                if (item.type !== 'chair' && item.type !== 'chair-sq') {
+                  lbl.classList.add('center');
+                  const status = (item.statuses && item.statuses[0]) || 'open';
+                  const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
+                  lbl.style.color = isDark ? '#fff' : '#1e293b';
+                }
+                lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
+                el.appendChild(lbl);
+              }
+              container.appendChild(el);
+            });
 
-        const scale = Math.min(vWidth / 800, vHeight / 450) * 0.95;
-        container.style.transform = `scale(${scale})`;
-        container.style.left = `${(vWidth - (800 * scale)) / 2}px`;
-        container.style.top = `${(vHeight - (450 * scale)) / 2}px`;
-    }
+            // Auto-scale to fit dashboard card
+            const rect = viewport.getBoundingClientRect();
+            const vWidth = rect.width || viewport.clientWidth || viewport.offsetWidth || 600;
+            const vHeight = rect.height || viewport.clientHeight || viewport.offsetHeight || 380;
+
+            const scale = Math.min(vWidth / 800, vHeight / 450) * 0.95;
+            container.style.transform = `scale(${scale})`;
+            container.style.left = `${(vWidth - (800 * scale)) / 2}px`;
+            container.style.top = `${(vHeight - (450 * scale)) / 2}px`;
+          } catch (e) {
+            console.error(e);
+            container.innerHTML = '<div style="color:red; padding:20px;">Error loading live status.</div>';
+          }
+        }
 
         // Handle Resize
         window.addEventListener('resize', renderLiveSeatMap);

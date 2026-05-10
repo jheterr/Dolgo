@@ -245,7 +245,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+
+    .item-visual.chair-icon {
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
     }
 
     .fp-item.selected {
@@ -451,9 +460,14 @@
     <main class="content">
       <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
       <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
-        <h1 class="page-title">Seat Management</h1>
-        <button class="btn btn-primary" id="btnEditToggle" onclick="toggleEditMode()"><i
-            class="fa-solid fa-pen-to-square"></i> Edit Layout</button>
+        <div>
+          <h1 class="page-title" style="margin:0">Floor Management</h1>
+          <p style="font-size:12px;color:var(--text-sm)">Real-time status tracking & layout designer</p>
+        </div>
+        <div class="mode-toggles" style="display:flex;background:#e2e8f0;padding:4px;border-radius:10px;gap:4px">
+          <button class="btn btn-sm" id="btnTrackMode" onclick="setAppMode('track')" style="border-radius:6px;background:var(--orange);color:white"><i class="fa-solid fa-radar"></i> Live Tracking</button>
+          <button class="btn btn-sm" id="btnEditMode" onclick="setAppMode('edit')" style="border-radius:6px;background:transparent;color:var(--text)"><i class="fa-solid fa-pen-ruler"></i> Edit Layout</button>
+        </div>
       </div>
 
       <div class="seat-page">
@@ -507,12 +521,12 @@
           </div>
           <!-- LEGEND -->
           <div class="legend" id="canvasLegend">
-            <span><span class="legend-dot" style="background:#faecd4;border:1px solid #d4a96a"></span>Open</span>
-            <span><span class="legend-dot" style="background:#9ca3af"></span>Taken</span>
-            <span><span class="legend-dot" style="background:#ef4444"></span>Reserved</span>
+            <span><span class="legend-dot" style="background:#10b981"></span>Available</span>
+            <span><span class="legend-dot" style="background:#d65c29"></span>Taken</span>
+            <span><span class="legend-dot" style="background:#1e293b"></span>Reserved</span>
+            <span><span class="legend-dot" style="background:#facc15"></span>Idle</span>
             <span><span class="legend-dot" style="background:#22c55e"></span>Meeting Room</span>
-            <span style="color:var(--orange)"><i class="fa-solid fa-hand-pointer" style="font-size:9px"></i> Click seat
-              to manage</span>
+            <span style="color:var(--orange)"><i class="fa-solid fa-hand-pointer" style="font-size:9px"></i> Click seat to manage</span>
           </div>
         </div>
 
@@ -579,16 +593,30 @@
       <div class="booking-field">
         <label>Action</label>
         <select id="seatAction">
-          <option value="book">📍 Book (Mark as Taken)</option>
-          <option value="reserve">🔴 Reserve for Later</option>
-          <option value="open">✅ Mark as Open / Available</option>
-          <option value="taken">⬛ Mark as Occupied</option>
+          <option value="open">✅ Mark as Available (Green)</option>
+          <option value="taken">📍 Mark as Taken (Orange)</option>
+          <option value="reserve">🔵 Mark as Reserved (Dark)</option>
+          <option value="idle">🟡 Mark as Idle (Yellow)</option>
         </select>
       </div>
       <div style="display:flex;gap:8px;margin-top:20px">
         <button class="btn btn-primary" style="flex:1" onclick="saveBooking()"><i class="fa-solid fa-check"></i>
           Save</button>
         <button class="btn" style="flex:1;background:#f1f5f9" onclick="closeBooking()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unsaved Changes Modal -->
+  <div class="modal-overlay" id="unsavedModal">
+    <div class="booking-modal" style="width:400px; text-align:center;">
+      <div class="booking-title" style="color:var(--orange)"><i class="fa-solid fa-triangle-exclamation"></i> Unsaved Changes</div>
+      <p style="font-size:14px; color:var(--text-md); margin-bottom:24px;">You have made changes to the floor layout. Would you like to save them before returning to Tracking Mode?</p>
+      
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="handleUnsavedSave()"><i class="fa-solid fa-floppy-disk"></i> Save & Exit</button>
+        <button class="btn" style="width:100%; padding:12px; background:#fee2e2; color:#ef4444;" onclick="handleUnsavedDiscard()"><i class="fa-solid fa-trash-can"></i> Discard Changes</button>
+        <button class="btn" style="width:100%; padding:12px; background:#f1f5f9;" onclick="closeUnsavedModal()">Keep Editing</button>
       </div>
     </div>
   </div>
@@ -606,6 +634,8 @@
     let items = [];
     let mode = 'select';
     let isEditMode = false;
+    let trackInterval = null;
+    let originalItems = null; // Copy of items when entering Edit Mode
     let selectedId = null;
     let dragging = null;
     let dragOff = { x: 0, y: 0 };
@@ -652,13 +682,104 @@
       { id: 54, type: 'rect-table', x: 510, y: 242, w: 80, h: 50, rot: 0, color: '#fdba74', label: 'T8' },
     ];
 
-    function init() {
-      const saved = localStorage.getItem('seatLayout');
-      if (saved) { try { items = JSON.parse(saved); nextId = Math.max(...items.map(i => i.id)) + 1 } catch (e) { items = [...defaultItems]; nextId = 60 } }
-      else { items = [...defaultItems]; nextId = 60 }
-      render();
-      buildCustList();
+
+    async function init() {
+      await loadData();
+      setAppMode('track');
     }
+
+    async function loadData() {
+      try {
+        const res = await fetch('/api/layout');
+        const data = await res.json();
+        if (data && data.items && data.items.length > 0) {
+          items = data.items;
+          nextId = Math.max(...items.map(i => i.id)) + 1;
+        } else {
+          items = [...defaultItems]; nextId = 60;
+        }
+        render();
+        buildCustList();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function hasUnsavedChanges() {
+      if (!isEditMode || !originalItems) return false;
+      return JSON.stringify(items) !== JSON.stringify(originalItems);
+    }
+
+    let pendingMode = null;
+    
+    function setAppMode(m) {
+      if (!isEditMode && m === 'edit') {
+        originalItems = JSON.parse(JSON.stringify(items));
+      }
+
+      if (isEditMode && m === 'track') {
+        if (hasUnsavedChanges()) {
+          pendingMode = m;
+          document.getElementById('unsavedModal').classList.add('show');
+          return;
+        }
+        originalItems = null;
+      }
+
+      isEditMode = (m === 'edit');
+      document.body.classList.toggle('edit-mode', isEditMode);
+      
+      const btnTrack = document.getElementById('btnTrackMode');
+      const btnEdit = document.getElementById('btnEditMode');
+      
+      if (isEditMode) {
+        btnEdit.style.background = 'var(--orange)';
+        btnEdit.style.color = 'white';
+        btnTrack.style.background = 'transparent';
+        btnTrack.style.color = 'var(--text)';
+        if (trackInterval) clearInterval(trackInterval);
+        document.getElementById('hintText').innerHTML = '<i class="fa-regular fa-hand-pointer"></i> Edit mode: Drag items to move. Click to cycle status.';
+      } else {
+        btnTrack.style.background = 'var(--orange)';
+        btnTrack.style.color = 'white';
+        btnEdit.style.background = 'transparent';
+        btnEdit.style.color = 'var(--text)';
+        selectedId = null;
+        hideProps();
+        document.getElementById('hintText').innerHTML = '<i class="fa-solid fa-radar"></i> Live Tracking: Auto-refreshing statuses every 5s.';
+        if (trackInterval) clearInterval(trackInterval);
+        trackInterval = setInterval(loadData, 5000);
+      }
+      render();
+    }
+
+    function closeUnsavedModal() {
+      document.getElementById('unsavedModal').classList.remove('show');
+      pendingMode = null;
+    }
+
+    async function handleUnsavedSave() {
+      await saveLayout();
+      closeUnsavedModal();
+    }
+
+    function handleUnsavedDiscard() {
+      items = JSON.parse(JSON.stringify(originalItems));
+      originalItems = null;
+      isEditMode = false;
+      document.body.classList.toggle('edit-mode', false);
+      setAppMode('track');
+      closeUnsavedModal();
+    }
+
+    // Browser navigation guard
+    window.onbeforeunload = function(e) {
+      if (hasUnsavedChanges()) {
+        const msg = "You have unsaved layout changes!";
+        e.returnValue = msg;
+        return msg;
+      }
+    };
 
     function render() {
       canvas.innerHTML = '';
@@ -678,32 +799,33 @@
         visual.style.transform = 'rotate(' + (item.rot || 0) + 'deg)';
 
         if (item.type === 'chair') {
-          visual.style.backgroundImage = 'url(/images/chair.png)';
-          visual.style.backgroundSize = 'contain';
-          visual.style.backgroundRepeat = 'no-repeat';
-          visual.style.backgroundPosition = 'center';
-          if (!item.statuses) item.statuses = ['open'];
-          const status = item.statuses[0];
-          if (status === 'taken') {
-            visual.style.backgroundColor = '#9ca3af';
-            visual.style.filter = 'grayscale(100%) brightness(80%)';
-            visual.style.borderRadius = '4px';
-          } else if (status === 'reserved') {
-            visual.style.backgroundColor = '#ef4444';
-            visual.style.filter = 'brightness(0) invert(1)'; // White icon on red
-            visual.style.borderRadius = '4px';
-          } else {
+          if (isEditMode) {
+            // Default look for editing
+            visual.classList.remove('chair-icon');
+            visual.style.webkitMaskImage = 'none';
+            visual.style.maskImage = 'none';
+            visual.style.backgroundImage = 'url(/images/chair.png)';
+            visual.style.backgroundSize = 'contain';
+            visual.style.backgroundRepeat = 'no-repeat';
+            visual.style.backgroundPosition = 'center';
             visual.style.backgroundColor = 'transparent';
-            visual.style.filter = 'none';
+          } else {
+            // Status-colored look for tracking
+            visual.classList.add('chair-icon');
+            visual.style.webkitMaskImage = 'url(/images/chair.png)';
+            visual.style.maskImage = 'url(/images/chair.png)';
+            if (!item.statuses) item.statuses = ['open'];
+            const status = item.statuses[0];
+            if (status === 'taken') visual.style.backgroundColor = '#d65c29';
+            else if (status === 'reserved') visual.style.backgroundColor = '#1e293b';
+            else if (status === 'idle') visual.style.backgroundColor = '#facc15';
+            else visual.style.backgroundColor = '#10b981';
           }
           el.onclick = (e) => { e.stopPropagation(); if (mode === 'select') handleSeatClick(e, item.id, 0) };
         } else if (item.type === 'chair-sq') {
-          if (!item.statuses) item.statuses = ['open'];
-          const status = item.statuses[0];
-          const sqColor = status === 'taken' ? '#9ca3af' : status === 'reserved' ? '#ef4444' : '#faecd4';
-          const borderColor = status === 'taken' ? '#6b7280' : status === 'reserved' ? '#991b1b' : '#b07828';
+          const status = (item.statuses && item.statuses[0]) || 'open';
+          const sqColor = isEditMode ? '#faecd4' : (status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981');
           visual.style.background = sqColor;
-          visual.style.border = '2px solid ' + borderColor;
           visual.style.borderRadius = '6px';
           el.onclick = (e) => { e.stopPropagation(); if (mode === 'select') handleSeatClick(e, item.id, 0) };
         } else if (item.type === 'round-table') {
@@ -754,23 +876,6 @@
         el.appendChild(del);
         canvas.appendChild(el);
       });
-    }
-
-    // Mode
-    function toggleEditMode() {
-      isEditMode = !isEditMode;
-      document.body.classList.toggle('edit-mode', isEditMode);
-      const btn = document.getElementById('btnEditToggle');
-      if (isEditMode) {
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> Finish Editing';
-        btn.style.background = '#22c55e';
-      } else {
-        btn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Edit Layout';
-        btn.style.background = 'var(--orange)';
-        selectedId = null;
-        hideProps();
-      }
-      render();
     }
 
     function setMode(m) {
@@ -899,14 +1004,28 @@
     }
     function deleteSelected() { if (selectedId) deleteItem(selectedId) }
 
-    function saveLayout() {
-      localStorage.setItem('seatLayout', JSON.stringify(items));
-      alert('Layout saved!');
+    async function saveLayout() {
+      try {
+        const res = await fetch('/api/layout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items })
+        });
+        if (res.ok) {
+          alert('Layout saved dynamically to the database!');
+          originalItems = JSON.parse(JSON.stringify(items)); // Update baseline after save
+          setAppMode('track'); // Auto-return to tracking after save
+        }
+        else alert('Error saving layout');
+      } catch (e) {
+        console.error(e);
+        alert('Error saving layout');
+      }
     }
-    function clearAll() {
+    async function clearAll() {
       if (!confirm('Clear all items?')) return;
       items = []; selectedId = null; hideProps(); render();
-      localStorage.removeItem('seatLayout');
+      await saveLayout();
     }
 
     function toggleSeatStatus(itemId, seatIndex) {
@@ -971,11 +1090,8 @@
       const action = document.getElementById('seatAction').value;
       const item = items.find(i => i.id === currentBookingItem);
       if (item) {
-        const count = item.type === 'chair' ? 1 : (item.type === 'chairs-2' ? 2 : 3);
-        if (!item.statuses) item.statuses = Array(count).fill('open');
-        if (action === 'book' || action === 'taken') item.statuses[currentBookingSeat] = 'taken';
-        else if (action === 'reserve') item.statuses[currentBookingSeat] = 'reserved';
-        else item.statuses[currentBookingSeat] = 'open';
+        if (!item.statuses) item.statuses = ['open'];
+        item.statuses[currentBookingSeat] = action;
         render();
       }
       closeBooking();

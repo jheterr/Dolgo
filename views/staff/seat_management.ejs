@@ -21,7 +21,27 @@
   .detail-panel { background:var(--white); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); border-left:4px solid var(--orange); margin-top:4px; }
   .detail-name { font-family:'Poppins',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:4px; }
   .detail-meta { font-size:12px; color:var(--text-sm); margin-bottom:14px; }
-  .seat-map { height: 390px; }
+  
+  .canvas-viewport { width: 100%; height: 500px; overflow: auto; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 10px; position: relative; display: flex; justify-content: center; align-items: flex-start; padding: 10px; }
+  .canvas-board { position: relative; width: 800px; height: 450px; background: #f0f4f8; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px; cursor: default; transform-origin: 0 0; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+  .fp-item { position: absolute; user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .item-visual.chair-icon {
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+  }
+  
+  .map-legend div span {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+
   @media(max-width:1100px){ .seat-page{grid-template-columns:1fr;} }
   
 </style>
@@ -40,51 +60,16 @@
       <div class="seat-page">
         <div class="card">
           
-          <div class="map-legend">
-            <div class="legend-dot"><span style="background:var(--green)"></span>Active</div>
-            <div class="legend-dot"><span style="background:var(--orange)"></span>Idle</div>
-            <div class="legend-dot"><span style="background:#e53e3e"></span>Inactive</div>
-            <div class="legend-dot"><span style="background:var(--olive)"></span>Reserved</div>
+          <div class="map-legend" style="display:flex;gap:12px;padding:8px 12px;background:rgba(255,255,255,0.6);border-radius:8px;font-size:10px;font-weight:600;margin-bottom:10px;">
+            <div><span style="background:#10b981"></span>Available</div>
+            <div><span style="background:#d65c29"></span>Taken</div>
+            <div><span style="background:#1e293b"></span>Reserved</div>
+            <div><span style="background:#facc15"></span>Idle</div>
+            <div><span style="background:#22c55e"></span>Meeting Room</div>
           </div>
           
-          <div class="seat-map">
-            <div class="map-entrance">Entrance</div>
-            <div class="map-zone zone-counter">Counter</div>
-            <div class="map-zone zone-meeting">Meeting<br>Room</div>
-            <div class="map-zone zone-table3">Table 3</div>
-            <div class="seat seat-active"   style="bottom:106px;left:44%" data-seat="T3-S1" data-name="Monkey D. Luffy">T3</div>
-            <div class="seat seat-inactive" style="bottom:82px;left:44%">T3</div>
-            <div class="seat seat-reserved" style="bottom:58px;left:44%">T3</div>
-            <div class="seat seat-idle"     style="bottom:34px;left:44%">T3</div>
-            <div class="seat seat-active"   style="bottom:120px;left:55%" data-seat="T3-S5" data-name="Nami Catburglar">T3</div>
-            <div class="seat seat-active"   style="bottom:96px;left:55%"  data-seat="T3-S6" data-name="Sanji Vinsmoke">T3</div>
-            <div class="seat seat-inactive" style="bottom:72px;left:55%">T3</div>
-            <div class="seat seat-idle"     style="bottom:48px;left:55%">T3</div>
-            <div class="rt-base" style="bottom:50px;left:78px"></div>
-            <div class="seat seat-idle"     style="bottom:74px;left:72px">RT1</div>
-            <div class="seat seat-active"   style="bottom:50px;left:60px" data-seat="RT1-S2" data-name="Zoro Roronoa">RT1</div>
-            <div class="seat seat-inactive" style="bottom:26px;left:72px">RT1</div>
-            <div class="seat seat-active"   style="bottom:50px;left:96px" data-seat="RT1-S4" data-name="Usopp">RT1</div>
-            <div class="rt-label" style="bottom:10px;left:62px">Rounded<br>Table 1</div>
-            <div class="rt-base" style="bottom:50px;left:194px"></div>
-            <div class="seat seat-active"   style="bottom:74px;left:188px" data-seat="RT2-S1" data-name="Jinbe">RT2</div>
-            <div class="seat seat-reserved" style="bottom:50px;left:176px">RT2</div>
-            <div class="seat seat-idle"     style="bottom:26px;left:188px">RT2</div>
-            <div class="seat seat-inactive" style="bottom:50px;left:212px">RT2</div>
-            <div class="rt-label" style="bottom:10px;left:178px">Rounded<br>Table 2</div>
-            <div class="rt-base" style="bottom:50px;right:158px"></div>
-            <div class="seat seat-active"   style="bottom:74px;right:164px" data-seat="RT3-S1" data-name="Franky">RT3</div>
-            <div class="seat seat-idle"     style="bottom:50px;right:176px">RT3</div>
-            <div class="seat seat-inactive" style="bottom:26px;right:164px">RT3</div>
-            <div class="seat seat-active"   style="bottom:50px;right:140px" data-seat="RT3-S4" data-name="Robin">RT3</div>
-            <div class="rt-label" style="bottom:10px;right:146px">Rounded<br>Table 3</div>
-            <div class="cubicle-block">
-              <div class="cubicle-row"><div class="c-seat seat-inactive">C1-S1</div><div class="c-seat seat-active" data-seat="C1-S2" data-name="Brook">C1-S2</div><span class="c-label">Cubicle 1</span></div>
-              <div class="cubicle-row"><div class="c-seat seat-active">C2-S1</div><div class="c-seat seat-active">C2-S2</div><span class="c-label">Cubicle 2</span></div>
-              <div class="cubicle-row"><div class="c-seat seat-inactive">C3-S1</div><div class="c-seat seat-inactive">C3-S2</div><span class="c-label">Cubicle 3</span></div>
-              <div class="cubicle-row"><div class="c-seat seat-active">C4-S1</div><div class="c-seat seat-idle">C4-S2</div><span class="c-label">Cubicle 4</span></div>
-              <div class="cubicle-row"><div class="c-seat seat-active">C5-S1</div><div class="c-seat seat-active">C5-S2</div><span class="c-label">Cubicle 5</span></div>
-            </div>
+          <div class="canvas-viewport">
+            <div class="canvas-board mode-select" id="canvas"></div>
           </div>
         </div>
         <div class="right-col">
@@ -209,9 +194,99 @@ function doTransferFor(name){
   }
 }
 
-document.querySelectorAll('.seat[data-name]').forEach(s=>{
-  s.addEventListener('click',()=>showDetail(s.dataset.name,s.dataset.seat,'09:30 AM'));
-});
+let items = [];
 
-window.onload = buildList;
+async function loadLayout() {
+  try {
+    const res = await fetch('/api/layout');
+    const data = await res.json();
+    if (data && data.items) {
+      items = data.items;
+      renderCanvas();
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function renderCanvas() {
+  const canvas = document.getElementById('canvas');
+  canvas.innerHTML = '';
+  items.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'fp-item';
+    el.style.left = item.x + 'px';
+    el.style.top = item.y + 'px';
+    el.style.width = item.w + 'px';
+    el.style.height = item.h + 'px';
+    el.style.zIndex = (item.type === 'chair' || item.type === 'chair-sq') ? 5 : item.type.startsWith('block') ? 2 : 3;
+
+    const visual = document.createElement('div');
+    visual.className = 'item-visual';
+    visual.style.transform = 'rotate(' + (item.rot || 0) + 'deg)';
+
+    if (item.type === 'chair') {
+      visual.classList.add('chair-icon');
+      visual.style.webkitMaskImage = 'url(/images/chair.png)';
+      visual.style.maskImage = 'url(/images/chair.png)';
+      const status = item.statuses ? item.statuses[0] : 'open';
+      if (status === 'taken') {
+        visual.style.backgroundColor = '#d65c29';
+      } else if (status === 'reserved') {
+        visual.style.backgroundColor = '#1e293b';
+      } else if (status === 'idle') {
+        visual.style.backgroundColor = '#facc15';
+      } else {
+        visual.style.backgroundColor = '#10b981';
+      }
+      el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Seat', item.label, '9:30 AM'); };
+    } else if (item.type === 'chair-sq') {
+      const status = item.statuses ? item.statuses[0] : 'open';
+      const sqColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981';
+      visual.style.background = sqColor;
+      visual.style.borderRadius = '6px';
+      el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Seat', item.label, '9:30 AM'); };
+    } else if (item.type === 'round-table') {
+      visual.style.background = item.color;
+      visual.style.borderRadius = '50%';
+      visual.style.border = '2px solid #f97316';
+    } else if (item.type === 'rect-table') {
+      visual.style.background = item.color;
+      visual.style.borderRadius = '8px';
+      visual.style.border = '2px solid #f97316';
+    } else if (item.type === 'room') {
+      const status = item.statuses ? item.statuses[0] : 'open';
+      const roomColor = status === 'taken' ? '#9ca3af' : status === 'reserved' ? '#ef4444' : item.color;
+      visual.style.background = roomColor;
+      visual.style.borderRadius = '8px';
+      visual.style.border = '2px solid #16a34a';
+      el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Room', item.label, '9:30 AM'); };
+    } else {
+      visual.style.background = item.color;
+      visual.style.borderRadius = '4px';
+      if (item.color === '#22c55e') visual.style.border = '2px solid #16a34a';
+      else if (item.color === '#fde68a') visual.style.border = '1.5px solid #f59e0b';
+    }
+    el.appendChild(visual);
+
+    if (item.label || item.type === 'room') {
+      const lbl = document.createElement('span');
+      lbl.className = 'item-label';
+      if (item.type !== 'chair' && item.type !== 'chair-sq') {
+        lbl.classList.add('center');
+        const status = item.statuses ? item.statuses[0] : 'open';
+        const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
+        lbl.style.color = isDark ? '#fff' : '#1e293b';
+      }
+      lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
+      el.appendChild(lbl);
+    }
+    canvas.appendChild(el);
+  });
+}
+
+window.onload = () => {
+  buildList();
+  loadLayout();
+};
 </script>

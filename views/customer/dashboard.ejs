@@ -256,7 +256,7 @@
                     style="background: white; border-radius: 12px; padding: 48px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
                     <div id="seats-available"
                         style="font-size: 7rem; font-weight: 800; color: #d65c29; line-height: 1;">
-                        17
+                        0
                     </div>
                     <p style="font-size: 1.6rem; font-weight: 700; color: #1e293b; margin-top: 16px;">
                         Seats Available Now
@@ -312,10 +312,7 @@
             <p class="modal-subtitle">Select new seat number</p>
             
             <select id="seatSelect" class="seat-select">
-                <option value="T2-S2">T2-S2</option>
-                <option value="T2-S3">T2-S3</option>
-                <option value="T3-S1">T3-S1</option>
-                <option value="T4-S5">T4-S5</option>
+                <option value="">Loading seats...</option>
             </select>
             
             <div class="modal-actions">
@@ -389,5 +386,36 @@
             }
         }
 
-        window.onload = () => updateTimer();
+        async function loadDynamicStats() {
+            try {
+                const res = await fetch('/api/layout');
+                const data = await res.json();
+                if (data && data.items) {
+                    const chairs = data.items.filter(i => (i.type === 'chair' || i.type === 'chair-sq'));
+                    const openChairs = chairs.filter(i => i.statuses && i.statuses[0] === 'open');
+                    
+                    document.getElementById('seats-available').textContent = openChairs.length;
+                    
+                    const select = document.getElementById('seatSelect');
+                    select.innerHTML = '';
+                    if (openChairs.length === 0) {
+                        select.innerHTML = '<option value="">No seats available</option>';
+                    } else {
+                        openChairs.forEach(c => {
+                            const opt = document.createElement('option');
+                            opt.value = c.label;
+                            opt.textContent = c.label;
+                            select.appendChild(opt);
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        window.onload = () => {
+            updateTimer();
+            loadDynamicStats();
+        };
     </script>

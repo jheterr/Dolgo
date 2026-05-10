@@ -189,6 +189,20 @@
             border-radius: 8px;
         }
         
+        .canvas-viewport { width: 100%; height: 500px; overflow: auto; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 10px; position: relative; display: flex; justify-content: center; align-items: flex-start; padding: 10px; }
+        .canvas-board { position: relative; width: 800px; height: 450px; background: #f0f4f8; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px; cursor: default; transform-origin: 0 0; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .item-visual.chair-icon {
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
+        }
+        
+        .fp-item .item-label { position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); font-family: 'Poppins', sans-serif; font-size: 9px; font-weight: 700; color: #475569; white-space: nowrap; pointer-events: none; z-index: 10; }
+        .fp-item .item-label.center { top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px; }
+        
         /* Map lines/dividers */
         .map-line-h {
             position: absolute;
@@ -506,67 +520,13 @@
                     <div class="map-container">
                         <div class="legend">
                             <div class="legend-item"><div class="legend-dot dot-green"></div> Available</div>
-                            <div class="legend-item"><div class="legend-dot dot-orange"></div> Occupied</div>
+                            <div class="legend-item"><div class="legend-dot dot-orange"></div> Taken</div>
                             <div class="legend-item"><div class="legend-dot dot-dark"></div> Reserved</div>
-                            <div class="legend-item"><div class="legend-dot dot-yellow"></div> Your selection</div>
+                            <div class="legend-item"><div class="legend-dot dot-yellow"></div> Idle</div>
                         </div>
                         
-                        <div class="map-area view-meeting">
-                            <!-- Room structure -->
-                            <div class="map-line-h" style="top: 220px; left: 0; width: 400px;"></div>
-                            <div class="map-line-v" style="top: 220px; left: 400px; height: 280px;"></div>
-                            
-                            <!-- Static texts -->
-                            <div class="counter">Counter</div>
-                            <div class="entry-text">Entry</div>
-                            
-                            <!-- T1 Cluster -->
-                            <div class="table-circle" style="left: 140px; top: 350px; width: 60px; height: 60px;">T1</div>
-                            <div class="seat seat-circle bg-green" style="left: 120px; top: 300px;">T1-S1</div>
-                            <div class="seat seat-circle bg-green" style="left: 210px; top: 360px;">T1-S2</div>
-                            <div class="seat seat-circle bg-orange" style="left: 100px; top: 400px;">T1-S3</div>
-                            
-                            <!-- T2 Cluster -->
-                            <div class="table-rect" style="left: 450px; top: 290px; width: 50px; height: 160px;">T2</div>
-                            <div class="seat seat-rect bg-orange" style="left: 455px; top: 250px;">T2-S1</div>
-                            <div class="seat seat-rect bg-orange" style="left: 400px; top: 300px;">T2-S2</div>
-                            <div class="seat seat-rect bg-orange" style="left: 400px; top: 340px;">T2-S3</div>
-                            <div class="seat seat-rect bg-green" style="left: 400px; top: 380px;">T2-S4</div>
-                            <div class="seat seat-rect bg-orange" style="left: 455px; top: 460px;">T2-S5</div>
-                            <div class="seat seat-rect bg-dark" style="left: 510px; top: 380px;">T2-S6</div>
-                            <div class="seat seat-rect bg-orange" style="left: 510px; top: 340px;">T2-S7</div>
-                            <div class="seat seat-rect bg-green" style="left: 510px; top: 300px;">T2-S8</div>
-                            
-                            <!-- T3 Cluster -->
-                            <div class="table-circle" style="left: 610px; top: 380px; width: 60px; height: 60px;">T3</div>
-                            <div class="seat seat-circle bg-green" style="left: 590px; top: 330px;">T3-S1</div>
-                            <div class="seat seat-circle bg-dark" style="left: 570px; top: 440px;">T3-S2</div>
-                            <div class="seat seat-circle bg-dark" style="left: 670px; top: 400px;">T3-S3</div>
-                            
-                            <!-- Meeting Room -->
-                            <div class="meeting-room">Meeting<br>Room</div>
-                            
-                            <!-- Right Side Tables (T4-T8) -->
-                            <div class="table-rect" style="right: 20px; top: 30px; width: 100px; height: 30px;">T4</div>
-                            <div class="seat seat-rect bg-green" style="right: 130px; top: 33px;">T4-S1</div>
-                            <div class="seat seat-rect bg-yellow" style="right: -25px; top: 33px; transform: translateX(-100%);">T4-S2</div>
-                            
-                            <div class="table-rect" style="right: 20px; top: 100px; width: 100px; height: 30px;">T5</div>
-                            <div class="seat seat-rect bg-orange" style="right: 130px; top: 103px;">T5-S1</div>
-                            <div class="seat seat-rect bg-green" style="right: -25px; top: 103px; transform: translateX(-100%);">T5-S2</div>
-                            
-                            <div class="table-rect" style="right: 20px; top: 170px; width: 100px; height: 30px;">T6</div>
-                            <div class="seat seat-rect bg-orange" style="right: 130px; top: 173px;">T6-S1</div>
-                            <div class="seat seat-rect bg-green" style="right: -25px; top: 173px; transform: translateX(-100%);">T6-S2</div>
-                            
-                            <div class="table-rect" style="right: 20px; top: 240px; width: 100px; height: 30px;">T7</div>
-                            <div class="seat seat-rect bg-green" style="right: 130px; top: 243px;">T7-S1</div>
-                            <div class="seat seat-rect bg-orange" style="right: -25px; top: 243px; transform: translateX(-100%);">T7-S2</div>
-                            
-                            <div class="table-rect" style="right: 20px; top: 310px; width: 100px; height: 30px;">T8</div>
-                            <div class="seat seat-rect bg-orange" style="right: 130px; top: 313px;">T8-S1</div>
-                            <div class="seat seat-rect bg-green" style="right: -25px; top: 313px; transform: translateX(-100%);">T8-S2</div>
-                            
+                        <div class="canvas-viewport">
+                            <div class="canvas-board mode-select" id="canvas"></div>
                         </div>
                     </div>
                 </div>
@@ -797,6 +757,112 @@
                 updatePeopleCounter();
             }
         }
+            
+        // Dynamic map logic
+        let items = [];
+
+        async function loadLayout() {
+            try {
+                const res = await fetch('/api/layout');
+                const data = await res.json();
+                if (data && data.items) {
+                    items = data.items;
+                    renderCanvas();
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function handleSeatClick(item) {
+            if (item.type === 'room') {
+                document.getElementById('detailsTables').style.display = 'none';
+                document.getElementById('detailsMeeting').style.display = 'flex';
+                document.querySelector('#detailsMeeting .seat-title').innerText = item.label || 'Meeting Room';
+            } else {
+                document.getElementById('detailsMeeting').style.display = 'none';
+                document.getElementById('detailsTables').style.display = 'flex';
+                document.querySelector('#detailsTables .seat-title').innerText = item.label || 'Seat';
+            }
+        }
+
+        function renderCanvas() {
+            const canvas = document.getElementById('canvas');
+            canvas.innerHTML = '';
+            items.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'fp-item';
+                el.style.left = item.x + 'px';
+                el.style.top = item.y + 'px';
+                el.style.width = item.w + 'px';
+                el.style.height = item.h + 'px';
+                el.style.zIndex = (item.type === 'chair' || item.type === 'chair-sq') ? 5 : item.type.startsWith('block') ? 2 : 3;
+
+                const visual = document.createElement('div');
+                visual.className = 'item-visual';
+                visual.style.transform = 'rotate(' + (item.rot || 0) + 'deg)';
+
+                if (item.type === 'chair') {
+                    visual.classList.add('chair-icon');
+                    visual.style.webkitMaskImage = 'url(/images/chair.png)';
+                    visual.style.maskImage = 'url(/images/chair.png)';
+                    const status = item.statuses ? item.statuses[0] : 'open';
+                    if (status === 'taken') {
+                        visual.style.backgroundColor = '#d65c29';
+                    } else if (status === 'reserved') {
+                        visual.style.backgroundColor = '#1e293b';
+                    } else if (status === 'idle') {
+                        visual.style.backgroundColor = '#facc15';
+                    } else {
+                        visual.style.backgroundColor = '#10b981';
+                    }
+                    el.onclick = (e) => { e.stopPropagation(); handleSeatClick(item); };
+                } else if (item.type === 'chair-sq') {
+                    const status = item.statuses ? item.statuses[0] : 'open';
+                    const sqColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981';
+                    visual.style.background = sqColor;
+                    visual.style.borderRadius = '6px';
+                    el.onclick = (e) => { e.stopPropagation(); handleSeatClick(item); };
+                } else if (item.type === 'round-table') {
+                    visual.style.background = 'white';
+                    visual.style.borderRadius = '50%';
+                    visual.style.border = '2px solid #1e293b';
+                } else if (item.type === 'rect-table') {
+                    visual.style.background = 'white';
+                    visual.style.borderRadius = '8px';
+                    visual.style.border = '2px solid #1e293b';
+                } else if (item.type === 'room') {
+                    const status = item.statuses ? item.statuses[0] : 'open';
+                    const roomColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : item.color;
+                    visual.style.background = roomColor;
+                    visual.style.borderRadius = '8px';
+                    visual.style.border = '2px solid #16a34a';
+                    el.onclick = (e) => { e.stopPropagation(); handleSeatClick(item); };
+                } else {
+                    visual.style.background = item.color;
+                    visual.style.borderRadius = '4px';
+                    if (item.color === '#22c55e') visual.style.border = '2px solid #16a34a';
+                    else if (item.color === '#fde68a') visual.style.border = '1.5px solid #f59e0b';
+                }
+                el.appendChild(visual);
+
+                if (item.label || item.type === 'room') {
+                    const lbl = document.createElement('span');
+                    lbl.className = 'item-label';
+                    if (item.type !== 'chair' && item.type !== 'chair-sq') {
+                        lbl.classList.add('center');
+                        const status = item.statuses ? item.statuses[0] : 'open';
+                        const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
+                        lbl.style.color = isDark ? '#fff' : '#1e293b';
+                    }
+                    lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
+                    el.appendChild(lbl);
+                }
+                canvas.appendChild(el);
+            });
+        }
+        
+        window.addEventListener('DOMContentLoaded', loadLayout);
         
         if (addPersonBtn) {
             addPersonBtn.addEventListener('click', addPerson);
