@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Last Muster • Events</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* Shared Sidebar Styles from dashboard */
+        .sidebar { background-color: #242f3d !important; }
+        .sidebar-logo-container {
+            display: flex; align-items: center; padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); gap: 12px;
+        }
+        .sidebar-nav ul li a.active {
+            background-color: #384250; color: white; font-weight: 600;
+            border-left: 4px solid #d65c29; border-radius: 0 8px 8px 0; padding-left: 16px;
+        }
+        .sidebar-nav ul li a { padding-left: 20px; }
+        .btn-logout-styled {
+            background-color: #384250; color: #d65c29; border: none; width: 100%;
+            padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.25s ease;
+        }
+        .btn-logout-styled:hover { background-color: #4a5568; }
+        
+        /* Event Page Specific Styles */
+        .page-title {
+            font-family: 'Poppins', sans-serif; font-size: 2.2rem;
+            color: #d65c29; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 24px;
+        }
+        
+        /* Calendar Widget */
+        .calendar-container {
+            background: white; border-radius: 16px; padding: 24px 32px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 24px;
+        }
+        .calendar-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+        }
+        .calendar-month-year {
+            font-family: 'Poppins', sans-serif; font-size: 1.6rem; font-weight: 700; color: #1e293b;
+        }
+        .calendar-nav-btns {
+            display: flex; gap: 8px;
+        }
+        .btn-prev, .btn-next {
+            padding: 8px 16px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer;
+        }
+        .btn-prev { background: #e2e8f0; color: #475569; }
+        .btn-next { background: #d65c29; color: white; }
+        
+        .calendar-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px;
+        }
+        .weekday-header {
+            text-align: center; font-weight: 700; color: #94a3b8; font-size: 1.1rem; margin-bottom: 8px;
+        }
+        .calendar-cell {
+            background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px;
+            height: 80px; padding: 8px; display: flex; flex-direction: column; position: relative;
+        }
+        .calendar-cell.inactive {
+            background: #d0d7ee; border-color: transparent;
+        }
+        .calendar-date-num {
+            align-self: flex-end; font-weight: 800; font-size: 1.1rem; color: #1e293b; margin-bottom: 4px;
+        }
+        .calendar-cell.inactive .calendar-date-num { color: #1e293b; }
+        
+        /* Event Pills */
+        .event-pill {
+            background: white; border: 1px solid #cbd5e1; border-radius: 6px;
+            padding: 4px; font-size: 0.6rem; font-weight: 700; color: #1e293b;
+            text-align: center; margin-bottom: 2px; line-height: 1.2; display: flex; align-items: center; justify-content: center; min-height: 24px;
+            transition: background 0.2s ease;
+        }
+        .event-pill:hover { background: #e2e8f0; cursor: pointer; }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: white; border-radius: 16px; padding: 32px; width: 90%; max-width: 480px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .modal-content h2 {
+            font-family: 'Poppins', sans-serif; font-size: 1.4rem; color: #1e293b; margin-bottom: 24px; font-weight: 700;
+        }
+        .modal-details p {
+            font-size: 0.95rem; color: #64748b; margin-bottom: 12px; line-height: 1.5; font-weight: 500;
+        }
+        .modal-details strong {
+            color: #64748b; font-weight: 700;
+        }
+        .btn-close-modal {
+            background-color: #d65c29; color: white; border: none; padding: 10px 32px; border-radius: 24px;
+            font-weight: 700; font-size: 0.95rem; cursor: pointer; display: block; margin: 32px auto 0; transition: background 0.2s ease;
+        }
+        .btn-close-modal:hover { background-color: #bf4d1f; }
+        
+
+        /* Lists */
+        .events-bottom-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+        }
+        .events-list-container {
+            background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .events-list-title {
+            font-size: 1.2rem; font-weight: 800; color: #1e293b; margin-bottom: 16px;
+        }
+        .event-card {
+            border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+        }
+        .event-card.past { background: #f8fafc; }
+        .event-card.upcoming { background: white; }
+        .event-card-title {
+            font-size: 1rem; font-weight: 800; color: #1e293b; margin-bottom: 4px;
+        }
+        .event-card-date {
+            font-size: 0.8rem; font-weight: 500; color: #64748b;
+        }
+        .status-pill {
+            padding: 6px 12px; border-radius: 16px; font-size: 0.75rem; font-weight: 700;
+        }
+        .status-pill.completed { background: #cbd5e1; color: #1e293b; }
+        .status-pill.upcoming { background: #fed7aa; color: #d65c29; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="sidebar-logo-container">
+                <svg width="36" height="42" viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0C5.37258 0 0 5.37258 0 12V28H24V12C24 5.37258 18.6274 0 12 0Z" fill="#CF6322"/>
+                    <path d="M6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12V28H6V12Z" fill="#1E2A38"/>
+                </svg>
+                <div style="display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <span style="color: #FFC107; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 14px;">THE</span>
+                        <span style="color: #d65c29; font-weight: 800; font-size: 22px; letter-spacing: 0.5px;">MUSTER</span>
+                    </div>
+                    <span style="color: #94a3b8; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px;">CUSTOMER PANEL</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="customer_dashboard.html" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                    <li><a href="reservations.html" class="nav-link"><i class="fa-solid fa-calendar"></i> Reservations</a></li>
+                    <li><a href="event.html" class="nav-link active"><i class="fa-solid fa-calendar-check"></i> Event</a></li>
+                    <li><a href="membership.html" class="nav-link"><i class="fa-solid fa-star" style="color: #FFC107;"></i> <span style="color: #FFC107;">Membership</span></a></li>
+                    <li><a href="notifications.html" class="nav-link"><i class="fa-solid fa-bell"></i> Notifications</a></li>
+                    <li><a href="reserve_history.html" class="nav-link"><i class="fa-solid fa-clock-rotate-left"></i> Reserve History</a></li>
+                    <li><a href="profile.html" class="nav-link"><i class="fa-solid fa-user"></i> Profile</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout-styled" onclick="logout()">
+                    <i class="fa-solid fa-power-off"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="content" style="background-color: #f4f6f9;">
+            <h1 class="page-title">Events</h1>
+            
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-month-year" id="monthYearDisplay">April 2026</div>
+                    <div class="calendar-nav-btns">
+                        <button class="btn-prev" onclick="changeMonth(-1)">&lt; Previous</button>
+                        <button class="btn-next" onclick="changeMonth(1)">Next &gt;</button>
+                    </div>
+                </div>
+                
+                <div class="calendar-grid">
+                    <div class="weekday-header">Sun</div>
+                    <div class="weekday-header">Mon</div>
+                    <div class="weekday-header">Tue</div>
+                    <div class="weekday-header">Wed</div>
+                    <div class="weekday-header">Thu</div>
+                    <div class="weekday-header">Fri</div>
+                    <div class="weekday-header">Sat</div>
+                    
+                    <!-- Calendar days will be injected via JS -->
+                </div>
+            </div>
+            
+            <div class="events-bottom-grid">
+                <div class="events-list-container">
+                    <h2 class="events-list-title">Past Events</h2>
+                    <div class="event-card past">
+                        <div>
+                            <div class="event-card-title">Business Meeting</div>
+                            <div class="event-card-date">March 28, 2026 at 10:00 AM - 5:00 PM</div>
+                        </div>
+                        <div class="status-pill completed">Completed</div>
+                    </div>
+                </div>
+                
+                <div class="events-list-container">
+                    <h2 class="events-list-title">Upcoming Events</h2>
+                    <div class="event-card upcoming">
+                        <div>
+                            <div class="event-card-title">The Last Muster 2nd Anniversary</div>
+                            <div class="event-card-date">April 19, 2026 - Whole Day</div>
+                        </div>
+                        <div class="status-pill upcoming">Upcoming</div>
+                    </div>
+                </div>
+            </div>
+            
+        </main>
+
+        <!-- Modal -->
+        <div id="eventModal" class="modal-overlay">
+            <div class="modal-content">
+                <h2 id="modalTitle"></h2>
+                <div class="modal-details">
+                    <p><strong>Date:</strong> <span id="modalDate"></span></p>
+                    <p><strong>Time:</strong> <span id="modalTime"></span></p>
+                    <p><strong>Description:</strong> <span id="modalDesc"></span></p>
+                </div>
+                <button class="btn-close-modal" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            if (confirm("Are you sure you want to logout?")) {
+                window.location.reload();
+            }
+        }
+        
+        // Calendar Logic
+        let currentYear = 2026;
+        let currentMonth = 3; // 0 = Jan, 3 = April
+        
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
+        const eventsData = {
+            '2026-04-12': [{ 
+                title: 'Reserved', 
+                class: 'reserved',
+                dateStr: 'April 12, 2026',
+                time: '10:00 AM - 12:00 PM',
+                desc: 'You have a reservation for Table 5.'
+            }],
+            '2026-04-19': [{ 
+                title: 'The Last Muster 2nd Anniversary', 
+                class: 'anniversary',
+                dateStr: 'April 19, 2026',
+                time: 'Whole Day',
+                desc: 'The study hub will celebrate the 2nd Anniversary.'
+            }]
+        };
+
+        function showModal(eventData) {
+            document.getElementById('modalTitle').innerText = eventData.title;
+            document.getElementById('modalDate').innerText = eventData.dateStr;
+            document.getElementById('modalTime').innerText = eventData.time;
+            document.getElementById('modalDesc').innerText = eventData.desc;
+            document.getElementById('eventModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('eventModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('eventModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        function renderCalendar() {
+            const grid = document.querySelector('.calendar-grid');
+            const monthYearDisplay = document.getElementById('monthYearDisplay');
+            
+            // Clear existing days
+            const headers = Array.from(grid.querySelectorAll('.weekday-header'));
+            grid.innerHTML = '';
+            headers.forEach(h => grid.appendChild(h));
+            
+            monthYearDisplay.innerText = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
+            
+            // Previous month inactive days
+            for (let i = firstDayIndex; i > 0; i--) {
+                const dayNum = prevMonthDays - i + 1;
+                const cell = createCell(dayNum, true);
+                grid.appendChild(cell);
+            }
+            
+            // Current month active days
+            for (let i = 1; i <= daysInMonth; i++) {
+                const cell = createCell(i, false, currentYear, currentMonth);
+                grid.appendChild(cell);
+            }
+            
+            // Next month inactive days
+            const totalCells = firstDayIndex + daysInMonth;
+            const nextDays = Math.ceil(totalCells / 7) * 7 - totalCells;
+            for (let i = 1; i <= nextDays; i++) {
+                const cell = createCell(i, true);
+                grid.appendChild(cell);
+            }
+        }
+        
+        function createCell(dayNum, isInactive, year, month) {
+            const cell = document.createElement('div');
+            cell.className = `calendar-cell ${isInactive ? 'inactive' : ''}`;
+            
+            const dateNum = document.createElement('div');
+            dateNum.className = 'calendar-date-num';
+            dateNum.innerText = dayNum;
+            cell.appendChild(dateNum);
+            
+            if (!isInactive && year !== undefined && month !== undefined) {
+                const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+                
+                if (eventsData[dateString]) {
+                    eventsData[dateString].forEach(ev => {
+                        const pill = document.createElement('div');
+                        pill.className = 'event-pill';
+                        pill.innerText = ev.title;
+                        pill.onclick = () => showModal(ev);
+                        cell.appendChild(pill);
+                    });
+                }
+            }
+            
+            return cell;
+        }
+
+        function changeMonth(step) {
+            currentMonth += step;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', renderCalendar);
+    </script>
+</body>
+</html>

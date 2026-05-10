@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Last Muster • Customer Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        .timer {
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+
+        .session-banner {
+            background: #d65c29;
+            color: white;
+            border-radius: 12px;
+            padding: 40px;
+            position: relative;
+            margin-top: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .welcome-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            color: #d65c29;
+            letter-spacing: -0.02em;
+        }
+
+        .welcome-text .light {
+            font-weight: 500;
+        }
+
+        .welcome-text .bold {
+            font-weight: 800;
+        }
+
+        .font-mono {
+            font-family: monospace;
+        }
+
+        .sidebar {
+            background-color: #242f3d !important;
+        }
+
+        .sidebar-logo-container {
+            display: flex;
+            align-items: center;
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 12px;
+        }
+
+        .sidebar-nav ul li a.active {
+            background-color: #384250;
+            color: white;
+            font-weight: 600;
+            border-left: 4px solid #d65c29;
+            border-radius: 0 8px 8px 0;
+            padding-left: 16px;
+        }
+
+        .sidebar-nav ul li a {
+            padding-left: 20px;
+        }
+
+        .btn-logout-styled {
+            background-color: #384250;
+            color: #d65c29;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.25s ease;
+        }
+
+        .btn-logout-styled:hover {
+            background-color: #4a5568;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            width: 100%;
+            max-width: 540px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            font-size: 0.95rem;
+            color: #475569;
+            margin-bottom: 24px;
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .time-btn {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 16px 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #1e293b;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .time-btn:hover {
+            border-color: #94a3b8;
+        }
+
+        .time-btn.active {
+            background: #d65c29;
+            color: white;
+            border-color: #d65c29;
+        }
+
+        .seat-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #1e293b;
+            font-weight: 500;
+            appearance: none;
+            background: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231e293b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") no-repeat right 16px top 55%;
+            background-size: 12px auto;
+            margin-bottom: 32px;
+            cursor: pointer;
+        }
+
+        .seat-select:focus {
+            outline: none;
+            border-color: #d65c29;
+        }
+
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .btn-cancel {
+            background: #e2e8f0;
+            color: #1e293b;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-confirm {
+            background: #d65c29;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-confirm:hover {
+            background: #c25021;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo-container">
+                <svg width="32" height="40" viewBox="0 0 40 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 40 L30 40" stroke="#f59e0b" stroke-width="2" />
+                    <path d="M20 40 L20 25" stroke="#f59e0b" stroke-width="2" />
+                    <path d="M12 25 L28 25" stroke="#f59e0b" stroke-width="2" />
+                    <path d="M12 25 L12 15 L20 15" stroke="#f59e0b" stroke-width="2" />
+                    <path d="M5 40 L5 10 C5 4 15 4 20 8" stroke="#f59e0b" stroke-width="2" fill="none" />
+                    <circle cx="22" cy="10" r="3" fill="#f59e0b" />
+                </svg>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1;">
+                        <span style="color: #f59e0b; font-weight: 700; font-size: 14px; letter-spacing: 0.5px;">THE
+                            LAST</span>
+                        <span
+                            style="color: #d65c29; font-weight: 800; font-size: 22px; letter-spacing: 0.5px;">MUSTER</span>
+                    </div>
+                    <span
+                        style="color: #94a3b8; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; margin-top: 6px;">CUSTOMER
+                        PANEL</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="customer_dashboard.html" class="nav-link active"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                    <li><a href="reservations.html" class="nav-link"><i class="fa-solid fa-calendar"></i> Reservations</a></li>
+                    <li><a href="event.html" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Event</a></li>
+                    <li><a href="membership.html" class="nav-link"><i class="fa-solid fa-star" style="color: #FFC107;"></i> <span
+                                style="color: #FFC107;">Membership</span></a></li>
+                    <li><a href="notifications.html" class="nav-link"><i class="fa-solid fa-bell"></i> Notifications</a></li>
+                    <li><a href="reserve_history.html" class="nav-link"><i class="fa-solid fa-clock-rotate-left"></i> Reserve History</a>
+                    </li>
+                    <li><a href="profile.html" class="nav-link"><i class="fa-solid fa-user"></i> Profile</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout-styled" onclick="logout()">
+                    <i class="fa-solid fa-power-off"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="content" style="background-color: #f4f6f9;">
+            <!-- Welcome -->
+            <div>
+                <h1 class="welcome-text"><span class="light">Welcome,</span> <span class="bold">Sanji!</span></h1>
+                <p style="color: #475569; margin-top: 4px; font-size: 16px; font-weight: 500;">Study well... ✍️</p>
+            </div>
+
+            <!-- Session Banner -->
+            <div class="session-banner"
+                style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                <button onclick="extendTime()"
+                    style="position: absolute; top: 24px; right: 24px; background: white; color: #d65c29; border: none; border-radius: 24px; padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <i class="fa-solid fa-plus" style="color: #d65c29;"></i> Extend Time
+                </button>
+
+                <h2 style="font-size: 1.8rem; font-weight: 600; color: white; margin-bottom: 4px;">Remaining Session
+                    Time</h2>
+
+                <div style="position: relative; display: inline-block;">
+                    <div id="timer" class="timer"
+                        style="font-size: 6.5rem; font-weight: 800; line-height: 1.1; letter-spacing: 2px; color: white;">
+                        01:38:07
+                    </div>
+
+                </div>
+
+                <div style="font-size: 18px; font-weight: 600; color: white; margin-top: 16px; line-height: 1.5;">
+                    Your MAC Address: <span class="font-mono">AA:BB:CC:DD:FF</span><br>
+                    Your IP Address: <span class="font-mono">192.168.0.X</span><br>
+                    <span style="font-size: 16px; font-weight: 500;">Session ends at 2:30 PM</span>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 24px;">
+                <!-- Seats Available -->
+                <div class="card text-center"
+                    style="background: white; border-radius: 12px; padding: 48px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
+                    <div id="seats-available"
+                        style="font-size: 7rem; font-weight: 800; color: #d65c29; line-height: 1;">
+                        17
+                    </div>
+                    <p style="font-size: 1.6rem; font-weight: 700; color: #1e293b; margin-top: 16px;">
+                        Seats Available Now
+                    </p>
+                </div>
+
+                <!-- Your Seat -->
+                <div class="card text-center"
+                    style="background: white; border-radius: 12px; padding: 48px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
+                    <div style="font-size: 7rem; font-weight: 800; color: #d65c29; line-height: 1;">
+                        5
+                    </div>
+                    <p style="font-size: 1.6rem; font-weight: 700; color: #1e293b; margin-top: 16px;">
+                        Your Seat
+                    </p>
+                    <button onclick="transferSeat()"
+                        style="background: #d65c29; color: white; border: none; border-radius: 24px; padding: 12px 32px; font-size: 16px; font-weight: 600; margin-top: 24px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Extend Session Time Modal -->
+    <div id="extendModal" class="modal-overlay" onclick="if(event.target===this) closeExtendModal()">
+        <div class="modal-content">
+            <h3 class="modal-title">Extend Session Time</h3>
+            <p class="modal-subtitle">Add time</p>
+            
+            <div class="time-grid">
+                <button class="time-btn" onclick="selectTime(this)">1 hour</button>
+                <button class="time-btn active" onclick="selectTime(this)">1 hour 30 mins</button>
+                <button class="time-btn" onclick="selectTime(this)">2 hours</button>
+                <button class="time-btn" onclick="selectTime(this)">2 hours 30 mins</button>
+                <button class="time-btn" onclick="selectTime(this)">3 hours</button>
+                <button class="time-btn" onclick="selectTime(this)">3 hours 30 mins</button>
+                <button class="time-btn" onclick="selectTime(this)">4 hours</button>
+                <button class="time-btn" onclick="selectTime(this)">4 hours 30 mins</button>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeExtendModal()">Cancel</button>
+                <button class="btn-confirm" onclick="confirmExtendTime()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transfer Seat Modal -->
+    <div id="transferModal" class="modal-overlay" onclick="if(event.target===this) closeTransferModal()">
+        <div class="modal-content" style="max-width: 440px;">
+            <h3 class="modal-title">Transfer Seat</h3>
+            <p class="modal-subtitle">Select new seat number</p>
+            
+            <select id="seatSelect" class="seat-select">
+                <option value="T2-S2">T2-S2</option>
+                <option value="T2-S3">T2-S3</option>
+                <option value="T3-S1">T3-S1</option>
+                <option value="T4-S5">T4-S5</option>
+            </select>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeTransferModal()">Cancel</button>
+                <button class="btn-confirm" onclick="confirmTransferSeat()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timeLeft = 1 * 3600 + 38 * 60 + 7; // 01:38:07
+
+        function updateTimer() {
+            const h = Math.floor(timeLeft / 3600).toString().padStart(2, '0');
+            const m = Math.floor((timeLeft % 3600) / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer').textContent = `${h}:${m}:${s}`;
+            if (timeLeft > 0) timeLeft--;
+        }
+
+        setInterval(updateTimer, 1000);
+
+        function extendTime() {
+            document.getElementById('extendModal').classList.add('active');
+        }
+        
+        function closeExtendModal() {
+            document.getElementById('extendModal').classList.remove('active');
+        }
+        
+        function selectTime(element) {
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+        }
+        
+        function confirmExtendTime() {
+            const activeBtn = document.querySelector('.time-btn.active');
+            if (activeBtn) {
+                const text = activeBtn.innerText;
+                let minutesToAdd = 0;
+                if (text.includes('1 hour')) minutesToAdd += 60;
+                if (text.includes('2 hours')) minutesToAdd += 120;
+                if (text.includes('3 hours')) minutesToAdd += 180;
+                if (text.includes('4 hours')) minutesToAdd += 240;
+                if (text.includes('30 mins')) minutesToAdd += 30;
+                
+                timeLeft += minutesToAdd * 60;
+                updateTimer();
+            }
+            closeExtendModal();
+        }
+
+        function transferSeat() {
+            document.getElementById('transferModal').classList.add('active');
+        }
+        
+        function closeTransferModal() {
+            document.getElementById('transferModal').classList.remove('active');
+        }
+        
+        function confirmTransferSeat() {
+            const newSeat = document.getElementById('seatSelect').value;
+            alert("Seat transferred to " + newSeat);
+            closeTransferModal();
+        }
+
+        function logout() {
+            if (confirm("Are you sure you want to logout?")) {
+                window.location.reload();
+            }
+        }
+
+        window.onload = () => updateTimer();
+    </script>
+</body>
+
+</html>
