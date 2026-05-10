@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Last Muster | Staff Dashboard</title>
+  <title>The Last Muster | Admin Dashboard</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -93,18 +93,42 @@
     .chart-card {
       background: white;
       border-radius: var(--radius);
-      padding: 16px;
+      padding: 18px;
       border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
     }
 
     .chart-title {
       font-size: 13px;
       font-weight: 700;
-      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .chart-select {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--text-sm);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .chart-select:focus {
+      border-color: var(--orange);
     }
 
     .chart-box {
-      height: 260px;
+      height: 250px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -133,6 +157,64 @@
       padding: 16px;
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
+    }
+
+    /* Dynamic Seat Map Styles */
+    .seat-map-container {
+      width: 100%;
+      height: 380px;
+      background: #f8fafc;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--border);
+    }
+
+    #dynamicSeatMap {
+      position: absolute;
+      width: 800px;
+      height: 450px;
+      transform-origin: 0 0;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    
+    #dynamicSeatMap:hover {
+      opacity: 0.9;
+    }
+
+    .fp-item {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .item-visual {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .item-label {
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8px;
+      font-weight: 700;
+      color: #475569;
+      white-space: nowrap;
+    }
+
+    .item-label.center {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 9px;
     }
 
     .payment-card .section-title {
@@ -269,25 +351,27 @@
       <div class="sidebar-logo">
         <img src="The_Last_Muster_logo1.png" alt="The Last Muster" class="logo-img">
         <div class="logo-info">
-          <div class="logo-sub">Staff Panel</div>
+          <div class="logo-sub">Admin Panel</div>
         </div>
       </div>
       <nav class="sidebar-nav">
         <ul>
-          <li><a href="staff_dashboard.html" class="nav-link active"><i class="fa-solid fa-house"></i> Dashboard</a>
-          </li>
-          <li><a href="staff_door_management.html" class="nav-link"><i class="fa-solid fa-door-open"></i> Door
-              Management</a></li>
-          <li><a href="staff_seat_management.html" class="nav-link"><i class="fa-solid fa-couch"></i> Seat
-              Management</a></li>
-          <li><a href="staff_reservation.html" class="nav-link"><i class="fa-solid fa-calendar-check"></i>
-              Reservation</a></li>
-          <li><a href="staff_customers.html" class="nav-link"><i class="fa-solid fa-users"></i> Customers</a></li>
-          <li><a href="staff_analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics &
-              Reports</a></li>
-          <li><a href="staff_events.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Events</a></li>
-          <li><a href="staff_notification.html" class="nav-link"><i class="fa-solid fa-bell"></i> Notification</a></li>
-          <li><a href="staff_profile.html" class="nav-link"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
+          <li><a href="admin_dashboard.html" class="nav-link active"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+          <li><a href="admin_door_management.html" class="nav-link"><i class="fa-solid fa-door-open"></i> Door Management</a></li>
+          <li><a href="admin_seat_management.html" class="nav-link"><i class="fa-solid fa-couch"></i> Seat Management</a></li>
+          <li><a href="admin_reservation.html" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Reservation</a></li>
+          <details class="nav-details">
+            <summary class="nav-link"><i class="fa-solid fa-users-gear"></i> Users Management</summary>
+            <ul class="submenu">
+              <li><a href="admin_staff.html" class="nav-link sub-link">Staffs</a></li>
+              <li><a href="admin_customers.html" class="nav-link sub-link">Customers</a></li>
+            </ul>
+          </details>
+          <li><a href="admin_analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics & Reports</a></li>
+          <li><a href="admin_events.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Event</a></li>
+          <li><a href="admin_messages.html" class="nav-link"><i class="fa-solid fa-envelope"></i> Message</a></li>
+          <li><a href="admin_notification.html" class="nav-link"><i class="fa-solid fa-bell"></i> Notification</a></li>
+          <li><a href="admin_profile.html" class="nav-link"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
         </ul>
       </nav>
       <div class="sidebar-footer">
@@ -302,7 +386,7 @@
 
       <!-- Welcome Banner -->
       <div class="welcome-banner">
-        <h2>Welcome back, <strong>Staff Zoro</strong> 👋</h2>
+        <h2>Welcome back, <strong>Admin</strong> 👋</h2>
         <p>Manage daily operations, monitor seat status, and assist customers</p>
       </div>
 
@@ -330,88 +414,76 @@
         </div>
       </div>
 
-      <!-- Charts -->
+      <!-- Charts Row 1 -->
       <div class="charts-row">
         <div class="chart-card">
-          <div class="chart-title">Today's Traffic</div>
+          <div class="chart-header">
+            <div class="chart-title">Today's Traffic</div>
+            <select class="chart-select" onchange="filterTraffic(this.value)">
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="week">This Week</option>
+            </select>
+          </div>
           <div class="chart-box" style="display:block;"><canvas id="trafficChart"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">Seat Status Distribution</div>
-          <div class="chart-box" style="display:flex; align-items:center; justify-content:center;"><canvas
-              id="seatChart" style="max-width:220px; max-height:220px;"></canvas></div>
+          <div class="chart-header">
+            <div class="chart-title">Seat Status Distribution</div>
+            <select class="chart-select" onchange="filterSeatStatus(this.value)">
+              <option value="all">All Areas</option>
+              <option value="ground">Ground Floor</option>
+              <option value="mezzanine">Mezzanine</option>
+            </select>
+          </div>
+          <div class="chart-box"><canvas id="seatChart" style="max-width:210px; max-height:210px;"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Charts Row 2 -->
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Weekly Booking Trend</div>
+            <select class="chart-select" onchange="filterWeekly(this.value)">
+              <option value="7">Last 7 Days</option>
+              <option value="14">Last 14 Days</option>
+              <option value="30">This Month</option>
+            </select>
+          </div>
+          <div class="chart-box" style="display:block;"><canvas id="weeklyChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Customer Type Distribution</div>
+            <select class="chart-select" onchange="filterCustomer(this.value)">
+              <option value="all">All Time</option>
+              <option value="month">This Month</option>
+              <option value="week">This Week</option>
+            </select>
+          </div>
+          <div class="chart-box"><canvas id="customerTypeChart" style="max-width:210px; max-height:210px;"></canvas>
+          </div>
         </div>
       </div>
 
       <!-- Seat Map + Activity -->
       <div class="dash-bottom">
         <div class="card">
-          <div class="section-title">Live Seat Status</div>
-          <div class="map-legend">
-            <div class="legend-dot"><span style="background:var(--green)"></span>Active</div>
-            <div class="legend-dot"><span style="background:var(--orange)"></span>Idle</div>
-            <div class="legend-dot"><span style="background:#e53e3e"></span>Inactive</div>
-            <div class="legend-dot"><span style="background:var(--olive)"></span>Reserved</div>
+          <div class="chart-header">
+            <div class="section-title" style="margin-bottom:0">Live Seat Status</div>
+            <button class="chart-select" onclick="renderLiveSeatMap()" title="Sync with Seat Management">
+              <i class="fa-solid fa-rotate"></i> Sync
+            </button>
           </div>
-          <div class="seat-map">
-            <div class="map-entrance">Entrance</div>
-            <div class="map-zone zone-counter">Counter</div>
-            <div class="map-zone zone-meeting">Meeting<br>Room</div>
-            <div class="map-zone zone-table3">Table 3</div>
-            <div class="seat seat-active" style="bottom:106px;left:44%" data-seat="T3-S1" data-name="Monkey D. Luffy">T3
-            </div>
-            <div class="seat seat-inactive" style="bottom:82px;left:44%">T3</div>
-            <div class="seat seat-reserved" style="bottom:58px;left:44%">T3</div>
-            <div class="seat seat-idle" style="bottom:34px;left:44%">T3</div>
-            <div class="seat seat-active" style="bottom:120px;left:55%" data-seat="T3-S5" data-name="Nami Catburglar">T3
-            </div>
-            <div class="seat seat-active" style="bottom:96px;left:55%" data-seat="T3-S6" data-name="Sanji Vinsmoke">T3
-            </div>
-            <div class="seat seat-inactive" style="bottom:72px;left:55%">T3</div>
-            <div class="seat seat-idle" style="bottom:48px;left:55%">T3</div>
-            <div class="rt-base" style="bottom:50px;left:78px"></div>
-            <div class="seat seat-idle" style="bottom:74px;left:72px">RT1</div>
-            <div class="seat seat-active" style="bottom:50px;left:60px" data-seat="RT1-S2" data-name="Zoro Roronoa">RT1
-            </div>
-            <div class="seat seat-inactive" style="bottom:26px;left:72px">RT1</div>
-            <div class="seat seat-active" style="bottom:50px;left:96px" data-seat="RT1-S4" data-name="Usopp">RT1</div>
-            <div class="rt-label" style="bottom:10px;left:62px">Rounded<br>Table 1</div>
-            <div class="rt-base" style="bottom:50px;left:194px"></div>
-            <div class="seat seat-active" style="bottom:74px;left:188px" data-seat="RT2-S1" data-name="Jinbe">RT2</div>
-            <div class="seat seat-reserved" style="bottom:50px;left:176px">RT2</div>
-            <div class="seat seat-idle" style="bottom:26px;left:188px">RT2</div>
-            <div class="seat seat-inactive" style="bottom:50px;left:212px">RT2</div>
-            <div class="rt-label" style="bottom:10px;left:178px">Rounded<br>Table 2</div>
-            <div class="rt-base" style="bottom:50px;right:158px"></div>
-            <div class="seat seat-active" style="bottom:74px;right:164px" data-seat="RT3-S1" data-name="Franky">RT3
-            </div>
-            <div class="seat seat-idle" style="bottom:50px;right:176px">RT3</div>
-            <div class="seat seat-inactive" style="bottom:26px;right:164px">RT3</div>
-            <div class="seat seat-active" style="bottom:50px;right:140px" data-seat="RT3-S4" data-name="Robin">RT3</div>
-            <div class="rt-label" style="bottom:10px;right:146px">Rounded<br>Table 3</div>
-            <div class="cubicle-block">
-              <div class="cubicle-row">
-                <div class="c-seat seat-inactive">C1-S1</div>
-                <div class="c-seat seat-active" data-seat="C1-S2" data-name="Brook">C1-S2</div><span
-                  class="c-label">Cubicle 1</span>
-              </div>
-              <div class="cubicle-row">
-                <div class="c-seat seat-active">C2-S1</div>
-                <div class="c-seat seat-active">C2-S2</div><span class="c-label">Cubicle 2</span>
-              </div>
-              <div class="cubicle-row">
-                <div class="c-seat seat-inactive">C3-S1</div>
-                <div class="c-seat seat-inactive">C3-S2</div><span class="c-label">Cubicle 3</span>
-              </div>
-              <div class="cubicle-row">
-                <div class="c-seat seat-active">C4-S1</div>
-                <div class="c-seat seat-idle">C4-S2</div><span class="c-label">Cubicle 4</span>
-              </div>
-              <div class="cubicle-row">
-                <div class="c-seat seat-active">C5-S1</div>
-                <div class="c-seat seat-active">C5-S2</div><span class="c-label">Cubicle 5</span>
-              </div>
-            </div>
+          <div class="map-legend" style="margin: 0 0 12px 0">
+            <div class="legend-dot"><span style="background:#22c55e"></span>Active</div>
+            <div class="legend-dot"><span style="background:#f97316"></span>Idle</div>
+            <div class="legend-dot"><span style="background:#ef4444"></span>Inactive</div>
+            <div class="legend-dot"><span style="background:#8A8636"></span>Reserved</div>
+          </div>
+          <div class="seat-map-container" id="seatMapViewport">
+            <div id="dynamicSeatMap"></div>
           </div>
         </div>
         <div class="card">
@@ -545,6 +617,207 @@
       });
     }
 
+    let weeklyChart, customerTypeChart;
+    function renderNewCharts() {
+      // Weekly Booking Trend (Bar)
+      const ctxW = document.getElementById('weeklyChart').getContext('2d');
+      if (weeklyChart) weeklyChart.destroy();
+      weeklyChart = new Chart(ctxW, {
+        type: 'bar',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'Total Bookings',
+            data: [65, 45, 75, 85, 95, 120, 110],
+            backgroundColor: '#3a8a7a',
+            borderRadius: 6,
+            barThickness: 20
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } }
+        }
+      });
+
+      // Customer Type Distribution (Pie)
+      const ctxC = document.getElementById('customerTypeChart').getContext('2d');
+      if (customerTypeChart) customerTypeChart.destroy();
+      customerTypeChart = new Chart(ctxC, {
+        type: 'pie',
+        data: {
+          labels: ['New Customers', 'Returning Members'],
+          datasets: [{
+            data: [35, 65],
+            backgroundColor: ['#f97316', '#2a6b5e'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { position: 'bottom', labels: { font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    // Filter Handlers
+    function filterTraffic(val) {
+      if (val === 'yesterday') {
+        trafficChart.data.datasets[0].data = [8, 15, 25, 45, 60, 75, 65, 50, 40, 25, 15, 5];
+      } else if (val === 'week') {
+        trafficChart.data.datasets[0].data = [40, 45, 55, 65, 75, 80, 85, 90, 80, 70, 60, 50];
+      } else {
+        trafficChart.data.datasets[0].data = trafficData;
+      }
+      trafficChart.update();
+    }
+
+    function filterSeatStatus(val) {
+      if (val === 'ground') {
+        seatChart.data.datasets[0].data = [10, 5, 5, 2];
+      } else if (val === 'mezzanine') {
+        seatChart.data.datasets[0].data = [5, 3, 2, 3];
+      } else {
+        seatChart.data.datasets[0].data = [15, 8, 7, 5];
+      }
+      seatChart.update();
+    }
+
+    function filterWeekly(val) {
+      if (val === '14') {
+        weeklyChart.data.labels = ['W1', 'W2'];
+        weeklyChart.data.datasets[0].data = [450, 520];
+        weeklyChart.data.datasets[0].barThickness = 40;
+      } else if (val === '30') {
+        weeklyChart.data.labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+        weeklyChart.data.datasets[0].data = [400, 480, 550, 600];
+        weeklyChart.data.datasets[0].barThickness = 30;
+      } else {
+        weeklyChart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        weeklyChart.data.datasets[0].data = [65, 45, 75, 85, 95, 120, 110];
+        weeklyChart.data.datasets[0].barThickness = 20;
+      }
+      weeklyChart.update();
+    }
+
+    function filterCustomer(val) {
+      if (val === 'month') {
+        customerTypeChart.data.datasets[0].data = [20, 80];
+      } else if (val === 'week') {
+        customerTypeChart.data.datasets[0].data = [45, 55];
+      } else {
+        customerTypeChart.data.datasets[0].data = [35, 65];
+      }
+      customerTypeChart.update();
+    }
+
+    // Dynamic Seat Map Rendering
+    function renderLiveSeatMap() {
+      const container = document.getElementById('dynamicSeatMap');
+      const viewport = document.getElementById('seatMapViewport');
+      if (!container) return;
+
+      const saved = localStorage.getItem('seatLayout');
+      let items = [];
+      if (saved) {
+        try { items = JSON.parse(saved); } catch (e) { console.error("Error loading layout", e); }
+      }
+
+      container.innerHTML = '';
+      
+      if (items.length === 0) {
+        container.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-weight:600;">No layout found. Click to create one.</div>';
+      }
+
+      // Add click listener to navigate to management
+      container.onclick = () => {
+        window.location.href = 'admin_seat_management.html';
+      };
+
+      items.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'fp-item';
+        el.style.left = item.x + 'px';
+        el.style.top = item.y + 'px';
+        el.style.width = item.w + 'px';
+        el.style.height = item.h + 'px';
+        el.style.zIndex = (item.type === 'chair' || item.type === 'chair-sq') ? 5 : item.type.startsWith('block') ? 2 : 3;
+
+        const visual = document.createElement('div');
+        visual.className = 'item-visual';
+        visual.style.transform = 'rotate(' + (item.rot || 0) + 'deg)';
+
+        if (item.type === 'chair') {
+          visual.style.backgroundImage = 'url(chair.png)';
+          visual.style.backgroundSize = 'contain';
+          visual.style.backgroundRepeat = 'no-repeat';
+          visual.style.backgroundPosition = 'center';
+          const status = (item.statuses && item.statuses[0]) || 'open';
+          if (status === 'taken') {
+            visual.style.backgroundColor = '#9ca3af';
+            visual.style.filter = 'grayscale(100%) brightness(80%)';
+            visual.style.borderRadius = '4px';
+          } else if (status === 'reserved') {
+            visual.style.backgroundColor = '#ef4444';
+            visual.style.filter = 'brightness(0) invert(1)';
+            visual.style.borderRadius = '4px';
+          }
+        } else if (item.type === 'chair-sq') {
+          const status = (item.statuses && item.statuses[0]) || 'open';
+          const sqColor = status === 'taken' ? '#9ca3af' : status === 'reserved' ? '#ef4444' : '#faecd4';
+          visual.style.background = sqColor;
+          visual.style.border = '1px solid #94a3b8';
+          visual.style.borderRadius = '4px';
+        } else if (item.type === 'round-table' || item.type === 'rect-table') {
+          visual.style.background = item.color || '#fdba74';
+          visual.style.border = '1.5px solid #f97316';
+          visual.style.borderRadius = item.type === 'round-table' ? '50%' : '6px';
+        } else if (item.type === 'room') {
+          const status = (item.statuses && item.statuses[0]) || 'open';
+          const roomColor = status === 'taken' ? '#9ca3af' : status === 'reserved' ? '#ef4444' : item.color;
+          visual.style.background = roomColor;
+          visual.style.border = '2px solid #16a34a';
+          visual.style.borderRadius = '8px';
+        } else {
+          visual.style.background = item.color || '#cbd5e1';
+          visual.style.borderRadius = '4px';
+        }
+        el.appendChild(visual);
+
+        if (item.label || item.type === 'room') {
+          const lbl = document.createElement('span');
+          lbl.className = 'item-label';
+          if (item.type !== 'chair' && item.type !== 'chair-sq') {
+            lbl.classList.add('center');
+            const status = (item.statuses && item.statuses[0]) || 'open';
+            const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
+            lbl.style.color = isDark ? '#fff' : '#1e293b';
+          }
+          lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
+          el.appendChild(lbl);
+        }
+        container.appendChild(el);
+      });
+
+      // Auto-scale to fit dashboard card
+      const rect = viewport.getBoundingClientRect();
+      const vWidth = rect.width || viewport.clientWidth || viewport.offsetWidth || 600;
+      const vHeight = rect.height || viewport.clientHeight || viewport.offsetHeight || 380;
+      
+      const scale = Math.min(vWidth / 800, vHeight / 450) * 0.95;
+      container.style.transform = `scale(${scale})`;
+      container.style.left = `${(vWidth - (800 * scale)) / 2}px`;
+      container.style.top = `${(vHeight - (450 * scale)) / 2}px`;
+    }
+
+    // Handle Resize
+    window.addEventListener('resize', renderLiveSeatMap);
+
     // Initialize All
     function renderAll() {
       renderReservationPayments();
@@ -553,6 +826,9 @@
       renderActivityFeed();
       renderTrafficChart();
       renderSeatChart();
+      renderNewCharts();
+      // Delay slightly to ensure viewport dimensions are ready
+      setTimeout(renderLiveSeatMap, 100);
     }
 
     window.onload = renderAll;

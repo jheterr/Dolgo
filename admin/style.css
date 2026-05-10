@@ -935,3 +935,53 @@ textarea.form-control {
     padding-top: 70px !important;
   }
 }
+
+/* ════════════════════════════════════════
+   COLLAPSIBLE SUBMENU
+════════════════════════════════════════ */
+.nav-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-details summary {
+  list-style: none;
+  position: relative;
+}
+
+.nav-details summary::after {
+  content: '\f107'; /* FontAwesome chevron-down */
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  position: absolute;
+  right: 20px;
+  transition: transform 0.3s;
+  font-size: 12px;
+}
+
+.nav-details[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.submenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+
+.submenu li a {
+  padding-left: 55px;
+  font-size: 13px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.submenu li a:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.sub-link.active {
+  border-left: 4px solid var(--orange);
+  background: #3c3532;
+  padding-left: 51px; /* Adjust padding to compensate for border */
+}

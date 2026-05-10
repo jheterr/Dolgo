@@ -64,9 +64,18 @@
     .income-period-log-select{padding:8px 16px;border-radius:30px;border:1px solid #cbd5e1;background:white;font-size:12px;font-weight:500;cursor:pointer;}
     .logs-table{width:100%;border-collapse:collapse;}
     .logs-table th,.logs-table td{padding:12px;text-align:left;border-bottom:1px solid #e2e8f0;font-size:12px;}
-    .logs-table th{background:#f8fafc;font-weight:700;color:#1e293b;}
+    .logs-table th{background:#f8fafc;font-weight:700;color:#1e293b;cursor:pointer;user-select:none;position:relative;}
+    .logs-table th:hover{background:#f1f5f9;}
     .logs-table tr:hover td{background:#f8fafc;}
     .badge-income{background:#dcfce7;color:#166534;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;display:inline-block;}
+    
+    .search-wrapper { position: relative; margin-bottom: 15px; }
+    .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-sm); font-size: 13px; }
+    .search-input { width: 100%; padding: 8px 12px 8px 35px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px; outline: none; transition: 0.2s; }
+    .search-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(207,99,34,0.1); }
+    
+    .sort-icon { font-size: 10px; margin-left: 5px; color: #94a3b8; }
+    .th-sort-active .sort-icon { color: var(--orange); }
     
     @media(max-width:900px){.stat-grid-4,.stat-grid-3,.two-col-grid,.three-col-grid{grid-template-columns:1fr;}.establishment-stats{gap:20px;}}
   </style>
@@ -86,8 +95,13 @@
         <li><a href="admin_door_management.html" class="nav-link"><i class="fa-solid fa-door-open"></i> Door Management</a></li>
         <li><a href="admin_seat_management.html" class="nav-link"><i class="fa-solid fa-couch"></i> Seat Management</a></li>
         <li><a href="admin_reservation.html" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Reservation</a></li>
-        <li><a href="admin_staff.html" class="nav-link"><i class="fa-solid fa-user-shield"></i> Staff</a></li>
-        <li><a href="admin_customers.html" class="nav-link"><i class="fa-solid fa-users"></i> Customers</a></li>
+        <details class="nav-details">
+          <summary class="nav-link"><i class="fa-solid fa-users-gear"></i> Users Management</summary>
+          <ul class="submenu">
+            <li><a href="admin_staff.html" class="nav-link sub-link">Staffs</a></li>
+            <li><a href="admin_customers.html" class="nav-link sub-link">Customers</a></li>
+          </ul>
+        </details>
         <li><a href="admin_analytics.html" class="nav-link active"><i class="fa-solid fa-chart-line"></i> Analytics & Reports</a></li>
         <li><a href="admin_events.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Event</a></li>
         <li><a href="admin_messages.html" class="nav-link"><i class="fa-solid fa-envelope"></i> Message</a></li>
@@ -199,25 +213,31 @@
       <div class="income-logs-section">
         <div class="income-logs-header">
           <div class="chart-title"><i class="fa-solid fa-receipt"></i> Income Logs & Transaction Details</div>
-          <select id="incomeLogsPeriodSelect" class="income-period-log-select" onchange="renderIncomeLogs()">
-            <option value="daily">Daily (Today's Transactions)</option>
-            <option value="week">Weekly (Last 7 Days)</option>
-            <option value="month">Monthly (Last 4 Weeks)</option>
-          </select>
+          <div class="chart-controls">
+            <div class="search-wrapper" style="margin-bottom:0; width:200px;">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" class="search-input" id="incomeLogSearch" placeholder="Search logs..." oninput="renderIncomeLogs()">
+            </div>
+            <select id="incomeLogsPeriodSelect" class="income-period-log-select" onchange="renderIncomeLogs()">
+              <option value="daily">Daily (Today's Transactions)</option>
+              <option value="week">Weekly (Last 7 Days)</option>
+              <option value="month">Monthly (Last 4 Weeks)</option>
+            </select>
+          </div>
         </div>
         <div class="summary-card" style="overflow-x:auto;">
           <table class="logs-table">
             <thead>
               <tr>
-                <th>Period</th>
-                <th>Total Income</th>
-                <th>Transactions</th>
+                <th onclick="sortLogs('period')">Period <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th onclick="sortLogs('totalIncome')">Total Income <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th onclick="sortLogs('transactions')">Transactions <i class="fa-solid fa-sort sort-icon"></i></th>
                 <th>Reservations</th>
                 <th>WiFi Extensions</th>
                 <th>Plan Upgrades</th>
                 <th>Walk-ins</th>
                 <th>Payment Methods</th>
-                </tr>
+              </tr>
             </thead>
             <tbody id="incomeLogsBody"></tbody>
             </table>
@@ -233,6 +253,10 @@
       <div class="two-col-grid">
         <div class="summary-card">
           <div class="chart-title"><i class="fa-solid fa-crown"></i> Top Members by Hours</div>
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search-input" id="memberSearch" placeholder="Search members..." oninput="renderTopCustomers()">
+          </div>
           <div class="top-customer-list" id="topMembersList"></div>
           <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--text-sm);border-top:1px solid var(--border);padding-top:10px;">
             Total Member Hours: <strong id="totalMemberHours">0</strong> hrs
@@ -240,6 +264,10 @@
         </div>
         <div class="summary-card">
           <div class="chart-title"><i class="fa-solid fa-person-walking"></i> Top Walk-ins by Hours</div>
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search-input" id="walkinSearch" placeholder="Search walk-ins..." oninput="renderTopCustomers()">
+          </div>
           <div class="top-customer-list" id="topWalkinsList"></div>
           <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--text-sm);border-top:1px solid var(--border);padding-top:10px;">
             Total Walk-in Hours: <strong id="totalWalkinHours">0</strong> hrs
@@ -266,11 +294,20 @@
 
       <!-- Transaction History Table -->
       <div class="summary-card" style="margin-bottom:24px;">
-        <div class="chart-title"><i class="fa-solid fa-list"></i> Transaction History</div>
+        <div class="search-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="transSearch" placeholder="Search transactions..." oninput="renderTransactionHistory()">
+        </div>
         <div style="overflow-x:auto;">
           <table class="history-table">
             <thead>
-              <tr><th>Date</th><th>Customer</th><th>Type</th><th>Amount</th><th>Status</th></tr>
+              <tr>
+                <th onclick="sortTransactions('date')" style="cursor:pointer">Date <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th onclick="sortTransactions('customer')" style="cursor:pointer">Customer <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th>Type</th>
+                <th onclick="sortTransactions('amount')" style="cursor:pointer">Amount <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th>Status</th>
+              </tr>
             </thead>
             <tbody id="transactionHistoryBody"></tbody>
           </table>
@@ -279,11 +316,19 @@
 
       <!-- Activity History Table -->
       <div class="summary-card" style="margin-bottom:24px;">
-        <div class="chart-title"><i class="fa-solid fa-clock-rotate-left"></i> Activity History</div>
+        <div class="search-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="activitySearch" placeholder="Search activities..." oninput="renderActivityHistory()">
+        </div>
         <div style="overflow-x:auto;">
           <table class="history-table">
             <thead>
-              <tr><th>Timestamp</th><th>User</th><th>Action</th><th>Details</th></tr>
+              <tr>
+                <th onclick="sortActivity('timestamp')" style="cursor:pointer">Timestamp <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th onclick="sortActivity('user')" style="cursor:pointer">User <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th>Action</th>
+                <th>Details</th>
+              </tr>
             </thead>
             <tbody id="activityHistoryBody"></tbody>
           </table>
@@ -439,6 +484,41 @@
     let incomeChart = null;
     let typeChart = null;
 
+    // Sort States
+    let transSort = { key: 'date', dir: 'desc' };
+    let activitySort = { key: 'timestamp', dir: 'desc' };
+    let logsSort = { key: 'period', dir: 'desc' };
+
+    function sortTransactions(key) {
+      if (transSort.key === key) transSort.dir = transSort.dir === 'asc' ? 'desc' : 'asc';
+      else { transSort.key = key; transSort.dir = 'asc'; }
+      renderTransactionHistory();
+    }
+
+    function sortActivity(key) {
+      if (activitySort.key === key) activitySort.dir = activitySort.dir === 'asc' ? 'desc' : 'asc';
+      else { activitySort.key = key; activitySort.dir = 'asc'; }
+      renderActivityHistory();
+    }
+
+    function sortLogs(key) {
+      if (logsSort.key === key) logsSort.dir = logsSort.dir === 'asc' ? 'desc' : 'asc';
+      else { logsSort.key = key; logsSort.dir = 'asc'; }
+      renderIncomeLogs();
+    }
+
+    function universalSort(data, key, dir) {
+      return data.sort((a, b) => {
+        let valA = a[key];
+        let valB = b[key];
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+        if (valA < valB) return dir === 'asc' ? -1 : 1;
+        if (valA > valB) return dir === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
     function formatPHP(amount) { return '₱' + amount.toLocaleString(); }
 
     function updateSinceEstablishment() {
@@ -505,38 +585,53 @@
     // Render Income Logs based on selected period (DAILY, WEEKLY, MONTHLY)
     function renderIncomeLogs() {
       const period = document.getElementById('incomeLogsPeriodSelect').value;
+      const q = document.getElementById('incomeLogSearch').value.toLowerCase();
       let logsData = [];
       
-      if (period === 'daily') {
-        logsData = dailyIncomeLogs;
-      } else if (period === 'week') {
-        logsData = weeklyIncomeLogs;
-      } else {
-        logsData = monthlyIncomeLogs;
-      }
+      if (period === 'daily') logsData = [...dailyIncomeLogs];
+      else if (period === 'week') logsData = [...weeklyIncomeLogs];
+      else logsData = [...monthlyIncomeLogs];
+      
+      // Filter
+      logsData = logsData.filter(log => 
+        log.period.toLowerCase().includes(q) || 
+        log.paymentMethods.toLowerCase().includes(q)
+      );
+
+      // Sort
+      universalSort(logsData, logsSort.key, logsSort.dir);
       
       const tbody = document.getElementById('incomeLogsBody');
       tbody.innerHTML = logsData.map(log => `
         <tr>
           <td><strong>${log.period}</strong></td>
           <td><span style="font-weight:800;color:#CF6322;">${formatPHP(log.totalIncome)}</span></td>
-          <td>${log.transactions} transactions</div></td>
-          <td>${formatPHP(log.reservations)}</div></td>
-          <td>${formatPHP(log.wifiExtensions)}</div></td>
-          <td>${formatPHP(log.planUpgrades)}</div></td>
-          <td>${formatPHP(log.walkIns)}</div></td>
-          <td><span style="font-size:11px;">${log.paymentMethods}</span></div></td>
+          <td>${log.transactions} transactions</td>
+          <td>${formatPHP(log.reservations)}</td>
+          <td>${formatPHP(log.wifiExtensions)}</td>
+          <td>${formatPHP(log.planUpgrades)}</td>
+          <td>${formatPHP(log.walkIns)}</td>
+          <td><span style="font-size:11px;">${log.paymentMethods}</span></td>
         </tr>
       `).join('');
     }
 
     function renderTopCustomers() {
+      const memQ = document.getElementById('memberSearch').value.toLowerCase();
+      const walkQ = document.getElementById('walkinSearch').value.toLowerCase();
+      
       const membersContainer = document.getElementById('topMembersList');
       const walkinsContainer = document.getElementById('topWalkinsList');
+      
+      const filteredMembers = topMembers.filter(m => m.name.toLowerCase().includes(memQ));
+      const filteredWalkins = topWalkins.filter(w => w.name.toLowerCase().includes(walkQ));
+
       const totalMemberHours = topMembers.reduce((sum, m) => sum + m.hours, 0);
       const totalWalkinHours = topWalkins.reduce((sum, w) => sum + w.hours, 0);
-      membersContainer.innerHTML = topMembers.map(m => `<div class="top-customer-item"><div><span class="top-customer-name">${m.rank}. ${m.name}</span></div><div class="top-customer-hours">${m.hours} hrs</div></div>`).join('');
-      walkinsContainer.innerHTML = topWalkins.map(w => `<div class="top-customer-item"><div><span class="top-customer-name">${w.rank}. ${w.name}</span></div><div class="top-customer-hours">${w.hours} hrs</div></div>`).join('');
+      
+      membersContainer.innerHTML = filteredMembers.map(m => `<div class="top-customer-item"><div><span class="top-customer-name">${m.rank}. ${m.name}</span></div><div class="top-customer-hours">${m.hours} hrs</div></div>`).join('');
+      walkinsContainer.innerHTML = filteredWalkins.map(w => `<div class="top-customer-item"><div><span class="top-customer-name">${w.rank}. ${w.name}</span></div><div class="top-customer-hours">${w.hours} hrs</div></div>`).join('');
+      
       document.getElementById('totalMemberHours').textContent = totalMemberHours;
       document.getElementById('totalWalkinHours').textContent = totalWalkinHours;
     }
@@ -556,13 +651,31 @@
     }
 
     function renderTransactionHistory() {
+      const q = document.getElementById('transSearch').value.toLowerCase();
+      let data = [...transactionHistory];
+      
+      // Filter
+      data = data.filter(t => t.customer.toLowerCase().includes(q) || t.type.toLowerCase().includes(q));
+      
+      // Sort
+      universalSort(data, transSort.key, transSort.dir);
+
       const tbody = document.getElementById('transactionHistoryBody');
-      tbody.innerHTML = transactionHistory.map(t => `<tr><td>${t.date}</td><td>${t.customer}</td><td><span class="badge-transaction">${t.type}</span></td><td>${formatPHP(t.amount)}</td><td><span class="${t.status === 'Paid' ? 'badge-income' : 'pending-badge'}">${t.status}</span></td>`).join('');
+      tbody.innerHTML = data.map(t => `<tr><td>${t.date}</td><td>${t.customer}</td><td><span class="badge-transaction">${t.type}</span></td><td>${formatPHP(t.amount)}</td><td><span class="${t.status === 'Paid' ? 'badge-income' : 'pending-badge'}">${t.status}</span></td>`).join('');
     }
 
     function renderActivityHistory() {
+      const q = document.getElementById('activitySearch').value.toLowerCase();
+      let data = [...activityHistory];
+      
+      // Filter
+      data = data.filter(a => a.user.toLowerCase().includes(q) || a.action.toLowerCase().includes(q) || a.details.toLowerCase().includes(q));
+      
+      // Sort
+      universalSort(data, activitySort.key, activitySort.dir);
+
       const tbody = document.getElementById('activityHistoryBody');
-      tbody.innerHTML = activityHistory.map(a => `<tr><td>${a.timestamp}</td><td>${a.user}</td><td><span class="badge-activity">${a.action}</span></td><td>${a.details}</td>`).join('');
+      tbody.innerHTML = data.map(a => `<tr><td>${a.timestamp}</td><td>${a.user}</td><td><span class="badge-activity">${a.action}</span></td><td>${a.details}</td>`).join('');
     }
 
     function renderTransactionSummary() {
