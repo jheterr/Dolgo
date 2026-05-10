@@ -1,0 +1,21 @@
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="/images/The_Last_Muster_logo1.png" alt="The Last Muster" class="logo-img">
+    <div class="logo-info"><div class="logo-sub">Staff Panel</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <ul>
+      <li><a href="/staff/dashboard" class="nav-link <%= active === 'Dashboard' ? 'active' : '' %>"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+      <li><a href="/staff/door-management" class="nav-link <%= active === 'Door Management' ? 'active' : '' %>"><i class="fa-solid fa-door-open"></i> Door Management</a></li>
+      <li><a href="/staff/seat-management" class="nav-link <%= active === 'Seat Management' ? 'active' : '' %>"><i class="fa-solid fa-couch"></i> Seat Management</a></li>
+      <li><a href="/staff/reservation" class="nav-link <%= active === 'Reservation' ? 'active' : '' %>"><i class="fa-solid fa-calendar-check"></i> Reservation</a></li>
+      <li><a href="/staff/customers" class="nav-link <%= active === 'Customers' ? 'active' : '' %>"><i class="fa-solid fa-users"></i> Customers</a></li>
+      <li><a href="/staff/events" class="nav-link <%= active === 'Event' ? 'active' : '' %>"><i class="fa-solid fa-calendar-days"></i> Events</a></li>
+
+      <li><a href="/staff/profile" class="nav-link <%= active === 'Profile' ? 'active' : '' %>"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
+    </ul>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="confirmLogout()"><i class="fa-solid fa-power-off"></i> Logout</button>
+  </div>
+</aside>

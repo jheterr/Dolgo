@@ -1,0 +1,31 @@
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="/images/The_Last_Muster_logo1.png" alt="The Last Muster" class="logo-img">
+    <div class="logo-info">
+      <div class="logo-sub">Admin Panel</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <ul>
+      <li><a href="/admin/dashboard" class="nav-link <%= active === 'Dashboard' ? 'active' : '' %>"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+      <li><a href="/admin/door-management" class="nav-link <%= active === 'Door Management' ? 'active' : '' %>"><i class="fa-solid fa-door-open"></i> Door Management</a></li>
+      <li><a href="/admin/seat-management" class="nav-link <%= active === 'Seat Management' ? 'active' : '' %>"><i class="fa-solid fa-couch"></i> Seat Management</a></li>
+      <li><a href="/admin/reservation" class="nav-link <%= active === 'Reservation' ? 'active' : '' %>"><i class="fa-solid fa-calendar-check"></i> Reservation</a></li>
+      <details class="nav-details" <%= active === 'Staffs' || active === 'Customers' ? 'open' : '' %>>
+        <summary class="nav-link"><i class="fa-solid fa-users-gear"></i> Users Management</summary>
+        <ul class="submenu">
+          <li><a href="/admin/staff" class="nav-link sub-link <%= active === 'Staffs' ? 'active' : '' %>">Staffs</a></li>
+          <li><a href="/admin/customers" class="nav-link sub-link <%= active === 'Customers' ? 'active' : '' %>">Customers</a></li>
+        </ul>
+      </details>
+      <li><a href="/admin/analytics" class="nav-link <%= active === 'Analytics & Reports' ? 'active' : '' %>"><i class="fa-solid fa-chart-line"></i> Analytics & Reports</a></li>
+      <li><a href="/admin/events" class="nav-link <%= active === 'Event' ? 'active' : '' %>"><i class="fa-solid fa-calendar-days"></i> Event</a></li>
+      <li><a href="/admin/messages" class="nav-link <%= active === 'Message' ? 'active' : '' %>"><i class="fa-solid fa-envelope"></i> Message</a></li>
+      <li><a href="/admin/notifications" class="nav-link <%= active === 'Notification' ? 'active' : '' %>"><i class="fa-solid fa-bell"></i> Notification</a></li>
+      <li><a href="/admin/profile" class="nav-link <%= active === 'Profile' ? 'active' : '' %>"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
+    </ul>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="confirmLogout()"><i class="fa-solid fa-power-off"></i> Logout</button>
+  </div>
+</aside>

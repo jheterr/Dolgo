@@ -1,0 +1,1024 @@
+<!-- Title passed to layout -->
+<% locals.title = 'The Last Muster | Staff Management' %>
+
+<%- contentFor('style') %>
+<style>
+
+    /* Status Toggle */
+    .status-toggle {
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+    .status-toggle:hover {
+      transform: scale(1.02);
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 560px;
+      box-shadow: var(--shadow-md);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* Modal Header */
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fafcff;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .modal-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: 0.2s;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-close:hover {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    /* Modal Body */
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Modal Footer */
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      background: #fafcff;
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+
+    /* Form Styles */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-label .required {
+      color: #e53e3e;
+      margin-left: 4px;
+    }
+    .form-control {
+      padding: 10px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 13px;
+      font-family: 'Montserrat', sans-serif;
+      color: #1e293b;
+      background: white;
+      outline: none;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    .form-control:focus {
+      border-color: #CF6322;
+      box-shadow: 0 0 0 3px rgba(207,99,34,0.1);
+    }
+    .form-control::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+    select.form-control {
+      cursor: pointer;
+      background: white;
+    }
+    textarea.form-control {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Form Row - Two Columns */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    .page-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #CF6322;
+      margin: 0;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    
+    .search-input {
+      padding: 8px 14px;
+      padding-left: 34px;
+      border: 1px solid #cbd5e1;
+      border-radius: 30px;
+      font-size: 13px;
+      width: 250px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      border-color: #CF6322;
+      box-shadow: 0 0 0 2px rgba(207,99,34,0.1);
+    }
+    
+    .search-container {
+      position: relative;
+    }
+    
+    .search-container i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    /* ========== CARD-BASED STAFF LIST ========== */
+    .staff-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .staff-section {
+      background: white;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 14px 20px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-header.active {
+      color: #166534;
+      background: #f0fdf4;
+    }
+
+    .section-header.inactive {
+      color: #991b1b;
+      background: #fef2f2;
+    }
+
+    .staff-cards {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .staff-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.2s;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .staff-card:last-child {
+      border-bottom: none;
+    }
+
+    .staff-card:hover {
+      background: #fafcff;
+    }
+
+    .staff-info {
+      flex: 2;
+      min-width: 200px;
+    }
+
+    .staff-name {
+      font-weight: 800;
+      font-size: 15px;
+      color: #1e293b;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .staff-role {
+      font-size: 11px;
+      background: #e2e8f0;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .staff-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .staff-details i {
+      width: 14px;
+      color: #94a3b8;
+      margin-right: 4px;
+    }
+
+    .staff-status {
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .staff-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      background: #f1f5f9;
+      color: #475569;
+    }
+    .btn-icon:hover {
+      background: #e2e8f0;
+      transform: scale(1.02);
+    }
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 200;
+      width: 42px;
+      height: 42px;
+      background: var(--orange);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #94a3b8;
+    }
+
+    /* Desktop Table View (hidden on mobile by default) */
+    .desktop-table-view {
+      display: block;
+    }
+    .mobile-card-view {
+      display: none;
+    }
+
+    /* Section divider styles */
+    .section-divider td {
+      background: transparent !important;
+      padding: 12px 8px 8px 8px !important;
+    }
+    .divider-active {
+      font-weight: 700;
+      color: #166534;
+      background: #f0fdf4;
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+    .divider-inactive {
+      font-weight: 700;
+      color: #991b1b;
+      background: #fef2f2;
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+
+    /* Button Styles */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border: none;
+      border-radius: 30px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #CF6322;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #a84d18;
+      transform: translateY(-1px);
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1.5px solid #e2e8f0;
+      color: #475569;
+      border-radius: 30px;
+      padding: 6px 16px;
+    }
+    .btn-ghost:hover {
+      border-color: #CF6322;
+      color: #CF6322;
+    }
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 11px;
+    }
+
+    /* Card component */
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px 24px;
+      box-shadow: 0 4px 24px rgba(30,42,56,0.07);
+      border: 1px solid #e2e8f0;
+    }
+    .table-wrap {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      padding: 12px 12px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: #f8fafc;
+    }
+    td {
+      padding: 12px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 12px;
+      color: #334155;
+    }
+    .td-bold {
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* ========== MOBILE OPTIMIZATIONS ========== */
+    @media (max-width: 768px) {
+      .mobile-menu-btn { display: flex !important; }
+      .content { padding-top: 75px; }
+      
+      .desktop-table-view {
+        display: none;
+      }
+      .mobile-card-view {
+        display: block;
+      }
+      
+      .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      
+      .header-actions {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+      }
+      
+      .header-actions .btn-primary {
+        width: auto;
+        padding: 8px 16px;
+      }
+      
+      .search-input {
+        width: auto;
+        flex: 1;
+        max-width: 180px;
+      }
+      
+      .page-title {
+        font-size: 22px;
+      }
+      
+      .staff-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .staff-status {
+        width: 100%;
+        text-align: left;
+      }
+      
+      .staff-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      
+      .staff-details {
+        flex-direction: column;
+        gap: 6px;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .modal {
+        max-width: 95%;
+      }
+      .modal-body {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-title {
+        font-size: 20px;
+      }
+      .search-input {
+        max-width: 150px;
+        font-size: 11px;
+        padding: 6px 10px;
+        padding-left: 30px;
+      }
+      .search-container i {
+        left: 8px;
+        font-size: 10px;
+      }
+      .staff-name {
+        font-size: 14px;
+      }
+    }
+  
+</style>
+
+<div class="app">
+    <%- include('../partials/admin_sidebar', { active: 'Staffs' }) %>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
+    <main class="content">
+      <button class="mobile-menu-btn" onclick="openSidebar()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <div class="page-header">
+        <h1 class="page-title">Staff Management</h1>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="openAddModal()">
+            <i class="fa-solid fa-plus"></i> Add Staff
+          </button>
+          <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search name, email, phone..." oninput="filterStaff()">
+          </div>
+        </div>
+      </div>
+
+      <!-- DESKTOP TABLE VIEW -->
+      <div class="desktop-table-view">
+        <div class="card">
+          <div class="table-wrap">
+            <table id="staffTable">
+              <thead>
+                <tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Location</th><th>Schedule</th><th>Status</th><th>Action</th></tr>
+              </thead>
+              <tbody id="staffTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOBILE CARD VIEW -->
+      <div class="mobile-card-view">
+        <div id="staffCardsContainer"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Staff Modal -->
+  <div class="modal-overlay" id="addStaffModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-user-plus"></i> Add New Staff</div>
+        <button class="modal-close" onclick="closeModal('addStaffModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Email Address <span class="required">*</span></label>
+          <input class="form-control" id="s-email" type="email" placeholder="staff@thelastmuster.com">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">First Name <span class="required">*</span></label>
+            <input class="form-control" id="s-firstname" type="text" placeholder="First name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name <span class="required">*</span></label>
+            <input class="form-control" id="s-lastname" type="text" placeholder="Last name">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input class="form-control" id="s-phone" type="tel" placeholder="+63 912 3456 789">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input class="form-control" id="s-location" type="text" placeholder="City, Province">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Role</label>
+            <select class="form-control" id="s-role">
+              <option>Staff</option>
+              <option>Admin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-control" id="s-status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Work Schedule</label>
+          <input class="form-control" id="s-sched" type="text" placeholder="Mon - Fri: 8:00 AM - 5:00 PM">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('addStaffModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="addStaff()"><i class="fa-solid fa-save"></i> Add Staff</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Staff Modal -->
+  <div class="modal-overlay" id="editStaffModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-pen"></i> Edit Staff</div>
+        <button class="modal-close" onclick="closeModal('editStaffModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Email Address <span class="required">*</span></label>
+          <input class="form-control" id="es-email" type="email">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">First Name <span class="required">*</span></label>
+            <input class="form-control" id="es-firstname" type="text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name <span class="required">*</span></label>
+            <input class="form-control" id="es-lastname" type="text">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input class="form-control" id="es-phone" type="tel">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input class="form-control" id="es-location" type="text">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Role</label>
+            <select class="form-control" id="es-role">
+              <option>Staff</option>
+              <option>Admin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-control" id="es-status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Work Schedule</label>
+          <input class="form-control" id="es-sched" type="text">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('editStaffModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveStaff()"><i class="fa-solid fa-save"></i> Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+<%- contentFor('script') %>
+<script>
+    // Staff Data with new fields
+    let staffData = [
+      { id: 1, firstName: "Daniel", lastName: "Padilla", email: "daniel.padilla@lastmuster.com", phone: "+63 912 3456 002", location: "Manila", role: "Staff", schedule: "Mon - Fri: 8:00 AM - 5:00 PM", status: "active" },
+      { id: 2, firstName: "Joshua", lastName: "Garcia", email: "joshua.garcia@lastmuster.com", phone: "+63 912 3456 003", location: "Quezon City", role: "Staff", schedule: "Mon - Sat: 7:00 AM - 3:00 PM", status: "inactive" },
+      { id: 3, firstName: "James", lastName: "Reid", email: "james.reid@lastmuster.com", phone: "+63 912 3456 005", location: "Makati", role: "Staff", schedule: "Tue - Sat: 9:00 AM - 6:00 PM", status: "inactive" }
+    ];
+    let nextId = 4;
+    let editId = null;
+
+    function getFullName(staff) {
+      return `${staff.firstName} ${staff.lastName}`;
+    }
+
+    function renderStaff() {
+      renderDesktopTable();
+      renderMobileCards();
+    }
+
+    function renderDesktopTable() {
+      const tbody = document.getElementById('staffTableBody');
+      const activeStaff = staffData.filter(s => s.status === 'active');
+      const inactiveStaff = staffData.filter(s => s.status === 'inactive');
+      
+      let html = '';
+      
+      // Active Staff Section
+      html += `<tr class="section-divider"><td colspan="8" class="divider-active"><i class="fa-solid fa-circle-check"></i> Active Staff</td></tr>`;
+      if (activeStaff.length === 0) {
+        html += `<tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">No active staff</td></tr>`;
+      } else {
+        activeStaff.forEach(s => {
+          html += `
+            <tr data-id="${s.id}">
+              <td class="td-bold">${escapeHtml(getFullName(s))}</td>
+              <td>${escapeHtml(s.email)}</td>
+              <td>${escapeHtml(s.phone)}</td>
+              <td>${escapeHtml(s.role)}</td>
+              <td>${escapeHtml(s.location || '—')}</td>
+              <td>${escapeHtml(s.schedule)}</td>
+              <td><span onclick="toggleStatus(${s.id})" class="status-toggle" style="background:#d1fae5;color:var(--green);">Active</span></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="openEditModal(${s.id})"><i class="fa-solid fa-pen"></i> Edit</button></td>
+            </tr>
+          `;
+        });
+      }
+      
+      // Inactive Staff Section
+      html += `<tr class="section-divider"><td colspan="8" class="divider-inactive"><i class="fa-solid fa-circle-xmark"></i> Inactive Staff</td></tr>`;
+      if (inactiveStaff.length === 0) {
+        html += `<tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">No inactive staff</td></tr>`;
+      } else {
+        inactiveStaff.forEach(s => {
+          html += `
+            <tr data-id="${s.id}">
+              <td class="td-bold">${escapeHtml(getFullName(s))}</td>
+              <td>${escapeHtml(s.email)}</td>
+              <td>${escapeHtml(s.phone)}</td>
+              <td>${escapeHtml(s.role)}</td>
+              <td>${escapeHtml(s.location || '—')}</td>
+              <td>${escapeHtml(s.schedule)}</td>
+              <td><span onclick="toggleStatus(${s.id})" class="status-toggle" style="background:#fee2e2;color:#e53e3e;">Inactive</span></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="openEditModal(${s.id})"><i class="fa-solid fa-pen"></i> Edit</button></td>
+            </tr>
+          `;
+        });
+      }
+      
+      tbody.innerHTML = html;
+    }
+
+    function renderMobileCards() {
+      const container = document.getElementById('staffCardsContainer');
+      const activeStaff = staffData.filter(s => s.status === 'active');
+      const inactiveStaff = staffData.filter(s => s.status === 'inactive');
+      
+      let html = '<div class="staff-sections">';
+      
+      // Active Section
+      html += `<div class="staff-section"><div class="section-header active"><i class="fa-solid fa-circle-check"></i> Active Staff</div><div class="staff-cards">`;
+      if (activeStaff.length === 0) {
+        html += '<div class="empty-state">No active staff</div>';
+      } else {
+        activeStaff.forEach(s => {
+          html += `
+            <div class="staff-card" data-id="${s.id}">
+              <div class="staff-info">
+                <div class="staff-name">${escapeHtml(getFullName(s))} <span class="staff-role">${escapeHtml(s.role)}</span></div>
+                <div class="staff-details">
+                  <span><i class="fa-solid fa-envelope"></i> ${escapeHtml(s.email)}</span>
+                  <span><i class="fa-solid fa-phone"></i> ${escapeHtml(s.phone)}</span>
+                  <span><i class="fa-solid fa-location-dot"></i> ${escapeHtml(s.location || '—')}</span>
+                  <span><i class="fa-regular fa-calendar"></i> ${escapeHtml(s.schedule)}</span>
+                </div>
+              </div>
+              <div class="staff-status">
+                <span onclick="toggleStatus(${s.id})" class="status-toggle" style="background:#d1fae5;color:var(--green);">Active</span>
+              </div>
+              <div class="staff-actions">
+                <button class="btn-icon" onclick="openEditModal(${s.id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
+              </div>
+            </div>
+          `;
+        });
+      }
+      html += `</div></div>`;
+      
+      // Inactive Section
+      html += `<div class="staff-section"><div class="section-header inactive"><i class="fa-solid fa-circle-xmark"></i> Inactive Staff</div><div class="staff-cards">`;
+      if (inactiveStaff.length === 0) {
+        html += '<div class="empty-state">No inactive staff</div>';
+      } else {
+        inactiveStaff.forEach(s => {
+          html += `
+            <div class="staff-card" data-id="${s.id}">
+              <div class="staff-info">
+                <div class="staff-name">${escapeHtml(getFullName(s))} <span class="staff-role">${escapeHtml(s.role)}</span></div>
+                <div class="staff-details">
+                  <span><i class="fa-solid fa-envelope"></i> ${escapeHtml(s.email)}</span>
+                  <span><i class="fa-solid fa-phone"></i> ${escapeHtml(s.phone)}</span>
+                  <span><i class="fa-solid fa-location-dot"></i> ${escapeHtml(s.location || '—')}</span>
+                  <span><i class="fa-regular fa-calendar"></i> ${escapeHtml(s.schedule)}</span>
+                </div>
+              </div>
+              <div class="staff-status">
+                <span onclick="toggleStatus(${s.id})" class="status-toggle" style="background:#fee2e2;color:#e53e3e;">Inactive</span>
+              </div>
+              <div class="staff-actions">
+                <button class="btn-icon" onclick="openEditModal(${s.id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
+              </div>
+            </div>
+          `;
+        });
+      }
+      html += `</div></div></div>`;
+      
+      container.innerHTML = html;
+    }
+
+    function filterStaff() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const filteredIds = staffData.filter(s => 
+        getFullName(s).toLowerCase().includes(searchTerm) || 
+        s.email.toLowerCase().includes(searchTerm) || 
+        s.phone.toLowerCase().includes(searchTerm)
+      ).map(s => s.id);
+      
+      // Filter desktop table
+      document.querySelectorAll('#staffTableBody tr:not(.section-divider)').forEach(row => {
+        const id = parseInt(row.getAttribute('data-id'));
+        if (id) {
+          row.style.display = filteredIds.includes(id) ? '' : 'none';
+        }
+      });
+      
+      // Filter mobile cards
+      document.querySelectorAll('.staff-card').forEach(card => {
+        const id = parseInt(card.getAttribute('data-id'));
+        card.style.display = filteredIds.includes(id) ? '' : 'none';
+      });
+      
+      // Show/hide section dividers
+      const hasActive = staffData.some(s => filteredIds.includes(s.id) && s.status === 'active');
+      const hasInactive = staffData.some(s => filteredIds.includes(s.id) && s.status === 'inactive');
+      
+      const rows = document.querySelectorAll('#staffTableBody tr');
+      let activeDividerShown = false;
+      let inactiveDividerShown = false;
+      
+      rows.forEach(row => {
+        if (row.classList.contains('section-divider')) {
+          const text = row.textContent.toLowerCase();
+          if (text.includes('active')) {
+            row.style.display = hasActive ? '' : 'none';
+            activeDividerShown = true;
+          } else if (text.includes('inactive')) {
+            row.style.display = hasInactive ? '' : 'none';
+            inactiveDividerShown = true;
+          }
+        }
+      });
+    }
+
+    function openAddModal() {
+      document.getElementById('addStaffModal').classList.add('show');
+      document.getElementById('s-email').value = '';
+      document.getElementById('s-firstname').value = '';
+      document.getElementById('s-lastname').value = '';
+      document.getElementById('s-phone').value = '';
+      document.getElementById('s-location').value = '';
+      document.getElementById('s-role').value = 'Staff';
+      document.getElementById('s-sched').value = '';
+      document.getElementById('s-status').value = 'active';
+    }
+
+    function addStaff() {
+      const email = document.getElementById('s-email').value.trim();
+      const firstName = document.getElementById('s-firstname').value.trim();
+      const lastName = document.getElementById('s-lastname').value.trim();
+      const phone = document.getElementById('s-phone').value.trim();
+      const location = document.getElementById('s-location').value.trim();
+      const role = document.getElementById('s-role').value;
+      const schedule = document.getElementById('s-sched').value.trim();
+      const status = document.getElementById('s-status').value;
+      
+      if (!email || !firstName || !lastName) { 
+        alert("Email, First Name, and Last Name are required!"); 
+        return; 
+      }
+      if (!email.includes('@')) {
+        alert("Please enter a valid email address!");
+        return;
+      }
+      
+      staffData.push({ 
+        id: nextId++, 
+        firstName, 
+        lastName, 
+        email, 
+        phone: phone || '—', 
+        location: location || '—', 
+        role, 
+        schedule: schedule || '—', 
+        status 
+      });
+      renderStaff();
+      closeModal('addStaffModal');
+      alert(`Staff member ${firstName} ${lastName} has been added.`);
+    }
+
+    function openEditModal(id) {
+      const staff = staffData.find(s => s.id === id);
+      if (!staff) return;
+      editId = id;
+      document.getElementById('es-email').value = staff.email;
+      document.getElementById('es-firstname').value = staff.firstName;
+      document.getElementById('es-lastname').value = staff.lastName;
+      document.getElementById('es-phone').value = staff.phone === '—' ? '' : staff.phone;
+      document.getElementById('es-location').value = staff.location === '—' ? '' : staff.location;
+      document.getElementById('es-role').value = staff.role;
+      document.getElementById('es-sched').value = staff.schedule === '—' ? '' : staff.schedule;
+      document.getElementById('es-status').value = staff.status;
+      document.getElementById('editStaffModal').classList.add('show');
+    }
+
+    function saveStaff() {
+      const staff = staffData.find(s => s.id === editId);
+      if (!staff) return;
+      
+      const email = document.getElementById('es-email').value.trim();
+      const firstName = document.getElementById('es-firstname').value.trim();
+      const lastName = document.getElementById('es-lastname').value.trim();
+      
+      if (!email || !firstName || !lastName) {
+        alert("Email, First Name, and Last Name are required!");
+        return;
+      }
+      if (!email.includes('@')) {
+        alert("Please enter a valid email address!");
+        return;
+      }
+      
+      staff.email = email;
+      staff.firstName = firstName;
+      staff.lastName = lastName;
+      staff.phone = document.getElementById('es-phone').value.trim() || '—';
+      staff.location = document.getElementById('es-location').value.trim() || '—';
+      staff.role = document.getElementById('es-role').value;
+      staff.schedule = document.getElementById('es-sched').value.trim() || '—';
+      staff.status = document.getElementById('es-status').value;
+      
+      renderStaff();
+      closeModal('editStaffModal');
+      alert("Staff information updated successfully.");
+    }
+
+    function toggleStatus(id) {
+      const staff = staffData.find(s => s.id === id);
+      if (staff) {
+        staff.status = staff.status === 'active' ? 'inactive' : 'active';
+        renderStaff();
+        alert(`Staff status changed to ${staff.status}.`);
+      }
+    }
+
+    function closeModal(id) { 
+      document.getElementById(id).classList.remove('show'); 
+    }
+    
+    function escapeHtml(str) { 
+      if (!str) return ''; 
+      return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m); 
+    }
+
+    function openSidebar() { 
+      document.getElementById('sidebar').classList.add('mobile-open'); 
+      document.getElementById('mobileOverlay').classList.add('show'); 
+    }
+    
+    function closeSidebar() { 
+      document.getElementById('sidebar').classList.remove('mobile-open'); 
+      document.getElementById('mobileOverlay').classList.remove('show'); 
+    }
+    
+    function confirmLogout() { 
+      if (confirm("Are you sure you want to logout?")) 
+        alert("Logged out successfully!"); 
+    }
+
+    renderStaff();
+  </script>

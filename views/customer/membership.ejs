@@ -1,0 +1,290 @@
+<!-- Title passed to layout -->
+<% locals.title = 'The Last Muster • Membership' %>
+
+<%- contentFor('style') %>
+<style>
+
+        /* Shared Sidebar Styles from dashboard */
+        .sidebar {
+            background-color: #242f3d !important;
+        }
+
+        .sidebar-logo-container {
+            display: flex;
+            align-items: center;
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 12px;
+        }
+
+        .sidebar-nav ul li a.active {
+            background-color: #384250;
+            color: white;
+            font-weight: 600;
+            border-left: 4px solid #d65c29;
+            border-radius: 0 8px 8px 0;
+            padding-left: 16px;
+        }
+
+        .sidebar-nav ul li a {
+            padding-left: 20px;
+        }
+
+        .btn-logout-styled {
+            background-color: #384250;
+            color: #d65c29;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.25s ease;
+        }
+
+        .btn-logout-styled:hover {
+            background-color: #4a5568;
+        }
+
+        /* Membership Page Specific Styles */
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            color: #d65c29;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1.3rem;
+            color: #64748b;
+            margin-bottom: 32px;
+        }
+
+        .plans-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: flex-start;
+        }
+
+        .plans-row-2 {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .plan-card {
+            background: #fffafa;
+            /* very slight warm tint */
+            border-radius: 12px;
+            padding: 32px;
+            width: 320px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .plan-card.premium {
+            border: 2px solid #d65c29;
+            background: #fff;
+        }
+
+        .plan-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .plan-title.starter {
+            color: #64748b;
+        }
+
+        .plan-title.regular {
+            color: #f59e0b;
+        }
+
+        .plan-title.pro {
+            color: #f43f5e;
+        }
+
+        .plan-title.executive {
+            color: #ef4444;
+        }
+
+        .plan-title.premium {
+            color: #d65c29;
+        }
+
+        .plan-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #d65c29;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .plan-price .period {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #d65c29;
+            margin-left: 2px;
+        }
+
+        .plan-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 24px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 32px 0;
+            flex-grow: 1;
+        }
+
+        .plan-features li {
+            font-size: 0.85rem;
+            color: #475569;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            font-weight: 600;
+        }
+
+        .plan-features li::before {
+            content: "-";
+            margin-right: 8px;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+
+        .btn-subscribe {
+            background: #d65c29;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            width: 100%;
+        }
+
+        .btn-subscribe:hover {
+            background: #bf4d1f;
+        }
+    
+</style>
+
+<div class="app">
+        <%- include('../partials/customer_sidebar', { active: '' }) %>
+
+        <main class="content" style="background-color: #f4f6f9; overflow-y: auto;">
+            <h1 class="page-title">Membership Plans</h1>
+            <p class="page-subtitle">Choose the perfect plan for your study & coworking needs</p>
+
+            <div class="plans-container" style="justify-content: center;">
+                <!-- Starter -->
+                <div class="plan-card">
+                    <div class="plan-title starter">Starter</div>
+                    <div class="plan-price">₱1,199<span class="period">/mo</span></div>
+                    <p class="plan-desc">Hot Desk Coworking Credits, Discounts, and Added Perks!</p>
+                    <ul class="plan-features">
+                        <li>30 hrs Hot Desk</li>
+                        <li>₱50 Printing Credit</li>
+                        <li>₱100 Snack Pass</li>
+                    </ul>
+                    <button class="btn-subscribe">Subscribe Now</button>
+                </div>
+
+                <!-- Regular -->
+                <div class="plan-card">
+                    <div class="plan-title regular">Regular</div>
+                    <div class="plan-price">₱1,499<span class="period">/mo</span></div>
+                    <p class="plan-desc">Hot Desk Coworking Credits, Discounts, and Added Perks!</p>
+                    <ul class="plan-features">
+                        <li>45 hrs Hot Desk</li>
+                        <li>10% Discount on Meeting Room</li>
+                        <li>₱50 Printing Credit</li>
+                    </ul>
+                    <button class="btn-subscribe">Subscribe Now</button>
+                </div>
+
+                <!-- Pro -->
+                <div class="plan-card">
+                    <div class="plan-title pro">Pro</div>
+                    <div class="plan-price">₱1,999<span class="period">/mo</span></div>
+                    <p class="plan-desc">All-Access Coworking Credits, Discounts, and Added Perks!</p>
+                    <ul class="plan-features">
+                        <li>70 hrs All Access</li>
+                        <li>₱75 Printing Credit</li>
+                        <li>₱150 Snack Pass</li>
+                        <li>10% Discount</li>
+                    </ul>
+                    <button class="btn-subscribe">Subscribe Now</button>
+                </div>
+            </div>
+
+            <div class="plans-row-2">
+                <!-- Executive -->
+                <div class="plan-card">
+                    <div class="plan-title executive">Executive</div>
+                    <div class="plan-price">₱2,499<span class="period">/mo</span></div>
+                    <p class="plan-desc">All-Access Coworking Credits, Discounts, and Added Perks!</p>
+                    <ul class="plan-features">
+                        <li>100 hrs All Access</li>
+                        <li>1 Free Hour Meeting Room</li>
+                        <li>₱100 Printing Credit</li>
+                        <li>10% Discount</li>
+                    </ul>
+                    <button class="btn-subscribe">Subscribe Now</button>
+                </div>
+
+                <!-- Premium -->
+                <div class="plan-card premium">
+                    <div class="plan-title premium">Premium</div>
+                    <div class="plan-price">₱3,499<span class="period">/mo</span></div>
+                    <p class="plan-desc">Premium Access, Discounts, and Added Perks!</p>
+                    <ul class="plan-features">
+                        <li>Unlimited Access</li>
+                        <li>3 Free Meeting Room Hours</li>
+                        <li>₱150 Printing Credit</li>
+                        <li>₱250 Snack Pass</li>
+                        <li>10% Discount</li>
+                    </ul>
+                    <button class="btn-subscribe">Subscribe Now</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+<%- contentFor('script') %>
+<script>
+        function logout() {
+            if (confirm("Are you sure you want to logout?")) {
+                window.location.href = "login.html"; // Redirect to login page
+            }
+        }
+    </script>

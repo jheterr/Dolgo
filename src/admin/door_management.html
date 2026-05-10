@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>The Last Muster | Door Management</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <style>
+        .door-control-box {
+      text-align: center;
+      padding: 25px;
+      background: #f1f5f9;
+      border-radius: 12px;
+      border: 1px dashed #cbd5e1;
+    }
+
+    .door-status-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .door-status-value {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #1e293b;
+      transition: 0.3s;
+      margin-bottom: 15px;
+    }
+
+    .door-status-value.unlocked {
+      color:#8C8636 ;
+      text-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+
+    .door-status-value.locked {
+      color: #DC6037;
+    }
+
+    .door-action-row {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .door-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .door-btn:active {
+      transform: scale(0.95);
+    }
+
+    .door-btn-open {
+      background: #8C8636 ;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    }
+
+    .door-btn-close {
+      background: #DC6037;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Table Styles */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+
+    .data-table th {
+      background-color: #f8fafc;
+      padding: 12px 15px;
+      text-align: left;
+      color: #475569;
+      font-weight: 700;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .data-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #f1f5f9;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    /* Mobile Card View */
+    .table-wrap {
+      width: 100%;
+    }
+
+    @media (min-width: 769px) {
+      .mobile-card-view {
+        display: none;
+      }
+      .desktop-table-view {
+        display: block;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .desktop-table-view {
+        display: none;
+      }
+      .mobile-card-view {
+        display: block;
+      }
+      
+      .activity-timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 450px;
+        overflow-y: auto;
+      }
+
+      .activity-card {
+        background: white;
+        border-radius: 12px;
+        padding: 12px 14px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+      }
+
+      .activity-card:hover {
+        background: #fafcff;
+        border-color: #cbd5e1;
+      }
+
+      .activity-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+
+      .activity-user {
+        font-weight: 800;
+        font-size: 0.85rem;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .role-badge {
+        font-size: 0.55rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 20px;
+        background: #f1f5f9;
+        color: #475569;
+      }
+
+      .role-badge.staff {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+
+      .role-badge.customer {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .activity-time {
+        font-size: 0.6rem;
+        color: #94a3b8;
+        font-weight: 500;
+      }
+
+      .activity-detail {
+        font-size: 0.65rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 4px;
+      }
+
+      .method-tag {
+        background: #f1f5f9;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.6rem;
+      }
+
+      .activity-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 10px;
+        border-radius: 30px;
+        font-size: 0.6rem;
+        font-weight: 700;
+      }
+
+      .activity-badge.success {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      .activity-badge.danger {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .empty-logs {
+        text-align: center;
+        padding: 30px;
+        color: #94a3b8;
+      }
+
+      .mobile-menu-btn {
+        display: flex;
+      }
+      .content {
+        padding-top: 75px;
+      }
+      .door-action-row {
+        flex-direction: column;
+        align-items: center;
+      }
+      .door-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .badge-green {
+      background: #d1fae5;
+      color: #8C8636;
+    }
+
+    .badge-red {
+      background: #fee2e2;
+      color: #DC6037;
+    }
+
+    .rfid-tag {
+      font-family: 'Montserrat', sans-serif;
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #475569;
+      font-size: 0.7rem;
+    }
+
+    .method-system {
+      color: #64748b;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 0.7rem;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid #e2e8f0;
+      background: white;
+      color: #64748b;
+      transition: 0.2s;
+    }
+
+    .filter-btn.active {
+      background: #CF6322;
+      color: white;
+      border-color: #CF6322;
+    }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* Fixed Mobile Menu Button - Right Side */
+    .mobile-menu-btn {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 200;
+      width: 42px;
+      height: 42px;
+      background: var(--orange);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .page-header {
+      color: var(--orange);
+      font-size: 1.65rem;
+      font-weight: 800;
+      margin-bottom: 28px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    @media (max-width: 768px) {
+      .table-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .filter-group {
+        gap: 6px;
+      }
+      .filter-btn {
+        padding: 5px 12px;
+        font-size: 0.65rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .table-header {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .filter-group {
+        gap: 5px;
+      }
+      .filter-btn {
+        padding: 4px 10px;
+        font-size: 0.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="The_Last_Muster_logo1.png" alt="The Last Muster" class="logo-img">
+      <div class="logo-info">
+        <div class="logo-sub">Admin Panel</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="admin_dashboard.html" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+        <li><a href="admin_door_management.html" class="nav-link active"><i class="fa-solid fa-door-open"></i> Door Management</a></li>
+        <li><a href="admin_seat_management.html" class="nav-link"><i class="fa-solid fa-couch"></i> Seat Management</a></li>
+        <li><a href="admin_reservation.html" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Reservation</a></li>
+        <details class="nav-details">
+          <summary class="nav-link"><i class="fa-solid fa-users-gear"></i> Users Management</summary>
+          <ul class="submenu">
+            <li><a href="admin_staff.html" class="nav-link sub-link">Staffs</a></li>
+            <li><a href="admin_customers.html" class="nav-link sub-link">Customers</a></li>
+          </ul>
+        </details>
+        <li><a href="admin_analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics & Reports</a></li>
+        <li><a href="admin_events.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Event</a></li>
+        <li><a href="admin_messages.html" class="nav-link"><i class="fa-solid fa-envelope"></i> Message</a></li>
+        <li><a href="admin_notification.html" class="nav-link"><i class="fa-solid fa-bell"></i> Notification</a></li>
+        <li><a href="admin_profile.html" class="nav-link"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="confirmLogout()">
+        <i class="fa-solid fa-power-off"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
+  <!-- Main Content -->
+  <main class="content">
+    <!-- Fixed Mobile Menu Button - Right Side -->
+    <button class="mobile-menu-btn" onclick="openSidebar()">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="page-header">
+      <h1 class="page-title">Door Management</h1>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Manual System Override</h3>
+      <div class="door-control-box">
+        <div class="door-status-label">Magnetic Lock Status</div>
+        <div class="door-status-value locked" id="doorVal">LOCKED</div>
+        <div class="door-action-row">
+          <button class="door-btn door-btn-open" onclick="triggerDoor('UNLOCKED', 'Admin', 'Manual Console')">
+            <i class="fa-solid fa-lock-open"></i> OPEN DOOR
+          </button>
+          <button class="door-btn door-btn-close" onclick="triggerDoor('LOCKED', 'Admin', 'Manual Console')">
+            <i class="fa-solid fa-lock"></i> CLOSE DOOR
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-header">
+        <h3 class="section-title" style="margin-bottom:0">Access & Activity Logs</h3>
+        <div class="filter-group" id="desktopFilterGroup">
+          <button class="filter-btn active" data-filter="all" onclick="filterLogs('all', this)">All Activity</button>
+          <button class="filter-btn" data-filter="Unlock" onclick="filterLogs('Unlock', this)">Unlocks</button>
+          <button class="filter-btn" data-filter="Lock" onclick="filterLogs('Lock', this)">Locks</button>
+        </div>
+      </div>
+      
+      <!-- DESKTOP TABLE VIEW -->
+      <div class="desktop-table-view">
+        <div class="table-wrap">
+          <table class="data-table" id="desktopLogTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Time</th>
+                <th>RFID / Method</th>
+                <th>Activity</th>
+              </tr>
+            </thead>
+            <tbody id="desktopLogBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MOBILE CARD VIEW (No large icons) -->
+      <div class="mobile-card-view">
+        <div class="activity-timeline" id="mobileActivityTimeline"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// Activity Logs Data
+let activityLogs = [
+  { id: 1, name: "Juan Dela Cruz", role: "Customer", roleType: "customer", time: "11:05 AM", timestamp: "2026-04-25 11:05", method: "RFID: 44:E2:01", methodType: "rfid", activity: "Unlock" },
+  { id: 2, name: "Daniel Padilla", role: "Staff", roleType: "staff", time: "09:45 AM", timestamp: "2026-04-25 09:45", method: "System Console", methodType: "system", activity: "Unlock" },
+  { id: 3, name: "Joshua Garcia", role: "Staff", roleType: "staff", time: "10:11 AM", timestamp: "2026-04-25 10:11", method: "System Console", methodType: "system", activity: "Lock" },
+  { id: 4, name: "Maria Santos", role: "Customer", roleType: "customer", time: "08:30 AM", timestamp: "2026-04-25 08:30", method: "RFID: A3:F2:7B", methodType: "rfid", activity: "Unlock" },
+  { id: 5, name: "Admin Zoro", role: "Admin", roleType: "staff", time: "07:55 AM", timestamp: "2026-04-25 07:55", method: "System Console", methodType: "system", activity: "Unlock" },
+  { id: 6, name: "Auto-lock", role: "System", roleType: "system", time: "08:00 AM", timestamp: "2026-04-25 08:00", method: "Auto Timer", methodType: "system", activity: "Lock" }
+];
+
+let currentFilter = "all";
+
+// Helper: Escape HTML
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
+// ========== DESKTOP RENDER ==========
+function renderDesktopLogs() {
+  const tbody = document.getElementById('desktopLogBody');
+  if (!tbody) return;
+  
+  let filteredLogs = [...activityLogs];
+  if (currentFilter !== "all") {
+    filteredLogs = activityLogs.filter(log => log.activity === currentFilter);
+  }
+  
+  tbody.innerHTML = filteredLogs.map(log => {
+    const badgeClass = log.activity === 'Unlock' ? 'badge-green' : 'badge-red';
+    const icon = log.activity === 'Unlock' ? 'fa-lock-open' : 'fa-lock';
+    const methodDisplay = log.methodType === 'rfid' 
+      ? `<span class="rfid-tag">${escapeHtml(log.method)}</span>`
+      : `<span class="method-system">${escapeHtml(log.method)}</span>`;
+    
+    return `
+      <tr data-activity="${log.activity}">
+        <td>${escapeHtml(log.name)}</td>
+        <td>${escapeHtml(log.role)}</td>
+        <td>${escapeHtml(log.time)}</td>
+        <td>${methodDisplay}</td>
+        <td><span class="badge ${badgeClass}"><i class="fa-solid ${icon}"></i> ${log.activity}</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ========== MOBILE CARD VIEW RENDER (No large icons) ==========
+function getMobileCardHTML(log) {
+  const badgeClass = log.activity === 'Unlock' ? 'success' : 'danger';
+  const badgeIcon = log.activity === 'Unlock' ? 'fa-lock-open' : 'fa-lock';
+  
+  let roleBadgeClass = "staff";
+  if (log.roleType === "customer") roleBadgeClass = "customer";
+  if (log.roleType === "system") roleBadgeClass = "staff";
+  
+  let methodDisplay = escapeHtml(log.method);
+  if (log.methodType === "rfid") {
+    methodDisplay = `<span class="method-tag"><i class="fa-solid fa-id-card"></i> ${escapeHtml(log.method)}</span>`;
+  } else if (log.methodType === "system") {
+    methodDisplay = `<span class="method-tag"><i class="fa-solid fa-desktop"></i> ${escapeHtml(log.method)}</span>`;
+  } else {
+    methodDisplay = `<span class="method-tag">${escapeHtml(log.method)}</span>`;
+  }
+
+  return `
+    <div class="activity-card" data-activity="${log.activity}">
+      <div class="activity-header">
+        <div class="activity-user">
+          <span>${escapeHtml(log.name)}</span>
+          <span class="role-badge ${roleBadgeClass}">${escapeHtml(log.role)}</span>
+        </div>
+        <div class="activity-time">
+          <i class="fa-regular fa-clock"></i> ${escapeHtml(log.time)}
+        </div>
+      </div>
+      <div class="activity-detail">
+        ${methodDisplay}
+        <span class="activity-badge ${badgeClass}">
+          <i class="fa-solid ${badgeIcon}"></i> ${log.activity}
+        </span>
+      </div>
+    </div>
+  `;
+}
+
+function renderMobileLogs() {
+  const container = document.getElementById('mobileActivityTimeline');
+  if (!container) return;
+  
+  let filteredLogs = [...activityLogs];
+  if (currentFilter !== "all") {
+    filteredLogs = activityLogs.filter(log => log.activity === currentFilter);
+  }
+  
+  filteredLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  
+  if (filteredLogs.length === 0) {
+    container.innerHTML = `<div class="empty-logs"><i class="fa-regular fa-folder-open"></i><p>No activity logs found</p></div>`;
+  } else {
+    container.innerHTML = filteredLogs.map(log => getMobileCardHTML(log)).join('');
+  }
+}
+
+// ========== FILTER FUNCTION (Unified for both views) ==========
+function filterLogs(filterType, btn) {
+  currentFilter = filterType;
+  
+  // Update active button UI in desktop filter group
+  const desktopGroup = document.getElementById('desktopFilterGroup');
+  if (desktopGroup) {
+    desktopGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  }
+  btn.classList.add('active');
+  
+  // Re-render both views
+  renderDesktopLogs();
+  renderMobileLogs();
+}
+
+// ========== DOOR TRIGGER FUNCTION ==========
+function triggerDoor(status, role, method) {
+  const el = document.getElementById('doorVal');
+  el.textContent = status;
+  el.className = 'door-status-value ' + (status === 'UNLOCKED' ? 'unlocked' : 'locked');
+  
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const timestamp = now.toISOString().slice(0, 16).replace('T', ' ');
+  
+  const activity = status === 'UNLOCKED' ? 'Unlock' : 'Lock';
+  const roleType = (role === 'Customer' || role === 'Admin' || role === 'Staff') ? 
+    (role === 'Customer' ? 'customer' : 'staff') : 'system';
+  
+  let methodType = "system";
+  let methodDisplay = method;
+  if (method === 'Manual Console') {
+    methodDisplay = 'System Console';
+    methodType = "system";
+  }
+  
+  const newLog = {
+    id: Date.now(),
+    name: 'Current User',
+    role: role,
+    roleType: roleType,
+    time: timeStr,
+    timestamp: timestamp,
+    method: methodDisplay,
+    methodType: methodType,
+    activity: activity
+  };
+  
+  activityLogs.unshift(newLog);
+  
+  // Re-render both views
+  renderDesktopLogs();
+  renderMobileLogs();
+  
+  // Visual feedback
+  const btn = status === 'UNLOCKED' ? document.querySelector('.door-btn-open') : document.querySelector('.door-btn-close');
+  if (btn) {
+    btn.style.transform = 'scale(0.95)';
+    setTimeout(() => { if (btn) btn.style.transform = ''; }, 200);
+  }
+}
+
+// ========== UTILITY FUNCTIONS ==========
+function confirmLogout() {
+  if (confirm('Are you sure you want to logout?')) {
+    alert('Logged out successfully');
+  }
+}
+
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('mobile-open');
+  document.getElementById('mobileOverlay').classList.add('show');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('mobileOverlay').classList.remove('show');
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  renderDesktopLogs();
+  renderMobileLogs();
+  
+  const doorVal = document.getElementById('doorVal');
+  if (doorVal && doorVal.textContent === 'LOCKED') {
+    doorVal.className = 'door-status-value locked';
+  }
+});
+</script>
+
+</body>
+</html>

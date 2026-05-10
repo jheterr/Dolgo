@@ -1,0 +1,301 @@
+<% locals.title = 'Sign Up — The Last Muster' %>
+
+<%- contentFor('style') %>
+<style>
+    :root {
+      --orange: #C06C3C;
+      --orange-dk: #a0562d;
+      --text: #34312D;
+      --text-md: #595550;
+      --text-sm: #94a3b8;
+      --white: #ffffff;
+      --radius: 20px;
+      --transition: 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(rgba(102, 126, 234, 0.45), rgba(160, 140, 231, 0.45)), 
+                  url('/images/A7301232.jpg') no-repeat center center/cover;
+      padding: 40px 20px;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      padding: 8px 18px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+      z-index: 10;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateX(-3px);
+    }
+
+    .signup-card {
+      background: var(--white);
+      width: 100%;
+      max-width: 440px;
+      padding: 50px 45px;
+      border-radius: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .logo-container {
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .logo-container img {
+      width: 150px;
+      height: auto;
+      padding: 5px;
+    }
+
+    .subtitle {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 14px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .form-group {
+      position: relative;
+      margin-bottom: 8px;
+      text-align: left;
+    }
+
+    .form-group i {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 0.85rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 10px 10px 40px;
+      border: 1.5px solid #f1f5f9;
+      background: #fdfdfd;
+      border-radius: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--orange);
+      background: var(--white);
+    }
+
+    .btn-signup {
+      width: 100%;
+      padding: 12px;
+      background: var(--orange);
+      color: var(--white);
+      border: none;
+      border-radius: 14px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 6px;
+    }
+
+    .btn-signup:hover {
+      background: var(--orange-dk);
+      transform: translateY(-1px);
+    }
+
+    .separator {
+      display: flex;
+      align-items: center;
+      margin: 12px 0;
+      color: #94a3b8;
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+
+    .separator::before, .separator::after {
+      content: '';
+      flex: 1;
+      height: 1.5px;
+      background: #e2e8f0;
+    }
+
+    .separator span { padding: 0 10px; }
+
+    .btn-google {
+      width: 100%;
+      padding: 10px;
+      background: var(--white);
+      border: 1.5px solid var(--orange);
+      border-radius: 12px;
+      color: var(--orange);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 12px;
+    }
+
+    .login-text {
+      font-size: 0.8rem;
+      color: var(--text-md);
+    }
+
+    .login-text a {
+      color: var(--orange);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .copyright {
+      margin-top: 12px;
+      font-size: 0.65rem;
+      color: var(--text-sm);
+    }
+
+    @media (max-width: 480px) {
+      .signup-card { padding: 30px 20px; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+    }
+</style>
+
+<%- contentFor('body') %>
+
+<a href="/" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Back to home
+</a>
+
+<div class="signup-card">
+    <div class="logo-container">
+      <img src="/images/The_Last_Muster_logo1.png" alt="Logo">
+    </div>
+    <p class="subtitle" style="margin-top: 10px;">Create your account</p>
+
+    <form id="signupForm" onsubmit="handleSignup(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <i class="fas fa-user-tag"></i>
+          <input type="text" class="form-control" placeholder="First Name" required id="firstName">
+        </div>
+        <div class="form-group">
+          <i class="fas fa-user-tag"></i>
+          <input type="text" class="form-control" placeholder="Last Name" required id="lastName">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" class="form-control" placeholder="Email Address" required id="email">
+      </div>
+      
+      <div class="form-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" class="form-control" placeholder="Password" required id="password">
+      </div>
+      
+      <div class="form-group">
+        <i class="fas fa-shield-alt"></i>
+        <input type="password" class="form-control" placeholder="Confirm Password" required id="confirmPassword">
+      </div>
+
+      <button type="submit" class="btn-signup">Create account</button>
+    </form>
+
+    <div class="separator"><span>or</span></div>
+
+    <button class="btn-google">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="18">
+      Sign Up with Google
+    </button>
+
+    <p class="login-text">
+      Already have an account? <a href="/login">Login</a>
+    </p>
+
+    <p class="copyright">
+      &copy; 2026 The Last Muster. All rights reserved.
+    </p>
+</div>
+
+<%- contentFor('script') %>
+<script>
+    function handleSignup(e) {
+      e.preventDefault();
+      const pw = document.getElementById('password').value;
+      const cpw = document.getElementById('confirmPassword').value;
+      
+      if (pw !== cpw) {
+        alert("Passwords do not match!");
+        return;
+      }
+      
+      // Simulate submission
+      const data = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        date: new Date().toLocaleDateString(),
+        status: 'Pending'
+      };
+      
+      // Store in localStorage to simulate "database" for the demo
+      let pending = JSON.parse(localStorage.getItem('pendingRegistrations') || '[]');
+      pending.push(data);
+      localStorage.setItem('pendingRegistrations', JSON.stringify(pending));
+      
+      alert("Registration submitted! Please wait for staff or admin to verify your account.");
+      window.location.href = '/login';
+    }
+</script>

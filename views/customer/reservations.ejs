@@ -1,0 +1,280 @@
+<!-- Title passed to layout -->
+<% locals.title = 'The Last Muster • Reservations' %>
+
+<%- contentFor('style') %>
+<style>
+
+        .sidebar {
+            background-color: #242f3d !important;
+        }
+
+        .sidebar-logo-container {
+            display: flex;
+            align-items: center;
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 12px;
+        }
+
+        .sidebar-nav ul li a.active {
+            background-color: #384250;
+            color: white;
+            font-weight: 600;
+            border-left: 4px solid #d65c29;
+            border-radius: 0 8px 8px 0;
+            padding-left: 16px;
+        }
+
+        .sidebar-nav ul li a {
+            padding-left: 20px;
+            text-decoration: none;
+        }
+
+        .btn-logout-styled {
+            background-color: #384250;
+            color: #d65c29;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.25s ease;
+        }
+
+        .btn-logout-styled:hover {
+            background-color: #4a5568;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #d65c29;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+        
+        .active-session-card {
+            background-color: #b7dbbf;
+            border-radius: 12px;
+            padding: 32px 40px;
+            position: relative;
+            margin-bottom: 32px;
+        }
+
+        .badge-active {
+            background-color: #10b981;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .badge-completed {
+            background-color: #71717a;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .session-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #27593c;
+            margin-bottom: 8px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .session-subtitle {
+            font-size: 1.1rem;
+            color: #27593c;
+            font-weight: 700;
+            margin-bottom: 36px;
+        }
+
+        .metric-group {
+            display: flex;
+            gap: 64px;
+        }
+
+        .metric-label {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #27593c;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #27593c;
+            line-height: 1;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #d65c29;
+            margin-bottom: 16px;
+        }
+
+        .reservations-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .reservations-table thead tr {
+            background-color: #cfd8f2;
+        }
+
+        .reservations-table th {
+            padding: 20px 24px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+        }
+
+        .reservations-table td {
+            padding: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1rem;
+        }
+
+        .reservations-table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .reservations-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .btn-reserve {
+            background-color: #d65c29;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 14px 32px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-reserve:hover {
+            background-color: #c25021;
+        }
+    
+</style>
+
+<div class="app">
+        <!-- Sidebar -->
+        <%- include('../partials/customer_sidebar', { active: '' }) %>
+
+        <main class="content" style="background-color: #f4f6f9;">
+            <h1 class="page-title">Reservations</h1>
+            
+            <!-- Active Session Card -->
+            <div class="active-session-card">
+                <div style="position: absolute; top: 32px; right: 40px;">
+                    <span class="badge-active">Active</span>
+                </div>
+                
+                <h2 class="session-title">Active Session</h2>
+                <p class="session-subtitle">Started at 12:30 PM - Ends at 2:30 PM / 3-hour package</p>
+                
+                <div class="metric-group">
+                    <div>
+                        <p class="metric-label">Remaining Time</p>
+                        <div class="metric-value" style="letter-spacing: -2px;">01:20</div>
+                    </div>
+                    <div style="margin-left: 40px;">
+                        <p class="metric-label">Assigned Seat</p>
+                        <div class="metric-value" style="padding-left: 20px;">5</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="section-title">Upcoming/Past Reservations</h2>
+            
+            <!-- Table -->
+            <table class="reservations-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">DATE</th>
+                        <th style="width: 25%;">TIME</th>
+                        <th style="width: 15%;">DURATION</th>
+                        <th style="width: 15%; text-align: center;">SEAT</th>
+                        <th style="width: 20%; text-align: center;">STATUS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Today, Apr 12</td>
+                        <td>12:30 - 2:30 PM</td>
+                        <td>2 hours</td>
+                        <td style="text-align: center;">5</td>
+                        <td style="text-align: center;">
+                            <span class="badge-active" style="padding: 6px 20px; font-size: 0.8rem;">Active</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Apr 10</td>
+                        <td>2:30 - 5:30 PM</td>
+                        <td>3 hours</td>
+                        <td style="text-align: center;">8</td>
+                        <td style="text-align: center;">
+                            <span class="badge-completed" style="padding: 6px 20px; font-size: 0.8rem;">Completed</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Apr 7</td>
+                        <td>10:30 - 11:30 AM</td>
+                        <td>1 hour</td>
+                        <td style="text-align: center;">15</td>
+                        <td style="text-align: center;">
+                            <span class="badge-completed" style="padding: 6px 20px; font-size: 0.8rem;">Completed</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="text-align: center; margin-top: 32px;">
+                <button class="btn-reserve" onclick="window.location.href='reserve_new.html'">
+                    <i class="fa-solid fa-plus"></i> Reserve New Time Slot
+                </button>
+            </div>
+        </main>
+    </div>
+
+<%- contentFor('script') %>
+<script>
+        function logout() {
+            if (confirm("Are you sure you want to logout?")) {
+                window.location.reload();
+            }
+        }
+    </script>
