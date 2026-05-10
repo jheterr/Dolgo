@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     role ENUM('admin', 'staff', 'customer') NOT NULL DEFAULT 'customer',
+    status ENUM('pending', 'active', 'suspended') DEFAULT 'pending',
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     phone VARCHAR(20),
@@ -148,5 +149,5 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 
 -- Insert Default Admin
-INSERT IGNORE INTO users (username, email, password_hash, role, first_name, last_name) 
-VALUES ('admin', 'admin@cramstation.com', 'hashed_password_here', 'admin', 'Super', 'Admin');
+INSERT IGNORE INTO users (username, email, password_hash, role, status, first_name, last_name) 
+VALUES ('admin', 'admin@cramstation.com', '$2b$10$Qpx5/KeHylsrP74P901beeC69jbfWYoK8NhMoK4qFGhOhOu2fVPhy', 'admin', 'active', 'Super', 'Admin');

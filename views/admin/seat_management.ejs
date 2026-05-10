@@ -827,6 +827,7 @@
           const sqColor = isEditMode ? '#faecd4' : (status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981');
           visual.style.background = sqColor;
           visual.style.borderRadius = '6px';
+          visual.style.border = '2px solid #8B4513'; // Added brown border for visibility
           el.onclick = (e) => { e.stopPropagation(); if (mode === 'select') handleSeatClick(e, item.id, 0) };
         } else if (item.type === 'round-table') {
           visual.style.background = item.color;
@@ -859,6 +860,11 @@
             // Better contrast for centered labels
             const status = (item.statuses && item.statuses[0]) || 'open';
             const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
+            lbl.style.color = isDark ? '#fff' : '#1e293b';
+          } else if (item.type === 'chair-sq') {
+            lbl.classList.add('center');
+            const status = (item.statuses && item.statuses[0]) || 'open';
+            const isDark = (status === 'taken' || status === 'reserved');
             lbl.style.color = isDark ? '#fff' : '#1e293b';
           }
           let text = item.label || (item.type === 'room' ? 'Room' : '');

@@ -191,6 +191,11 @@
   
 </style>
 
+<%- contentFor('body') %>
+<% 
+  const initials = (user.firstName && user.lastName) ? (user.firstName[0] + user.lastName[0]).toUpperCase() : 'LM';
+  const fullName = (user.firstName && user.lastName) ? `${user.firstName} ${user.lastName}` : 'Admin User';
+%>
 <div class="toast-stack" id="toastStack"></div>
   <div class="app">
     <%- include('../partials/admin_sidebar', { active: 'Profile' }) %>
@@ -201,10 +206,10 @@
       <h1 class="page-title">Profile</h1>
       <div class="profile-layout">
         <div class="profile-card">
-          <div class="avatar" id="avatarInitials">LM</div>
-          <div class="profile-name" id="profileName">Luffy Monkey</div>
-          <div class="profile-email" id="profileEmail">luffy@thelastmuster.com</div>
-          <div class="role-tag">ADMIN</div>
+          <div class="avatar" id="avatarInitials"><%= initials %></div>
+          <div class="profile-name" id="profileName"><%= fullName %></div>
+          <div class="profile-email" id="profileEmail"><%= user.email %></div>
+          <div class="role-tag"><%= user.role.toUpperCase() %></div>
           <button class="btn btn-ghost" style="margin-top:6px" onclick="openModal('editProfileModal')"><i
               class="fa-solid fa-pen"></i> Edit Profile</button>
         </div>
@@ -214,42 +219,42 @@
             <div class="info-icon"><i class="fa-solid fa-user"></i></div>
             <div>
               <div class="info-lbl">Full Name</div>
-              <div class="info-val" id="infoName">Luffy Monkey</div>
+              <div class="info-val" id="infoName"><%= fullName %></div>
             </div>
           </div>
           <div class="info-field">
             <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
             <div>
               <div class="info-lbl">Email Address</div>
-              <div class="info-val" id="infoEmail">Luffy@thelastmuster.com</div>
+              <div class="info-val" id="infoEmail"><%= user.email %></div>
             </div>
           </div>
           <div class="info-field">
             <div class="info-icon"><i class="fa-solid fa-shield-halved"></i></div>
             <div>
               <div class="info-lbl">Role</div>
-              <div class="info-val">Admin</div>
+              <div class="info-val"><%= user.role.charAt(0).toUpperCase() + user.role.slice(1) %></div>
             </div>
           </div>
           <div class="info-field">
             <div class="info-icon"><i class="fa-solid fa-calendar"></i></div>
             <div>
-              <div class="info-lbl">Admin Since</div>
-              <div class="info-val">January 1, 2026</div>
+              <div class="info-lbl">Account Status</div>
+              <div class="info-val" style="color:#166534; font-weight:800;">Active</div>
             </div>
           </div>
           <div class="info-field">
             <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
             <div>
               <div class="info-lbl">Contact Number</div>
-              <div class="info-val" id="infoPhone">09652564525</div>
+              <div class="info-val" id="infoPhone"><%= user.phone || 'Not set' %></div>
             </div>
           </div>
           <div class="info-field">
             <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
             <div>
               <div class="info-lbl">Location</div>
-              <div class="info-val" id="infoLocation">Iriga City, Philippines</div>
+              <div class="info-val" id="infoLocation"><%= user.location || 'Philippines' %></div>
             </div>
           </div>
         </div>
@@ -262,13 +267,13 @@
           </div>
           <div class="modal-body">
             <div class="form-group"><label class="form-label">Full Name</label><input class="form-control" id="ep-name"
-                type="text" value="Luffy Monkey"></div>
+                type="text" value="<%= fullName %>"></div>
             <div class="form-group"><label class="form-label">Email Address</label><input class="form-control"
-                id="ep-email" type="email" value="Luffy@thelastmuster.com"></div>
+                id="ep-email" type="email" value="<%= user.email %>" readonly disabled></div>
             <div class="form-group"><label class="form-label">Contact Number</label><input class="form-control"
-                id="ep-phone" type="tel" value="09652564525"></div>
+                id="ep-phone" type="tel" value="<%= user.phone || '' %>" placeholder="09xxxxxxxxx"></div>
             <div class="form-group"><label class="form-label">Location</label><input class="form-control" id="ep-loc"
-                type="text" value="Iriga City, Philippines"></div>
+                type="text" value="<%= user.location || '' %>" placeholder="City, Country"></div>
           </div>
           <div class="modal-footer"><button class="btn btn-ghost"
               onclick="closeModal('editProfileModal')">Cancel</button><button class="btn btn-primary"
@@ -280,13 +285,6 @@
 
 <%- contentFor('script') %>
 <script>
-    function confirmLogout() {
-      if (confirm('Are you sure you want to logout?')) {
-        alert('Logging out...');
-        setTimeout(() => location.reload(), 1500);
-      }
-    }
-
     function openSidebar() {
       document.getElementById('sidebar').classList.add('mobile-open');
       document.getElementById('mobileOverlay').classList.add('show');
@@ -306,30 +304,25 @@
     }
 
     function saveProfile() {
-      const name = document.getElementById('ep-name').value.trim(),
-        email = document.getElementById('ep-email').value.trim();
+      // For now, this is a UI update only until we add the /api/profile update route
+      const name = document.getElementById('ep-name').value.trim();
+      const phone = document.getElementById('ep-phone').value.trim();
+      const loc = document.getElementById('ep-loc').value.trim();
 
-      if (!name || !email) {
-        alert('Name and email are required');
+      if (!name) {
+        alert('Full Name is required');
         return;
       }
 
-      const phone = document.getElementById('ep-phone').value.trim(),
-        loc = document.getElementById('ep-loc').value.trim();
-
       document.getElementById('profileName').textContent = name;
-      document.getElementById('profileEmail').textContent = email;
-
       document.getElementById('infoName').textContent = name;
-      document.getElementById('infoEmail').textContent = email;
-      document.getElementById('infoPhone').textContent = phone;
-      document.getElementById('infoLocation').textContent = loc;
+      document.getElementById('infoPhone').textContent = phone || 'Not set';
+      document.getElementById('infoLocation').textContent = loc || 'Philippines';
 
-      document.getElementById('avatarInitials').textContent =
-        name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('avatarInitials').textContent = initials;
 
-      alert('Profile updated successfully');
-
+      alert('Profile updated successfully (UI Only)');
       closeModal('editProfileModal');
     }
   </script>

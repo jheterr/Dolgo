@@ -62,4 +62,64 @@ router.post('/layout', async (req, res) => {
     }
 });
 
+// Get users by status/role
+router.get('/users', async (req, res) => {
+    const { status, role } = req.query;
+    let query = 'SELECT id, email, first_name, last_name, role, status, phone, location, schedule, created_at FROM users WHERE role != "super_admin" AND id != ?';
+    const params = [req.session.user ? req.session.user.id : 0];
+
+    if (status) { query += ' AND status = ?'; params.push(status); }
+    if (role) { query += ' AND role = ?'; params.push(role); }
+
+    try {
+        const [users] = await db.query(query, params);
+        res.json({ users });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Approve user
+router.post('/users/approve/:id', async (req, res) => {
+    try {
+        await db.query('UPDATE users SET status = "active" WHERE id = ?', [req.params.id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
+// Add user (Admin/Staff)
+router.post('/users/add', async (req, res) => {
+    const { firstName, lastName, email, role, password, phone, location, schedule } = req.body;
+    const bcrypt = require('bcryptjs');
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password || '123456', salt); // Default pass if none provided
+
+        await db.query(
+            'INSERT INTO users (username, email, password_hash, role, status, first_name, last_name, phone, location, schedule) VALUES (?, ?, ?, ?, "active", ?, ?, ?, ?, ?)',
+            [email, email, hashedPassword, role || 'customer', firstName, lastName, phone || null, location || null, schedule || null]
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
+// Delete user
+router.delete('/users/:id', async (req, res) => {
+    try {
+        await db.query('DELETE FROM users WHERE id = ?', [req.params.id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
 module.exports = router;
