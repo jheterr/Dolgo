@@ -974,7 +974,7 @@
     }
   }
 
-  function confirmLogout() { if (confirm('Logout?')) alert('Logged out'); }
+  
   function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
   function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
   function openModal(id) { document.getElementById(id).classList.add('open'); if(id === 'walkinModal') { renderModalSeatLayout(); updateMacFieldsUI(); selectedSeatForWalkin = null; document.getElementById('selectedSeatDisplay').innerHTML = "No seat selected"; document.getElementById('wi-rfid').value = ''; } }
@@ -986,3 +986,4 @@
   renderUpgrade();
   document.getElementById('addMacBtn').addEventListener('click', addNewMacField);
 </script>
+

@@ -213,12 +213,6 @@
 
 <%- contentFor('script') %>
 <script>
-    function confirmLogout() {
-      if (confirm('Are you sure you want to logout?')) {
-        alert('Logging out...');
-        setTimeout(() => location.reload(), 1500);
-      }
-    }
 
     function openSidebar() {
       document.getElementById('sidebar').classList.add('mobile-open');
@@ -311,3 +305,4 @@
     function editEvent() { alert('Edit feature coming soon'); }
 
   </script>
+

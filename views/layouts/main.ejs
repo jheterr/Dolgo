@@ -24,8 +24,16 @@
   <!-- Main Application Body -->
   <%- body %>
 
+  <!-- Global Logout Script -->
+  <script>
+    function handleLogout() {
+      window.location.href = '/login/logout';
+    }
+  </script>
+
   <!-- Page Specific Scripts -->
   <%- typeof script !== 'undefined' ? script : '' %>
 </body>
 
 </html>
+

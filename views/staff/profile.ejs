@@ -486,12 +486,6 @@
 
 <%- contentFor('script') %>
 <script>
-    function confirmLogout() {
-      if (confirm('Are you sure you want to logout?')) {
-        alert('Logging out...');
-        setTimeout(() => location.reload(), 1500);
-      }
-    }
 
     function openSidebar() {
       document.getElementById('sidebar').classList.add('mobile-open');
@@ -651,3 +645,4 @@
       setTimeout(() => { t.style.opacity = '0'; t.style.bottom = '20px'; setTimeout(() => t.remove(), 300); }, 2500);
     }
   </script>
+

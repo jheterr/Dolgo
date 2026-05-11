@@ -435,16 +435,26 @@
         </div>
       </div>
       
-      <!-- WiFi Edit Modal -->
+      <!-- Session Time Edit Modal -->
       <div class="modal-overlay" id="wifiEditModal">
         <div class="modal">
-          <div class="modal-header"><div class="modal-title"><i class="fa-solid fa-wifi"></i> Adjust WiFi Hours</div><button class="modal-close" onclick="closeModal('wifiEditModal')">&times;</button></div>
+          <div class="modal-header"><div class="modal-title"><i class="fa-solid fa-clock"></i> Extend Session Time</div><button class="modal-close" onclick="closeModal('wifiEditModal')">&times;</button></div>
           <div class="modal-body">
+            <input type="hidden" id="wifiCustomerId">
             <div class="form-group"><label class="form-label">Customer Name</label><input class="form-control" id="wifiCustomerName" type="text" readonly disabled></div>
-            <div class="form-group"><label class="form-label">Current WiFi Hours</label><input class="form-control" id="wifiCurrentHours" type="text" readonly disabled></div>
-            <div class="form-group"><label class="form-label">New WiFi Hours</label><input class="form-control" id="wifiNewHours" type="number" step="0.5" min="0" placeholder="Enter new hours"></div>
+            <div class="form-group"><label class="form-label">Current Session Ends</label><input class="form-control" id="wifiCurrentHours" type="text" readonly disabled></div>
+            <div class="form-group">
+                <label class="form-label">Add Minutes</label>
+                <select class="form-control" id="wifiAddMinutes">
+                    <option value="30">30 minutes</option>
+                    <option value="60">1 hour</option>
+                    <option value="90">1 hour 30 mins</option>
+                    <option value="120">2 hours</option>
+                    <option value="180">3 hours</option>
+                </select>
+            </div>
           </div>
-          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('wifiEditModal')">Cancel</button><button class="btn btn-primary" onclick="updateWifiHours()">Update Hours</button></div>
+          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('wifiEditModal')">Cancel</button><button class="btn btn-primary" onclick="updateWifiHours()">Extend Session</button></div>
         </div>
       </div>
       
@@ -458,7 +468,8 @@
       </div>
     </main>
   </div>
-<script>
+
+<script>
     const rows = ['A', 'B', 'C', 'D'];
     const seatsPerRow = 7;
     let occupiedSeats = []; // Will be fetched later
@@ -472,24 +483,41 @@
 
     async function loadRealUsers() {
       try {
-        const res = await fetch('/api/users?role=customer');
-        const data = await res.json();
-        const users = data.users || [];
+        // Load All Customers (role=customer)
+        const resMem = await fetch('/api/users?role=customer');
+        const dataMem = await resMem.json();
+        const allCustomers = dataMem.users || [];
+        
+        // Load Active Sessions (for time info)
+        const resAct = await fetch('/api/active-customers');
+        const dataAct = await resAct.json();
+        const activeSessions = dataAct.customers || [];
         
         const memberBody = document.getElementById('custBody');
+        const walkinBody = document.getElementById('walkinsBody');
         memberBody.innerHTML = '';
+        walkinBody.innerHTML = '';
         
-        users.forEach(user => {
+        allCustomers.forEach(user => {
+          const session = activeSessions.find(s => s.id === user.id);
+          const endTime = session ? new Date(session.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'No active session';
+          
           const tr = document.createElement('tr');
+          tr.setAttribute('data-type', user.type === 'member' ? 'Member' : 'Walk-in');
+          tr.setAttribute('data-status', session ? 'Active' : 'Inactive');
+          
           tr.innerHTML = `
-            <td>—</td>
+            <td>${session?.seat_label || '—'}</td>
             <td class="td-bold">${escapeHtml(user.first_name)} ${escapeHtml(user.last_name)}</td>
             <td>${escapeHtml(user.email)}</td>
-            <td>${user.role === 'admin' ? 'Admin' : (user.role === 'staff' ? 'Staff' : 'Member')}</td>
+            <td>${user.type === 'member' ? 'Member' : 'Walk-in'}</td>
             <td>—</td>
-            <td>—</td>
-            <td>—</td>
-            <td><span class="badge badge-green">Active</span></td>
+            <td class="wifi-cell">
+                ${endTime} 
+                ${session ? `<button class="wifi-edit-btn" onclick="openWifiEditModal(this, '${user.first_name} ${user.last_name}', '${endTime}', ${user.id})"><i class="fa-solid fa-pen"></i></button>` : ''}
+            </td>
+            <td>${session?.mac_address || '—'}</td>
+            <td><span class="badge badge-${session ? 'green' : 'red'}">${session ? 'Active' : 'Inactive'}</span></td>
             <td>
               <div style="display:flex;gap:5px">
                 <button class="btn btn-ghost btn-sm" title="View"><i class="fa-solid fa-eye"></i></button>
@@ -498,9 +526,45 @@
               </div>
             </td>
           `;
-          memberBody.appendChild(tr);
+          
+          if (user.type === 'walkin') {
+            walkinBody.appendChild(tr);
+          } else {
+            memberBody.appendChild(tr);
+          }
         });
+
       } catch (err) { console.error(err); }
+    }
+
+    function openWifiEditModal(btn, name, currentEndTime, id) {
+        document.getElementById('wifiCustomerName').value = name;
+        document.getElementById('wifiCurrentHours').value = currentEndTime;
+        document.getElementById('wifiCustomerId').value = id;
+        openModal('wifiEditModal');
+    }
+
+    async function updateWifiHours() {
+        const id = document.getElementById('wifiCustomerId').value;
+        const minutes = document.getElementById('wifiAddMinutes').value;
+        
+        try {
+            const res = await fetch('/api/session/extend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: id, minutes: parseInt(minutes) })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast("Session extended!", "success");
+                closeModal('wifiEditModal');
+                loadRealUsers();
+            } else {
+                alert("Failed to extend session.");
+            }
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     async function renderPendingTable() {
@@ -573,7 +637,7 @@
         const res = await fetch('/api/users/add', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ firstName, lastName, email, role: 'customer' })
+          body: JSON.stringify({ firstName, lastName, email, role: 'customer', type: 'walkin' })
         });
         if((await res.json()).success) {
           toast("Customer added!", "success");
@@ -639,3 +703,4 @@
     }
     document.getElementById('addMacBtn')?.addEventListener('click', addNewMacField);
 </script>
+

@@ -38,50 +38,6 @@
             font-family: monospace;
         }
 
-        .sidebar {
-            background-color: #242f3d !important;
-        }
-
-        .sidebar-logo-container {
-            display: flex;
-            align-items: center;
-            padding: 24px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            gap: 12px;
-        }
-
-        .sidebar-nav ul li a.active {
-            background-color: #384250;
-            color: white;
-            font-weight: 600;
-            border-left: 4px solid #d65c29;
-            border-radius: 0 8px 8px 0;
-            padding-left: 16px;
-        }
-
-        .sidebar-nav ul li a {
-            padding-left: 20px;
-        }
-
-        .btn-logout-styled {
-            background-color: #384250;
-            color: #d65c29;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: 0.25s ease;
-        }
-
-        .btn-logout-styled:hover {
-            background-color: #4a5568;
-        }
 
         .modal-overlay {
             position: fixed;
@@ -214,7 +170,7 @@
 
 <div class="app">
         <!-- Sidebar -->
-        <%- include('../partials/customer_sidebar', { active: '' }) %>
+        <%- include('../partials/customer_sidebar') %>
 
         <main class="content" style="background-color: #f4f6f9;">
             <!-- Welcome -->
@@ -225,28 +181,35 @@
 
             <!-- Session Banner -->
             <div class="session-banner"
-                style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-                <button onclick="extendTime()"
-                    style="position: absolute; top: 24px; right: 24px; background: white; color: #d65c29; border: none; border-radius: 24px; padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <i class="fa-solid fa-plus" style="color: #d65c29;"></i> Extend Time
-                </button>
+                style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 280px;">
+                
+                <% if (activeSession) { %>
+                    <button onclick="extendTime()"
+                        style="position: absolute; top: 24px; right: 24px; background: white; color: #d65c29; border: none; border-radius: 24px; padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <i class="fa-solid fa-plus" style="color: #d65c29;"></i> Extend Time
+                    </button>
 
-                <h2 style="font-size: 1.8rem; font-weight: 600; color: white; margin-bottom: 4px;">Remaining Session
-                    Time</h2>
+                    <h2 style="font-size: 1.8rem; font-weight: 600; color: white; margin-bottom: 4px;">Remaining Session Time</h2>
 
-                <div style="position: relative; display: inline-block;">
-                    <div id="timer" class="timer"
-                        style="font-size: 6.5rem; font-weight: 800; line-height: 1.1; letter-spacing: 2px; color: white;">
-                        01:38:07
+                    <div style="position: relative; display: inline-block;">
+                        <div id="timer" class="timer"
+                            style="font-size: 6.5rem; font-weight: 800; line-height: 1.1; letter-spacing: 2px; color: white;">
+                            00:00:00
+                        </div>
                     </div>
 
-                </div>
-
-                <div style="font-size: 18px; font-weight: 600; color: white; margin-top: 16px; line-height: 1.5;">
-                    Your MAC Address: <span class="font-mono">AA:BB:CC:DD:FF</span><br>
-                    Your IP Address: <span class="font-mono">192.168.0.X</span><br>
-                    <span style="font-size: 16px; font-weight: 500;">Session ends at 2:30 PM</span>
-                </div>
+                    <div style="font-size: 18px; font-weight: 600; color: white; margin-top: 16px; line-height: 1.5;">
+                        Your MAC Address: <span class="font-mono"><%= activeSession.mac_address || 'Not Registered' %></span><br>
+                        Your IP Address: <span class="font-mono"><%= activeSession.ip_address || 'Not Registered' %></span><br>
+                        <span style="font-size: 16px; font-weight: 500;">Session ends at <%= new Date(activeSession.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %></span>
+                    </div>
+                <% } else { %>
+                    <h2 style="font-size: 2.2rem; font-weight: 800; color: white; margin-bottom: 12px;">No Active Session</h2>
+                    <p style="font-size: 1.1rem; color: rgba(255,255,255,0.9); margin-bottom: 24px;">Please check in at the counter or reserve a seat to start your session.</p>
+                    <a href="/customer/reserve-new" style="background: white; color: #d65c29; border: none; border-radius: 24px; padding: 12px 32px; font-size: 16px; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                        Start New Session
+                    </a>
+                <% } %>
             </div>
 
             <!-- Stats Cards -->
@@ -324,7 +287,7 @@
 
 <%- contentFor('script') %>
 <script>
-        let timeLeft = 1 * 3600 + 38 * 60 + 7; // 01:38:07
+        let timeLeft = <%= activeSession ? Math.max(0, Math.floor((new Date(activeSession.end_time) - new Date()) / 1000)) : 0 %>;
 
         function updateTimer() {
             const h = Math.floor(timeLeft / 3600).toString().padStart(2, '0');
@@ -349,7 +312,7 @@
             element.classList.add('active');
         }
         
-        function confirmExtendTime() {
+        async function confirmExtendTime() {
             const activeBtn = document.querySelector('.time-btn.active');
             if (activeBtn) {
                 const text = activeBtn.innerText;
@@ -360,8 +323,24 @@
                 if (text.includes('4 hours')) minutesToAdd += 240;
                 if (text.includes('30 mins')) minutesToAdd += 30;
                 
-                timeLeft += minutesToAdd * 60;
-                updateTimer();
+                try {
+                    const res = await fetch('/api/session/extend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ minutes: minutesToAdd })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        timeLeft += minutesToAdd * 60;
+                        updateTimer();
+                        alert('Session extended successfully!');
+                        window.location.reload(); 
+                    } else {
+                        alert('Failed to extend session');
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
             }
             closeExtendModal();
         }
@@ -380,11 +359,6 @@
             closeTransferModal();
         }
 
-        function logout() {
-            if (confirm("Are you sure you want to logout?")) {
-                window.location.reload();
-            }
-        }
 
         async function loadDynamicStats() {
             try {
@@ -419,3 +393,4 @@
             loadDynamicStats();
         };
     </script>
+

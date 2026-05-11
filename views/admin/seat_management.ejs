@@ -654,7 +654,7 @@
 <%- contentFor('script') %>
 <script>
     // Sidebar
-    function confirmLogout() { if (confirm('Logout?')) setTimeout(() => location.reload(), 1e3) }
+    
     function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show') }
     function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show') }
     function acceptTransfer() { confirm('Accept transfer?') }
@@ -1098,3 +1098,4 @@
 <% } %>
 </body>
 </html>
+

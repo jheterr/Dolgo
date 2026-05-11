@@ -718,10 +718,14 @@
         // Fetch users with admin or staff roles
         const res = await fetch('/api/users'); 
         const data = await res.json();
-        // Filter on frontend to ensure we only show management roles
+        
+        // Filter for management roles only
         const staff = (data.users || []).filter(u => u.role === 'admin' || u.role === 'staff');
         renderStaffTable(staff);
-      } catch (err) { console.error(err); }
+      } catch (err) { 
+        console.error('Error loading staff:', err);
+        toast("Failed to load staff accounts", "error");
+      }
     }
 
     function renderStaffTable(staff) {
@@ -773,6 +777,7 @@
       const phone = document.getElementById('s-phone').value.trim();
       const location = document.getElementById('s-location').value.trim();
       const role = document.getElementById('s-role').value.toLowerCase();
+      const status = document.getElementById('s-status').value;
       const schedule = document.getElementById('s-sched').value.trim();
       
       if (!email || !firstName || !lastName) { alert("Required fields missing!"); return; }
@@ -781,12 +786,24 @@
         const res = await fetch('/api/users/add', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, firstName, lastName, phone, location, role, schedule })
+          body: JSON.stringify({ 
+            email, 
+            firstName, 
+            lastName, 
+            phone, 
+            location, 
+            role, 
+            status,
+            type: 'member',
+            schedule 
+          })
         });
         if((await res.json()).success) {
           toast("Staff member added!", "success");
           closeModal('addStaffModal');
           loadStaff();
+        } else {
+          alert("Failed to add staff member. Email might already be in use.");
         }
       } catch (err) { console.error(err); }
     }
@@ -816,3 +833,4 @@
       setTimeout(() => el.remove(), 2500);
     }
 </script>
+
