@@ -1,304 +1,418 @@
 <!-- Title passed to layout -->
 <% locals.title = 'The Last Muster • Profile' %>
 
+<%- contentFor('head') %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+
 <%- contentFor('style') %>
 <style>
+    /* Profile-specific design synchronization */
+    .role-tag {
+      background: var(--orange);
+      color: #fff;
+      padding: 3px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
 
-        /* Shared Sidebar Styles from dashboard */
-        .sidebar { background-color: #242f3d !important; }
-        .sidebar-logo-container {
-            display: flex; align-items: center; padding: 24px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05); gap: 12px;
-        }
-        .sidebar-nav ul li a.active {
-            background-color: #384250; color: white; font-weight: 600;
-            border-left: 4px solid #d65c29; border-radius: 0 8px 8px 0; padding-left: 16px;
-        }
-        .sidebar-nav ul li a { padding-left: 20px; }
-        .btn-logout-styled {
-            background-color: #384250; color: #d65c29; border: none; width: 100%;
-            padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.25s ease;
-        }
-        .btn-logout-styled:hover { background-color: #4a5568; }
-        
-        /* Profile Page Specific Styles */
-        .content {
-            background-color: #f4f6f9;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            padding-bottom: 32px;
-        }
-        .page-title {
-            font-family: 'Poppins', sans-serif; font-size: 2.2rem;
-            color: #d65c29; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 24px;
-        }
-        
-        .profile-layout {
-            display: flex; gap: 24px; align-items: flex-start;
-        }
-        .profile-card {
-            background: white; border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0; padding: 40px;
-        }
-        
-        /* Left Column */
-        .profile-summary {
-            flex: 0 0 320px; display: flex; flex-direction: column; align-items: center; padding: 48px 32px;
-        }
-        .profile-avatar {
-            width: 140px; height: 140px; border-radius: 50%; object-fit: cover; margin-bottom: 24px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .profile-name {
-            font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 800;
-            color: #1e293b; margin-bottom: 4px; text-align: center; letter-spacing: -0.01em;
-        }
-        .profile-email {
-            font-size: 0.9rem; color: #64748b; font-weight: 600; margin-bottom: 16px; text-align: center;
-        }
-        .profile-plan-pill {
-            background-color: #d65c29; color: white; padding: 6px 24px; border-radius: 20px;
-            font-size: 0.9rem; font-weight: 700; margin-bottom: 40px; box-shadow: 0 4px 6px -2px rgba(214, 92, 41, 0.3);
-        }
-        .btn-edit-profile {
-            background: white; color: #1e293b; border: 1px solid #cbd5e1;
-            padding: 10px 24px; border-radius: 24px; font-weight: 700; font-size: 0.95rem;
-            cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
-        }
-        .btn-edit-profile:hover {
-            background: #f8fafc; border-color: #94a3b8;
-        }
-        
-        /* Right Column */
-        .account-info {
-            flex: 1; padding: 48px;
-        }
-        .info-title {
-            font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 800;
-            color: #1e293b; margin-bottom: 8px; padding-bottom: 16px; border-bottom: 1px solid #1e293b;
-        }
-        .info-list {
-            display: flex; flex-direction: column;
-        }
-        .info-item {
-            display: flex; align-items: center; gap: 24px; padding: 20px 0; border-bottom: 1px solid #e2e8f0;
-        }
-        .info-item:last-child {
-            border-bottom: none; padding-bottom: 0;
-        }
-        .info-icon {
-            width: 44px; height: 44px; background-color: #e0e7ff; color: #d65c29;
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.15rem; flex-shrink: 0;
-        }
-        .info-text {
-            display: flex; flex-direction: column; gap: 4px;
-        }
-        .info-label {
-            font-size: 0.8rem; font-weight: 600; color: #64748b;
-        }
-        .info-value {
-            font-size: 1.05rem; font-weight: 700; color: #1e293b; line-height: 1.3;
-        }
-        
-        /* Edit Profile Modal */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.4); z-index: 1000; align-items: center; justify-content: center;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-content {
-            background: white; border-radius: 12px; padding: 32px; width: 90%; max-width: 480px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-height: 90vh; overflow-y: auto;
-        }
-        .edit-photo-container {
-            display: flex; justify-content: center; margin-bottom: 24px;
-        }
-        .edit-photo-circle {
-            width: 80px; height: 80px; background-color: #f1f5f9; border-radius: 50%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: #475569; font-size: 0.65rem; font-weight: 700; text-align: center; cursor: pointer;
-            transition: background 0.2s;
-        }
-        .edit-photo-circle:hover { background-color: #e2e8f0; }
-        .edit-photo-circle i {
-            font-size: 1.1rem; margin-bottom: 4px; color: #1e293b;
-        }
-        .edit-profile-form {
-            display: flex; flex-direction: column; gap: 16px;
-        }
-        .form-row {
-            display: flex; gap: 16px;
-        }
-        .form-group {
-            display: flex; flex-direction: column; flex: 1;
-        }
-        .form-group label {
-            font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 6px;
-        }
-        .form-input {
-            padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem;
-            color: #64748b; font-family: inherit; outline: none; transition: border-color 0.2s; font-weight: 500;
-        }
-        .form-input:focus { border-color: #d65c29; }
-        .form-actions {
-            display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;
-        }
-        .btn-cancel {
-            background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 24px;
-            border-radius: 6px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-size: 0.95rem;
-        }
-        .btn-cancel:hover { background: #f8fafc; }
-        .btn-save {
-            background: #d65c29; border: none; color: white; padding: 8px 32px;
-            border-radius: 6px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-size: 0.95rem;
-        }
-        .btn-save:hover { background: #bf4d1f; }
-    
+    /* Modal Design Sync */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: var(--text-sm);
+      cursor: pointer;
+    }
+
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .choice-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 24px;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 1;
+    }
+    .choice-btn:hover {
+      border-color: var(--orange);
+      background: var(--cream-lt);
+      transform: translateY(-2px);
+    }
+    .choice-btn i { font-size: 2rem; color: var(--orange); }
+    .choice-btn span { font-size: 13px; font-weight: 700; color: var(--text); }
+
+    .camera-container {
+      width: 100%;
+      aspect-ratio: 1;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    #cameraVideo { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+    .cropper-container-wrapper {
+      width: 100%;
+      max-height: 400px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #cropImage { max-width: 100%; display: block; }
+    .cropper-view-box, .cropper-face { border-radius: 50%; }
+    .cropper-view-box { outline: none !important; }
+    .cropper-dashed, .cropper-point, .cropper-line, .cropper-center { display: none !important; }
+
+    /* Override profile-layout for exact size match */
+    .profile-layout {
+      grid-template-columns: 260px 1fr;
+      gap: 16px;
+    }
+    .profile-card { padding: 28px 20px; }
+    .avatar-wrapper { width: 100px; height: 100px; margin-bottom: 8px; }
+    .profile-name { font-size: 1rem; }
+    .avatar { font-size: 1.8rem; border: 3px solid #fff; }
+    .avatar-overlay { width: 32px; height: 32px; border: 3px solid #fff; font-size: 0.9rem; bottom: 0; right: 0; }
 </style>
 
 <div class="app">
-        <%- include('../partials/customer_sidebar', { active: 'Profile' }) %>
+    <%- include('../partials/customer_sidebar', { active: 'Profile' }) %>
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+    
+    <main class="content">
+      <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
 
-        <main class="content">
-            <h1 class="page-title">Profile</h1>
-            
-            <div class="profile-layout">
-                <!-- Left Column: User Summary -->
-                <div class="profile-card profile-summary">
-                    <img src="/images/anime_avatar.png" alt="Profile Avatar" class="profile-avatar">
-                    <h2 class="profile-name">Sanji Vinsmoke</h2>
-                    <p class="profile-email">luffy@thelastmuster.com</p>
-                    <div class="profile-plan-pill">Premium</div>
-                    <button class="btn-edit-profile" onclick="openEditModal()"><i class="fa-solid fa-pen-to-square"></i> Edit Profile</button>
-                </div>
-                
-                <!-- Right Column: Account Information -->
-                <div class="profile-card account-info">
-                    <h2 class="info-title">Account Information</h2>
-                    <div class="info-list">
-                        <div class="info-item">
-                            <div class="info-icon"><i class="fa-solid fa-user"></i></div>
-                            <div class="info-text">
-                                <span class="info-label">Full Name</span>
-                                <span class="info-value">Sanji Vinsmoke</span>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
-                            <div class="info-text">
-                                <span class="info-label">Email Address</span>
-                                <span class="info-value">Sanji@thelastmuster.com</span>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-icon"><i class="fa-solid fa-mobile-screen"></i></div>
-                            <div class="info-text">
-                                <span class="info-label">MAC Address</span>
-                                <span class="info-value">AA:BB:CC:DD:EE:FF<br>AA:BB:CC:DD:EE:FF</span>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-icon"><i class="fa-solid fa-calendar"></i></div>
-                            <div class="info-text">
-                                <span class="info-label">Member Since</span>
-                                <span class="info-value">January 1, 2026</span>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
-                            <div class="info-text">
-                                <span class="info-label">Contact Number</span>
-                                <span class="info-value">09652564525</span>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
-                            <div class="info-text">
-                                <span class="info-label">Location</span>
-                                <span class="info-value">Iriga City, Philippines</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <h1 class="page-title">Profile</h1>
+
+      <div class="profile-layout">
+        <!-- Left: Summary Card -->
+        <div class="profile-card">
+          <div class="avatar-wrapper" onclick="openModal('avatarChoiceModal')">
+            <div class="avatar" id="avatarInitials">
+  <!-- The span will now hide itself automatically if there is a picture -->
+  <span id="initialsText" style="display: <%= user.profile_picture ? 'none' : 'block' %>;">
+    <%= user.first_name ? user.first_name[0] : '' %><%= user.last_name ? user.last_name[0] : '' %>
+  </span>
+  
+  <img id="avatarImg" src="<%= user.profile_picture || '' %>" alt="Avatar" 
+       style="display: <%= user.profile_picture ? 'block' : 'none' %>; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+</div>
+            <div class="avatar-overlay">
+              <i class="fa-solid fa-camera"></i>
             </div>
-        </main>
-        <!-- Edit Profile Modal -->
-        <div id="editProfileModal" class="modal-overlay">
-            <div class="modal-content" style="max-width: 500px; padding: 40px;">
-                <h2 class="modal-title" style="font-family: 'Poppins', sans-serif; margin-bottom: 24px; font-size: 1.25rem; font-weight: 800; color: #1e293b;">Edit Profile</h2>
-                
-                <div class="edit-photo-container">
-                    <div class="edit-photo-circle">
-                        <i class="fa-solid fa-camera"></i>
-                        <span>Choose<br>Photo</span>
-                    </div>
-                </div>
-                
-                <form class="edit-profile-form">
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" value="sanji@thelastmuster.com" class="form-input">
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>First Name</label>
-                            <input type="text" value="sanji" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>Last Name</label>
-                            <input type="text" value="vinsmoke" class="form-input">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Phone Number</label>
-                        <input type="text" value="09652564525" class="form-input">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Location</label>
-                        <input type="text" value="Iriga City, Philippines" class="form-input">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>MAC Address</label>
-                        <input type="text" value="AA:DD:ADD:DA" class="form-input">
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
-                        <button type="button" class="btn-save" onclick="closeEditModal()">Save</button>
-                    </div>
-                </form>
-            </div>
+          </div>
+          <input type="file" id="avatarInput" hidden accept="image/*">
+          
+          <div class="profile-name"><%= user.first_name %> <%= user.last_name %></div>
+          <div class="profile-email"><%= user.email %></div>
+          <div class="role-tag">CUSTOMER</div>
+          
+          <button class="btn btn-ghost" style="margin-top:6px" onclick="openModal('editProfileModal')">
+            <i class="fa-solid fa-pen"></i> Edit Profile
+          </button>
         </div>
+
+        <!-- Right: Information Card -->
+        <div class="info-card">
+          <div class="info-title">Account Information</div>
+          
+          <div class="info-field">
+            <div class="info-icon"><i class="fa-solid fa-user"></i></div>
+            <div>
+              <div class="info-lbl">Full Name</div>
+              <div class="info-val"><%= user.first_name %> <%= user.last_name %></div>
+            </div>
+          </div>
+
+          <div class="info-field">
+            <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
+            <div>
+              <div class="info-lbl">Email Address</div>
+              <div class="info-val"><%= user.email %></div>
+            </div>
+          </div>
+
+          <div class="info-field">
+            <div class="info-icon"><i class="fa-solid fa-microchip"></i></div>
+            <div>
+              <div class="info-lbl">MAC Address</div>
+              <div class="info-val"><%= user.mac_address || 'Not Registered' %></div>
+            </div>
+          </div>
+
+          <div class="info-field">
+            <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
+            <div>
+              <div class="info-lbl">Contact Number</div>
+              <div class="info-val"><%= user.phone || '098982314' %></div>
+            </div>
+          </div>
+
+          <div class="info-field">
+            <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+            <div>
+              <div class="info-lbl">Location</div>
+              <div class="info-val"><%= user.location || 'Not Set' %></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="avatarChoiceModal">
+      <div class="modal" style="max-width: 400px;">
+        <div class="modal-header">
+          <div class="modal-title">Update Profile Picture</div>
+          <button class="modal-close" onclick="closeModal('avatarChoiceModal')">&times;</button>
+        </div>
+        <div class="modal-body" style="flex-direction: row; gap: 16px;">
+          <div class="choice-btn" onclick="startCamera()">
+            <i class="fa-solid fa-camera"></i>
+            <span>Take Photo</span>
+          </div>
+          <div class="choice-btn" onclick="document.getElementById('avatarInput').click(); closeModal('avatarChoiceModal');">
+            <i class="fa-solid fa-upload"></i>
+            <span>Upload Photo</span>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <div class="modal-overlay" id="cameraModal">
+      <div class="modal" style="max-width: 480px;">
+        <div class="modal-header">
+          <div class="modal-title"><i class="fa-solid fa-video"></i> Camera</div>
+          <button class="modal-close" onclick="stopCamera(); closeModal('cameraModal');">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="camera-container">
+            <video id="cameraVideo" autoplay playsinline></video>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="stopCamera(); closeModal('cameraModal');">Cancel</button>
+          <button class="btn btn-primary" onclick="capturePhoto()"><i class="fa-solid fa-circle"></i> Take Photo</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="cropModal">
+      <div class="modal" style="max-width: 600px;">
+        <div class="modal-header">
+          <div class="modal-title"><i class="fa-solid fa-crop"></i> Adjust Photo</div>
+          <button class="modal-close" onclick="closeModal('cropModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="cropper-container-wrapper">
+            <img id="cropImage" src="">
+          </div>
+          <p style="font-size: 12px; color: var(--text-sm); text-align: center;">Drag to position, scroll to zoom</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('cropModal')">Cancel</button>
+          <button class="btn btn-primary" id="cropSaveBtn"><i class="fa-solid fa-check"></i> Apply Crop</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="editProfileModal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title"><i class="fa-solid fa-pen"></i> Edit Profile</div>
+          <button class="modal-close" onclick="closeModal('editProfileModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input class="form-control" id="ep-name" type="text" value="<%= user.first_name %> <%= user.last_name %>">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input class="form-control" id="ep-email" type="email" value="<%= user.email %>">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Number</label>
+            <input class="form-control" id="ep-phone" type="tel" value="<%= user.phone %>">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input class="form-control" id="ep-loc" type="text" value="<%= user.location %>">
+          </div>
+          <div class="form-group">
+            <label class="form-label">MAC Address</label>
+            <input class="form-control" id="ep-mac" type="text" value="<%= user.mac_address %>">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('editProfileModal')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveProfile()"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+        </div>
+      </div>
+    </div>
+</div>
 
 <%- contentFor('script') %>
 <script>
-        function openEditModal() {
-            document.getElementById('editProfileModal').classList.add('active');
-        }
+    function openSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+    function closeSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+    function openModal(id){ document.getElementById(id).classList.add('open'); }
+    function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
-        function closeEditModal() {
-            document.getElementById('editProfileModal').classList.remove('active');
-        }
+    // DATABASE SAVE: Profile Info
+    async function saveProfile() {
+      const data = {
+        fullName: document.getElementById('ep-name').value,
+        email: document.getElementById('ep-email').value,
+        phone: document.getElementById('ep-phone').value,
+        location: document.getElementById('ep-loc').value,
+        mac_address: document.getElementById('ep-mac').value
+      };
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('editProfileModal');
-            if (event.target == modal) {
-                closeEditModal();
-            }
-        }
+      console.log("Sending data:", data);
 
-        function logout() {
-            if (confirm("Are you sure you want to logout?")) {
-                window.location.href = "login.html"; // Redirect to login page
-            }
+      try {
+        // IMPORTANT: Ensure the path starts with /customer/ if your router is mounted there
+        const response = await fetch('/customer/profile/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const res = await response.json();
+        console.log("Server Response:", res);
+
+        if (res.success) {
+          alert('Profile updated successfully!');
+          location.reload();
+        } else {
+          alert('Save failed: ' + res.error);
         }
-    </script>
+      } catch (err) {
+        console.error("Fetch Error:", err);
+        alert('Could not connect to the server.');
+      }
+    }
+
+    // Avatar Logic
+    let cropper = null;
+    let videoStream = null;
+    const avatarInput = document.getElementById('avatarInput');
+    const cropImage = document.getElementById('cropImage');
+    const cameraVideo = document.getElementById('cameraVideo');
+
+    async function startCamera() {
+      closeModal('avatarChoiceModal');
+      openModal('cameraModal');
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({ video: { aspectRatio: 1 }, audio: false });
+        cameraVideo.srcObject = videoStream;
+      } catch (err) { alert("Camera error: " + err); }
+    }
+
+    function stopCamera() { if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; } }
+
+    function capturePhoto() {
+      const canvas = document.createElement('canvas');
+      canvas.width = cameraVideo.videoWidth; canvas.height = cameraVideo.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
+      ctx.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+      stopCamera(); closeModal('cameraModal');
+      initCropper(canvas.toDataURL('image/jpeg'));
+    }
+
+    avatarInput.addEventListener('change', function (e) {
+      if (e.target.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = (ev) => initCropper(ev.target.result);
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    function initCropper(src) {
+      cropImage.src = src;
+      openModal('cropModal');
+      if (cropper) cropper.destroy();
+      setTimeout(() => {
+        cropper = new Cropper(cropImage, { aspectRatio: 1, viewMode: 2 });
+      }, 200);
+    }
+
+    // DATABASE SAVE: Avatar
+    document.getElementById('cropSaveBtn').addEventListener('click', async function () {
+      if (!cropper) return;
+      const canvas = cropper.getCroppedCanvas({ width: 240, height: 240 });
+      const base64Image = canvas.toDataURL('image/jpeg');
+
+      try {
+        const response = await fetch('/customer/profile/avatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: base64Image })
+        });
+        
+        if (response.ok) {
+          alert('Photo updated!');
+          location.reload();
+        }
+      } catch (err) { alert("Error saving image"); }
+    });
+</script>

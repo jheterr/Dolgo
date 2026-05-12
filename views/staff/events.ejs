@@ -542,37 +542,32 @@ function showScheduleModal(dateStr) {
   openModal('scheduleModal');
 }
 
-let events = [
-  { id: 1, name: "The Last Muster 2nd Anniversary", date: "2026-04-19", time: "11:11 PM", location: "Whole Room", description: "Celebration event with free snacks and drinks for all members." },
-  { id: 2, name: "Staff Meeting", date: "2026-04-12", time: "11:11 PM", location: "Meeting Room", description: "Monthly staff meeting to discuss operations." },
-  { id: 3, name: "WiFi Security Workshop", date: "2026-04-25", time: "02:00 PM", location: "Meeting Room", description: "Learn about network security best practices." },
-  { id: 4, name: "Summer Art Club - Week 1", date: "2026-04-28", time: "10:00 AM", location: "Art Room", description: "Creative art workshops for all skill levels." },
-  { id: 5, name: "Bocca Food Festival", date: "2026-04-30", time: "06:00 PM", location: "Cafeteria", description: "Italian and Mediterranean cuisine tasting event." }
-];
+// Data from Database
+const dbEvents = <%- (locals.events) ? JSON.stringify(events) : '[]' %>;
+const dbReservations = <%- (locals.reservations) ? JSON.stringify(reservations) : '[]' %>;
 
-// Full customer reservations data - all confirmed
-let customerReservations = [
-  { id: 1, customerName: "Monkey D. Luffy", date: "2026-04-14", time: "08:00 AM", seat: "A3", hours: 2, status: "confirmed", phone: "+63 912 3456 789", email: "luffy@strawhat.com" },
-  { id: 2, customerName: "Roronoa Zoro", date: "2026-04-14", time: "09:00 AM", seat: "B2", hours: 3, status: "confirmed", phone: "+63 912 3456 790", email: "zoro@strawhat.com" },
-  { id: 3, customerName: "Nami Catburglar", date: "2026-04-14", time: "10:00 AM", seat: "C5", hours: 2, status: "confirmed", phone: "+63 912 3456 791", email: "nami@weather.com" },
-  { id: 4, customerName: "Sanji Vinsmoke", date: "2026-04-14", time: "11:00 AM", seat: "B4", hours: 2, status: "confirmed", phone: "+63 912 3456 792", email: "sanji@allblue.com" },
-  { id: 5, customerName: "Tony Chopper", date: "2026-04-14", time: "01:00 PM", seat: "C1", hours: 2, status: "confirmed", phone: "+63 912 3456 793", email: "chopper@dr.com" },
-  { id: 6, customerName: "Brook", date: "2026-04-14", time: "03:00 PM", seat: "A7", hours: 1, status: "confirmed", phone: "+63 912 3456 794", email: "brook@walkin.com" },
-  { id: 7, customerName: "Jinbe", date: "2026-04-14", time: "05:00 PM", seat: "A2", hours: 2, status: "confirmed", phone: "+63 912 3456 795", email: "jinbe@temp.com" },
-  { id: 8, customerName: "Vivi Nefertari", date: "2026-04-14", time: "07:00 PM", seat: "D3", hours: 4, status: "confirmed", phone: "+63 912 3456 796", email: "vivi@alabasta.com" },
-  { id: 9, customerName: "Franky", date: "2026-04-14", time: "09:00 PM", seat: "D6", hours: 3, status: "confirmed", phone: "+63 912 3456 797", email: "franky@example.com" },
-  { id: 10, customerName: "Robin", date: "2026-04-14", time: "10:00 PM", seat: "D3", hours: 4, status: "confirmed", phone: "+63 912 3456 796", email: "robin@alabasta.com" },
-  { id: 11, customerName: "Usopp", date: "2026-04-14", time: "11:00 PM", seat: "B3", hours: 2, status: "confirmed", phone: "+63 912 3456 798", email: "usopp@example.com" },
-  { id: 12, customerName: "Monkey D. Luffy", date: "2026-04-23", time: "10:00 AM", seat: "A3", hours: 2, status: "confirmed", phone: "+63 912 3456 789", email: "luffy@strawhat.com" },
-  { id: 13, customerName: "Roronoa Zoro", date: "2026-04-17", time: "09:00 AM", seat: "B2", hours: 3, status: "confirmed", phone: "+63 912 3456 790", email: "zoro@strawhat.com" },
-  { id: 14, customerName: "Nami Catburglar", date: "2026-04-18", time: "02:00 PM", seat: "C5", hours: 2, status: "confirmed", phone: "+63 912 3456 791", email: "nami@weather.com" },
-  { id: 15, customerName: "Sanji Vinsmoke", date: "2026-04-19", time: "11:00 AM", seat: "B4", hours: 2, status: "pending", phone: "+63 912 3456 792", email: "sanji@allblue.com" },
-  { id: 16, customerName: "Tony Chopper", date: "2026-04-24", time: "01:30 PM", seat: "C1", hours: 2, status: "confirmed", phone: "+63 912 3456 793", email: "chopper@dr.com" },
-  { id: 17, customerName: "Brook", date: "2026-04-25", time: "03:00 PM", seat: "A7", hours: 1, status: "confirmed", phone: "+63 912 3456 794", email: "brook@walkin.com" },
-  { id: 18, customerName: "Jinbe", date: "2026-04-21", time: "10:00 AM", seat: "A2", hours: 2, status: "pending", phone: "+63 912 3456 795", email: "jinbe@temp.com" },
-  { id: 19, customerName: "Vivi Nefertari", date: "2026-04-22", time: "09:00 AM", seat: "D3", hours: 4, status: "confirmed", phone: "+63 912 3456 796", email: "vivi@alabasta.com" },
-  { id: 20, customerName: "Franky", date: "2026-04-26", time: "11:00 AM", seat: "D6", hours: 3, status: "confirmed", phone: "+63 912 3456 797", email: "franky@example.com" }
-];
+// Map DB events to the format used in the script
+let events = dbEvents.map(e => ({
+  id: e.id,
+  name: e.title,
+  date: e.event_date ? e.event_date.split('T')[0] : '',
+  time: e.start_time || 'All day', // Assuming start_time might exist or use e.time if available
+  location: e.location,
+  description: e.description
+}));
+
+// Map DB reservations to the format used in the script
+let customerReservations = dbReservations.map(r => ({
+  id: r.id,
+  customerName: r.customer_name || 'Guest',
+  date: r.start_time ? r.start_time.split('T')[0] : '',
+  time: r.start_time ? new Date(r.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+  seat: r.seat_label,
+  hours: r.duration_hours || 1, // Defaulting to 1 if not present
+  status: r.status || 'confirmed',
+  email: r.customer_email || '',
+  phone: r.customer_phone || ''
+}));
 
 function isToday(dateStr){
   const today = new Date();
@@ -582,12 +577,12 @@ function isToday(dateStr){
 function getTodayReservations(){
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  return customerReservations.filter(r => r.date === todayStr && r.status === 'confirmed');
+  return customerReservations.filter(r => r.date === todayStr);
 }
 function getUpcomingReservations(){
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  return customerReservations.filter(r => r.date > todayStr && r.status === 'confirmed');
+  return customerReservations.filter(r => r.date > todayStr);
 }
 function getUpcomingEvents(){
   const today = new Date();

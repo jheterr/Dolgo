@@ -10,8 +10,8 @@
     <ul>
       <li><a href="/customer/dashboard" class="nav-link <%= active === 'Dashboard' ? 'active' : '' %>"><i class="fa-solid fa-house"></i> Dashboard</a></li>
       <li><a href="/customer/reservations" class="nav-link <%= active === 'Reservations' ? 'active' : '' %>"><i class="fa-solid fa-calendar"></i> Reservations</a></li>
-      <li><a href="/customer/events" class="nav-link <%= active === 'Events' ? 'active' : '' %>"><i class="fa-solid fa-calendar-check"></i> Event</a></li>
-      <li><a href="/customer/membership" class="nav-link <%= active === 'Membership' ? 'active' : '' %>"><i class="fa-solid fa-star" style="color: #FFC107;"></i> <span style="color: #FFC107;">Membership</span></a></li>
+      <li><a href="/customer/events" class="nav-link <%= active === 'Events' || active === 'Event' ? 'active' : '' %>"><i class="fa-solid fa-calendar-check"></i> Event</a></li>
+      <li><a href="/customer/membership" class="nav-link <%= active === 'Membership' ? 'active' : '' %>"><i class="fa-solid fa-star"></i> Membership</a></li>
       <li><a href="/customer/notifications" class="nav-link <%= active === 'Notifications' ? 'active' : '' %>"><i class="fa-solid fa-bell"></i> Notifications</a></li>
       <li><a href="/customer/reserve-history" class="nav-link <%= active === 'Reserve History' ? 'active' : '' %>"><i class="fa-solid fa-clock-rotate-left"></i> Reserve History</a></li>
       <li><a href="/customer/profile" class="nav-link <%= active === 'Profile' ? 'active' : '' %>"><i class="fa-solid fa-user"></i> Profile</a></li>

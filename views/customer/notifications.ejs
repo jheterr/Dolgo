@@ -3,238 +3,263 @@
 
 <%- contentFor('style') %>
 <style>
+    .content {
+        padding: 40px;
+        background-color: #f4f6f9;
+        min-height: 100vh;
+    }
 
-        /* Shared Sidebar Styles from dashboard */
-        .sidebar { background-color: #242f3d !important; }
-        .sidebar-logo-container {
-            display: flex; align-items: center; padding: 24px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05); gap: 12px;
-        }
-        .sidebar-nav ul li a.active {
-            background-color: #384250; color: white; font-weight: 600;
-            border-left: 4px solid #d65c29; border-radius: 0 8px 8px 0; padding-left: 16px;
-        }
-        .sidebar-nav ul li a { padding-left: 20px; }
-        .btn-logout-styled {
-            background-color: #384250; color: #d65c29; border: none; width: 100%;
-            padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.25s ease;
-        }
-        .btn-logout-styled:hover { background-color: #4a5568; }
-        
-        /* Notifications Page Specific Styles */
-        .content {
-            background-color: #f4f6f9;
-            display: flex;
-            flex-direction: column;
-            height: 100vh; /* Make content full height to support scrolling in container */
-            padding-bottom: 32px;
-        }
-        .page-title {
-            font-family: 'Poppins', sans-serif; font-size: 2.2rem;
-            color: #d65c29; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 24px;
-        }
-        
-        .notifications-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #e2e8f0;
-        }
-        
-        /* Custom Scrollbar for Notifications */
-        .notifications-container::-webkit-scrollbar {
-            width: 16px;
-        }
-        .notifications-container::-webkit-scrollbar-track {
-            background: transparent;
-            margin: 12px 0;
-        }
-        .notifications-container::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 20px;
-            border: 4px solid white;
-        }
-
-        .notification-item {
-            display: flex;
-            padding: 40px 48px;
-            border-bottom: 1px solid #e2e8f0;
-            gap: 24px;
-            align-items: flex-start;
-            position: relative;
-        }
-        .notification-item.unread {
-            background-color: #fffaf7;
-        }
-        .notification-item.unread::before {
-            content: '';
-            position: absolute;
-            left: 20px;
-            top: 60px;
-            width: 10px;
-            height: 10px;
-            background-color: #d65c29;
-            border-radius: 50%;
-        }
-        .notifications-header-controls {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
-        }
-        .notification-tabs {
-            display: flex; gap: 12px;
-        }
-        .tab-btn {
-            background: transparent; border: 1px solid #cbd5e1; padding: 6px 20px;
-            border-radius: 20px; font-size: 0.95rem; font-weight: 700; color: #64748b;
-            cursor: pointer; transition: all 0.2s ease;
-        }
-        .tab-btn.active {
-            background: #d65c29; color: white; border-color: #d65c29;
-        }
-        .tab-btn:hover:not(.active) {
-            background: #f1f5f9;
-        }
-        .btn-mark-read {
-            background: transparent; border: none; color: #d65c29; font-size: 0.95rem;
-            font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;
-        }
-        .btn-mark-read:hover {
-            text-decoration: underline;
-        }
-        .notification-item:last-child {
-            border-bottom: none;
-        }
-        .notification-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            width: 56px;
-            height: 56px;
-            flex-shrink: 0;
-        }
-        .notification-content {
-            flex-grow: 1;
-        }
-        .notification-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 8px;
-        }
-        .notification-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0;
-            letter-spacing: -0.01em;
-        }
-        .notification-time {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #94a3b8;
-        }
-        .notification-desc {
-            font-size: 1rem;
-            color: #64748b;
-            line-height: 1.6;
-            margin: 0;
-            font-weight: 500;
-        }
+    .page-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--orange);
+        margin-bottom: 24px;
+        letter-spacing: -0.02em;
+    }
     
+    .notifications-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .tab-group {
+        display: flex;
+        background: #e2e8f0;
+        padding: 4px;
+        border-radius: 12px;
+        gap: 4px;
+    }
+
+    .tab-btn {
+        padding: 8px 20px;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .tab-btn.active {
+        background: white;
+        color: var(--orange);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .btn-mark-all {
+        background: none;
+        border: none;
+        color: var(--orange);
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-mark-all:hover {
+        opacity: 0.8;
+    }
+
+    .notifications-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .notification-item {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+        position: relative;
+    }
+
+    .notification-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    }
+
+    .notification-item.unread {
+        border-left: 4px solid var(--orange);
+        background: #fffaf8;
+    }
+
+    .notif-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: var(--orange);
+        flex-shrink: 0;
+    }
+
+    .unread .notif-icon {
+        background: #fdf2f2;
+    }
+
+    .notif-content {
+        flex: 1;
+    }
+
+    .notif-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 4px;
+    }
+
+    .notif-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #1e293b;
+    }
+
+    .notif-time {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #94a3b8;
+    }
+
+    .notif-desc {
+        font-size: 0.95rem;
+        color: #64748b;
+        line-height: 1.5;
+        font-weight: 500;
+    }
+
+    .unread-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--orange);
+        border-radius: 50%;
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        display: none;
+    }
+
+    .unread .unread-dot {
+        display: block;
+    }
+
+    .empty-state {
+        padding: 80px 20px;
+        text-align: center;
+        color: #94a3b8;
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+    }
 </style>
 
 <div class="app">
-        <%- include('../partials/customer_sidebar', { active: '' }) %>
+    <%- include('../partials/customer_sidebar', { active: 'Notifications' }) %>
 
-        <main class="content">
-            <h1 class="page-title">Notifications</h1>
-            
-            <div class="notifications-header-controls">
-                <div class="notification-tabs">
-                    <button class="tab-btn active" onclick="filterNotifications('all', this)">All</button>
-                    <button class="tab-btn" onclick="filterNotifications('unread', this)">Unread</button>
+    <main class="content">
+        <h1 class="page-title">Notifications</h1>
+        
+        <div class="notifications-header">
+            <div class="tab-group">
+                <button class="tab-btn active" data-filter="all">All Notifications</button>
+                <button class="tab-btn" data-filter="unread">Unread</button>
+            </div>
+            <button class="btn-mark-all" onclick="markAllAsRead()">
+                <i class="fa-solid fa-check-double"></i> Mark all as read
+            </button>
+        </div>
+
+        <div class="notifications-list" id="notifList">
+            <!-- Notification 1 -->
+            <div class="notification-item unread">
+                <div class="notif-icon"><i class="fa-solid fa-cake-candles"></i></div>
+                <div class="notif-content">
+                    <div class="notif-header">
+                        <h3 class="notif-title">2nd Anniversary Celebration!</h3>
+                        <span class="notif-time">2 hours ago</span>
+                    </div>
+                    <p class="notif-desc">Join us on April 19, 2026, for our 2nd Anniversary! Exclusive discounts and freebies await all members. See you there!</p>
                 </div>
-                <button class="btn-mark-read" onclick="markAllAsRead()"><i class="fa-solid fa-check-double"></i> Mark all as read</button>
+                <div class="unread-dot"></div>
             </div>
 
-            <div class="notifications-container">
-                <!-- Notification 1 -->
-                <div class="notification-item unread">
-                    <div class="notification-icon">🎉</div>
-                    <div class="notification-content">
-                        <div class="notification-header">
-                            <h3 class="notification-title">The Last Muster 2nd Anniversary Celebration</h3>
-                            <span class="notification-time">2 hours ago</span>
-                        </div>
-                        <p class="notification-desc">The Study Hub will celebrate the 2nd Anniversary on April 19, 2026. We look forward for you!</p>
+            <!-- Notification 2 -->
+            <div class="notification-item unread">
+                <div class="notif-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                <div class="notif-content">
+                    <div class="notif-header">
+                        <h3 class="notif-title">Seat Reservation Confirmed</h3>
+                        <span class="notif-time">Yesterday</span>
                     </div>
+                    <p class="notif-desc">Your reservation for Seat #5 on April 18, 2026 (10:00 AM - 1:00 PM) has been confirmed. Don't forget your QR code!</p>
                 </div>
-
-                <!-- Notification 2 -->
-                <div class="notification-item unread">
-                    <div class="notification-icon">🪑</div>
-                    <div class="notification-content">
-                        <div class="notification-header">
-                            <h3 class="notification-title">Your Reservation is Confirmed</h3>
-                            <span class="notification-time">Yesterday</span>
-                        </div>
-                        <p class="notification-desc">Seat #5 . April 18, 2026 . 10:00 AM - 1:00 PM</p>
-                    </div>
-                </div>
-
-                <!-- Notification 3 -->
-                <div class="notification-item">
-                    <div class="notification-icon">📢</div>
-                    <div class="notification-content">
-                        <div class="notification-header">
-                            <h3 class="notification-title">System Maintenance Notice</h3>
-                            <span class="notification-time">April 5</span>
-                        </div>
-                        <p class="notification-desc">The Study Hub will undergo scheduled maintenance on April 5 from 2:00 AM to 4:00 AM.</p>
-                    </div>
-                </div>
+                <div class="unread-dot"></div>
             </div>
-        </main>
-    </div>
+
+            <!-- Notification 3 -->
+            <div class="notification-item">
+                <div class="notif-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                <div class="notif-content">
+                    <div class="notif-header">
+                        <h3 class="notif-title">Scheduled System Maintenance</h3>
+                        <span class="notif-time">3 days ago</span>
+                    </div>
+                    <p class="notif-desc">The Last Muster portal will undergo scheduled maintenance on April 15 from 2:00 AM to 4:00 AM. Access may be intermittent.</p>
+                </div>
+                <div class="unread-dot"></div>
+            </div>
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="fa-regular fa-bell-slash" style="font-size: 3rem; margin-bottom: 16px; display: block;"></i>
+            <p>You're all caught up! No new notifications.</p>
+        </div>
+    </main>
+</div>
 
 <%- contentFor('script') %>
 <script>
-        function filterNotifications(filter, element) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
+    function markAllAsRead() {
+        document.querySelectorAll('.notification-item.unread').forEach(item => {
+            item.classList.remove('unread');
+        });
+        alert('All notifications marked as read.');
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             
+            const filter = btn.dataset.filter;
             const items = document.querySelectorAll('.notification-item');
+            let visibleCount = 0;
+
             items.forEach(item => {
-                if (filter === 'all') {
+                if (filter === 'all' || (filter === 'unread' && item.classList.contains('unread'))) {
                     item.style.display = 'flex';
-                } else if (filter === 'unread') {
-                    item.style.display = item.classList.contains('unread') ? 'flex' : 'none';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
                 }
             });
-        }
-        
-        function markAllAsRead() {
-            document.querySelectorAll('.notification-item.unread').forEach(item => {
-                item.classList.remove('unread');
-            });
-            
-            const activeTab = document.querySelector('.tab-btn.active');
-            if (activeTab && activeTab.innerText.toLowerCase() === 'unread') {
-                document.querySelectorAll('.notification-item').forEach(item => {
-                    item.style.display = 'none';
-                });
-            }
-        }
 
-        function logout() {
-            if (confirm("Are you sure you want to logout?")) {
-                window.location.href = "login.html"; // Redirect to login page
-            }
-        }
-    </script>
+            document.getElementById('emptyState').style.display = visibleCount === 0 ? 'block' : 'none';
+        });
+    });
+</script>

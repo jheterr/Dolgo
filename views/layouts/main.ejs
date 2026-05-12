@@ -26,6 +26,15 @@
 
   <!-- Page Specific Scripts -->
   <%- typeof script !== 'undefined' ? script : '' %>
+
+  <!-- Global Scripts -->
+  <script>
+    function confirmLogout() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.location.href = '/login';
+      }
+    }
+  </script>
 </body>
 
 </html>

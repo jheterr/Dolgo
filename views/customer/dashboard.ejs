@@ -3,419 +3,439 @@
 
 <%- contentFor('style') %>
 <style>
+    .timer-container {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-top: 10px;
+    }
 
-        .timer {
-            font-feature-settings: "tnum";
-            font-variant-numeric: tabular-nums;
-        }
+    .timer {
+        font-feature-settings: "tnum";
+        font-variant-numeric: tabular-nums;
+        font-size: 5.5rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 2px;
+        color: white;
+    }
 
-        .session-banner {
-            background: #d65c29;
-            color: white;
-            border-radius: 12px;
-            padding: 40px;
-            position: relative;
-            margin-top: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
+    .pause-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        color: white;
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
 
-        .welcome-text {
-            font-family: 'Poppins', sans-serif;
-            font-size: 2.2rem;
-            color: #d65c29;
-            letter-spacing: -0.02em;
-        }
+    .pause-btn:hover {
+        background: white;
+        color: #d65c29;
+        transform: scale(1.1);
+    }
 
-        .welcome-text .light {
-            font-weight: 500;
-        }
+    .pause-btn.paused {
+        background: white;
+        color: #d65c29;
+    }
 
-        .welcome-text .bold {
-            font-weight: 800;
-        }
+    /* Approved Green Session Card */
+    .session-banner {
+        background: linear-gradient(135deg, #d65c29, #b0461c);
+        color: white;
+        border-radius: 16px;
+        padding: 40px 32px;
+        position: relative;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
 
-        .font-mono {
-            font-family: monospace;
-        }
+    .welcome-section {
+        margin-bottom: 4px;
+    }
 
-        .sidebar {
-            background-color: #242f3d !important;
-        }
+    .welcome-text {
+        font-family: 'Poppins', sans-serif;
+        font-size: 2rem;
+        color: #d65c29;
+        letter-spacing: -0.02em;
+    }
 
-        .sidebar-logo-container {
-            display: flex;
-            align-items: center;
-            padding: 24px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            gap: 12px;
-        }
+    .welcome-text .light { font-weight: 500; }
+    .welcome-text .bold { font-weight: 800; }
 
-        .sidebar-nav ul li a.active {
-            background-color: #384250;
-            color: white;
-            font-weight: 600;
-            border-left: 4px solid #d65c29;
-            border-radius: 0 8px 8px 0;
-            padding-left: 16px;
-        }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-top: 24px;
+    }
 
-        .sidebar-nav ul li a {
-            padding-left: 20px;
-        }
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: var(--shadow);
+        text-align: center;
+        transition: transform 0.2s ease;
+        min-height: 180px;
+    }
 
-        .btn-logout-styled {
-            background-color: #384250;
-            color: #d65c29;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: 0.25s ease;
-        }
+    .stat-card:hover {
+        transform: translateY(-4px);
+    }
 
-        .btn-logout-styled:hover {
-            background-color: #4a5568;
-        }
+    .stat-value {
+        font-size: 4.5rem;
+        font-weight: 800;
+        color: #d65c29;
+        line-height: 1;
+    }
 
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.3);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
+    .stat-label {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-top: 10px;
+    }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+    .font-mono { font-family: monospace; font-weight: 700; }
 
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 32px;
-            width: 100%;
-            max-width: 540px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
+    /* Modal Styles Sync with Staff */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        backdrop-filter: blur(4px);
+    }
 
-        .modal-title {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #1e293b;
-            margin-bottom: 8px;
-        }
+    .modal-overlay.active { display: flex; }
 
-        .modal-subtitle {
-            font-size: 0.95rem;
-            color: #475569;
-            margin-bottom: 24px;
-        }
+    .modal-content {
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        width: 100%;
+        max-width: 520px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
 
-        .time-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 32px;
-        }
+    .modal-title { font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+    .modal-subtitle { font-size: 1rem; color: var(--text-sm); margin-bottom: 24px; }
 
-        .time-btn {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            padding: 16px 8px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #1e293b;
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: center;
-        }
+    .time-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 32px;
+    }
 
-        .time-btn:hover {
-            border-color: #94a3b8;
-        }
+    .time-btn {
+        background: #f8fafc;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
 
-        .time-btn.active {
-            background: #d65c29;
-            color: white;
-            border-color: #d65c29;
-        }
+    .time-btn span { font-size: 13px; font-weight: 700; color: var(--text); }
+    .time-btn small { font-size: 11px; font-weight: 600; color: var(--text-sm); }
 
-        .seat-select {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 1rem;
-            color: #1e293b;
-            font-weight: 500;
-            appearance: none;
-            background: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231e293b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") no-repeat right 16px top 55%;
-            background-size: 12px auto;
-            margin-bottom: 32px;
-            cursor: pointer;
-        }
+    .time-btn:hover { border-color: var(--orange); background: var(--cream-lt); }
+    .time-btn.active { background: var(--orange); border-color: var(--orange); }
+    .time-btn.active span, .time-btn.active small { color: white; }
 
-        .seat-select:focus {
-            outline: none;
-            border-color: #d65c29;
-        }
+    .seat-select {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 32px;
+        background-color: #f8fafc;
+        cursor: pointer;
+    }
 
-        .modal-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .btn-cancel {
-            background: #e2e8f0;
-            color: #1e293b;
-            border: none;
-            border-radius: 8px;
-            padding: 14px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-cancel:hover {
-            background: #cbd5e1;
-        }
-
-        .btn-confirm {
-            background: #d65c29;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 14px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-confirm:hover {
-            background: #c25021;
-        }
-    
+    .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 </style>
 
 <div class="app">
-        <!-- Sidebar -->
-        <%- include('../partials/customer_sidebar', { active: '' }) %>
+    <%- include('../partials/customer_sidebar', { active: 'Dashboard' }) %>
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
 
-        <main class="content" style="background-color: #f4f6f9;">
-            <!-- Welcome -->
-            <div>
-                <h1 class="welcome-text"><span class="light">Welcome,</span> <span class="bold">Sanji!</span></h1>
-                <p style="color: #475569; margin-top: 4px; font-size: 16px; font-weight: 500;">Study well... ✍️</p>
-            </div>
+    <main class="content">
+        <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
 
-            <!-- Session Banner -->
-            <div class="session-banner"
-                style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-                <button onclick="extendTime()"
-                    style="position: absolute; top: 24px; right: 24px; background: white; color: #d65c29; border: none; border-radius: 24px; padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <i class="fa-solid fa-plus" style="color: #d65c29;"></i> Extend Time
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1 class="welcome-text"><span class="light">Welcome,</span> <span class="bold"><%= user.first_name %>!</span></h1>
+            <p style="color: #475569; margin-top: 2px; font-size: 14px; font-weight: 500;">Study well... ✍️</p>
+        </div>
+
+        <!-- Session Banner -->
+        <div class="session-banner">
+            <% if (session) { %>
+                <button onclick="openExtendModal()" style="position: absolute; top: 20px; right: 20px; background: white; color: #d65c29; border: none; border-radius: 20px; padding: 8px 18px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10;">
+                    <i class="fa-solid fa-plus"></i> Extend Time
                 </button>
 
-                <h2 style="font-size: 1.8rem; font-weight: 600; color: white; margin-bottom: 4px;">Remaining Session
-                    Time</h2>
+                <h2 style="font-size: 1.8rem; font-weight: 600; color: white; margin-bottom: 4px;">Remaining Session Time</h2>
 
-                <div style="position: relative; display: inline-block;">
-                    <div id="timer" class="timer"
-                        style="font-size: 6.5rem; font-weight: 800; line-height: 1.1; letter-spacing: 2px; color: white;">
-                        01:38:07
-                    </div>
-
+                <div class="timer-container">
+                    <div id="timer" class="timer">00:00:00</div>
+                    <button id="pauseBtn" class="pause-btn" onclick="togglePause()" title="Pause/Resume Timer">
+                        <i class="fa-solid fa-pause"></i>
+                    </button>
                 </div>
 
                 <div style="font-size: 18px; font-weight: 600; color: white; margin-top: 16px; line-height: 1.5;">
-                    Your MAC Address: <span class="font-mono">AA:BB:CC:DD:FF</span><br>
-                    Your IP Address: <span class="font-mono">192.168.0.X</span><br>
-                    <span style="font-size: 16px; font-weight: 500;">Session ends at 2:30 PM</span>
+                    Your MAC Address: <span class="font-mono"><%= session.mac_address || 'Not Detected' %></span><br>
+                    Your IP Address: <span class="font-mono"><%= session.ip_address || 'Connecting...' %></span><br>
+                    <span style="font-size: 16px; font-weight: 500; opacity: 0.9;">Session ends at <%= new Date(session.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %></span>
                 </div>
+            <% } else { %>
+                <h2 style="font-size: 1.8rem; font-weight: 600; color: white;">No Active Session</h2>
+                <p>Please check-in at the counter to start your session.</p>
+            <% } %>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <!-- Available Seats -->
+            <div class="stat-card">
+                <div class="stat-value" id="seats-available">
+                    <%= availableSeats %>
+                </div>
+                <p class="stat-label">Seats Available Now</p>
             </div>
 
-            <!-- Stats Cards -->
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 24px;">
-                <!-- Seats Available -->
-                <div class="card text-center"
-                    style="background: white; border-radius: 12px; padding: 48px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
-                    <div id="seats-available"
-                        style="font-size: 7rem; font-weight: 800; color: #d65c29; line-height: 1;">
-                        0
-                    </div>
-                    <p style="font-size: 1.6rem; font-weight: 700; color: #1e293b; margin-top: 16px;">
-                        Seats Available Now
-                    </p>
+            <!-- Your Seat -->
+            <div class="stat-card">
+                <div class="stat-value">
+                    <%= mySeat || 'N/A' %>
                 </div>
-
-                <!-- Your Seat -->
-                <div class="card text-center"
-                    style="background: white; border-radius: 12px; padding: 48px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
-                    <div style="font-size: 7rem; font-weight: 800; color: #d65c29; line-height: 1;">
-                        5
-                    </div>
-                    <p style="font-size: 1.6rem; font-weight: 700; color: #1e293b; margin-top: 16px;">
-                        Your Seat
-                    </p>
-                    <button onclick="transferSeat()"
-                        style="background: #d65c29; color: white; border: none; border-radius: 24px; padding: 12px 32px; font-size: 16px; font-weight: 600; margin-top: 24px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                        <i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer
-                    </button>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Extend Session Time Modal -->
-    <div id="extendModal" class="modal-overlay" onclick="if(event.target===this) closeExtendModal()">
-        <div class="modal-content">
-            <h3 class="modal-title">Extend Session Time</h3>
-            <p class="modal-subtitle">Add time</p>
-            
-            <div class="time-grid">
-                <button class="time-btn" onclick="selectTime(this)">1 hour</button>
-                <button class="time-btn active" onclick="selectTime(this)">1 hour 30 mins</button>
-                <button class="time-btn" onclick="selectTime(this)">2 hours</button>
-                <button class="time-btn" onclick="selectTime(this)">2 hours 30 mins</button>
-                <button class="time-btn" onclick="selectTime(this)">3 hours</button>
-                <button class="time-btn" onclick="selectTime(this)">3 hours 30 mins</button>
-                <button class="time-btn" onclick="selectTime(this)">4 hours</button>
-                <button class="time-btn" onclick="selectTime(this)">4 hours 30 mins</button>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeExtendModal()">Cancel</button>
-                <button class="btn-confirm" onclick="confirmExtendTime()">Confirm</button>
+                <p class="stat-label">Your Current Seat</p>
+                <button onclick="transferSeat()" class="btn btn-primary" style="margin-top: 20px; border-radius: 20px; padding: 10px 28px; font-size: 14px;">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer Seat
+                </button>
             </div>
         </div>
-    </div>
+    </main>
+</div>
 
-    <!-- Transfer Seat Modal -->
-    <div id="transferModal" class="modal-overlay" onclick="if(event.target===this) closeTransferModal()">
-        <div class="modal-content" style="max-width: 440px;">
-            <h3 class="modal-title">Transfer Seat</h3>
-            <p class="modal-subtitle">Select new seat number</p>
-            
-            <select id="seatSelect" class="seat-select">
-                <option value="">Loading seats...</option>
-            </select>
-            
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeTransferModal()">Cancel</button>
-                <button class="btn-confirm" onclick="confirmTransferSeat()">Confirm</button>
-            </div>
+<!-- Modal: Extend Session -->
+<div id="extendModal" class="modal-overlay" onclick="if(event.target===this) closeExtendModal()">
+    <div class="modal-content">
+        <h3 class="modal-title">Extend Session Time</h3>
+        <p class="modal-subtitle">Select how much time you want to add</p>
+        
+        <div class="time-grid">
+            <button class="time-btn" onclick="selectTime(this)" data-mins="60">
+                <span>1.0 Hour</span>
+                <small>60 Minutes</small>
+            </button>
+            <button class="time-btn active" onclick="selectTime(this)" data-mins="90">
+                <span>1.5 Hours</span>
+                <small>90 Minutes</small>
+            </button>
+            <button class="time-btn" onclick="selectTime(this)" data-mins="120">
+                <span>2.0 Hours</span>
+                <small>120 Minutes</small>
+            </button>
+            <button class="time-btn" onclick="selectTime(this)" data-mins="150">
+                <span>2.5 Hours</span>
+                <small>150 Minutes</small>
+            </button>
+            <button class="time-btn" onclick="selectTime(this)" data-mins="180">
+                <span>3.0 Hours</span>
+                <small>180 Minutes</small>
+            </button>
+            <button class="time-btn" onclick="selectTime(this)" data-mins="210">
+                <span>3.5 Hours</span>
+                <small>210 Minutes</small>
+            </button>
+            <button class="time-btn" onclick="selectTime(this)" data-mins="240">
+                <span>4.0 Hours</span>
+                <small>240 Minutes</small>
+            </button>
+            <button class="time-btn" onclick="selectTime(this)" data-mins="270">
+                <span>4.5 Hours</span>
+                <small>270 Minutes</small>
+            </button>
+        </div>
+        
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeExtendModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="confirmExtendTime()">Confirm Extension</button>
         </div>
     </div>
+</div>
+
+<!-- Modal: Transfer Seat -->
+<div id="transferModal" class="modal-overlay" onclick="if(event.target===this) closeTransferModal()">
+    <div class="modal-content" style="max-width: 440px;">
+        <h3 class="modal-title">Transfer Seat</h3>
+        <p class="modal-subtitle">Choose an available seat from the list</p>
+        
+        <select id="seatSelect" class="seat-select">
+            <option value="">Loading seats...</option>
+        </select>
+        
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeTransferModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="confirmTransferSeat()">Confirm Transfer</button>
+        </div>
+    </div>
+</div>
 
 <%- contentFor('script') %>
 <script>
-        let timeLeft = 1 * 3600 + 38 * 60 + 7; // 01:38:07
+    function openSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+    function closeSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
 
-        function updateTimer() {
-            const h = Math.floor(timeLeft / 3600).toString().padStart(2, '0');
-            const m = Math.floor((timeLeft % 3600) / 60).toString().padStart(2, '0');
-            const s = (timeLeft % 60).toString().padStart(2, '0');
-            document.getElementById('timer').textContent = `${h}:${m}:${s}`;
-            if (timeLeft > 0) timeLeft--;
-        }
+    // Timer State
+    let isPaused = <%= (session && session.is_paused) ? 'true' : 'false' %>;
+    let timeRemaining = 0;
+    let timerInterval = null;
 
-        setInterval(updateTimer, 1000);
+    <% if (session) { %>
+        <% if (session.is_paused) { %>
+            timeRemaining = <%= session.remaining_seconds || 0 %> * 1000;
+        <% } else if (session.end_time) { %>
+            timeRemaining = Math.max(0, new Date("<%= session.end_time %>").getTime() - Date.now());
+        <% } %>
+    <% } %>
 
-        function extendTime() {
-            document.getElementById('extendModal').classList.add('active');
+    const timerEl = document.getElementById('timer');
+    const pauseBtn = document.getElementById('pauseBtn');
+
+    function updateTimerDisplay() {
+        if (timeRemaining <= 0) {
+            timerEl.textContent = "00:00:00";
+            return;
         }
-        
-        function closeExtendModal() {
-            document.getElementById('extendModal').classList.remove('active');
-        }
-        
-        function selectTime(element) {
-            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-        }
-        
-        function confirmExtendTime() {
-            const activeBtn = document.querySelector('.time-btn.active');
-            if (activeBtn) {
-                const text = activeBtn.innerText;
-                let minutesToAdd = 0;
-                if (text.includes('1 hour')) minutesToAdd += 60;
-                if (text.includes('2 hours')) minutesToAdd += 120;
-                if (text.includes('3 hours')) minutesToAdd += 180;
-                if (text.includes('4 hours')) minutesToAdd += 240;
-                if (text.includes('30 mins')) minutesToAdd += 30;
-                
-                timeLeft += minutesToAdd * 60;
-                updateTimer();
+        const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+        timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function startTimerLoop() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if (!isPaused && timeRemaining > 0) {
+                timeRemaining -= 1000;
+                updateTimerDisplay();
             }
-            closeExtendModal();
-        }
+        }, 1000);
+    }
 
-        function transferSeat() {
-            document.getElementById('transferModal').classList.add('active');
-        }
-        
-        function closeTransferModal() {
-            document.getElementById('transferModal').classList.remove('active');
-        }
-        
-        function confirmTransferSeat() {
-            const newSeat = document.getElementById('seatSelect').value;
-            alert("Seat transferred to " + newSeat);
-            closeTransferModal();
-        }
+    // Pause/Resume
+    async function togglePause() {
+        const newPauseState = !isPaused;
+        const remainingSecs = Math.floor(timeRemaining / 1000);
 
-        function logout() {
-            if (confirm("Are you sure you want to logout?")) {
-                window.location.reload();
+        try {
+            const response = await fetch('/customer/session/pause-toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isPaused: newPauseState, remainingSeconds: remainingSecs })
+            });
+
+            if (response.ok) {
+                isPaused = newPauseState;
+                pauseBtn.innerHTML = isPaused ? '<i class="fa-solid fa-play"></i>' : '<i class="fa-solid fa-pause"></i>';
+                pauseBtn.classList.toggle('paused', isPaused);
             }
-        }
+        } catch (err) { console.error("Error toggling pause", err); }
+    }
 
-        async function loadDynamicStats() {
-            try {
-                const res = await fetch('/api/layout');
-                const data = await res.json();
-                if (data && data.items) {
-                    const chairs = data.items.filter(i => (i.type === 'chair' || i.type === 'chair-sq'));
-                    const openChairs = chairs.filter(i => i.statuses && i.statuses[0] === 'open');
-                    
-                    document.getElementById('seats-available').textContent = openChairs.length;
-                    
-                    const select = document.getElementById('seatSelect');
-                    select.innerHTML = '';
-                    if (openChairs.length === 0) {
-                        select.innerHTML = '<option value="">No seats available</option>';
-                    } else {
-                        openChairs.forEach(c => {
-                            const opt = document.createElement('option');
-                            opt.value = c.label;
-                            opt.textContent = c.label;
-                            select.appendChild(opt);
-                        });
-                    }
-                }
-            } catch (e) {
-                console.error(e);
+    // Extend Time
+    async function confirmExtendTime() {
+        const activeBtn = document.querySelector('.time-btn.active');
+        const minutes = parseInt(activeBtn.getAttribute('data-mins'));
+
+        try {
+            const response = await fetch('/customer/session/extend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ minutes: minutes })
+            });
+
+            if (response.ok) {
+                location.reload();
             }
-        }
+        } catch (err) { console.error("Error extending time", err); }
+    }
 
-        window.onload = () => {
-            updateTimer();
-            loadDynamicStats();
-        };
-    </script>
+    // Seat Transfer
+    async function loadSeatsForTransfer() {
+        try {
+            const res = await fetch('/api/layout');
+            const data = await res.json();
+            const select = document.getElementById('seatSelect');
+            if (data && data.items) {
+                const chairs = data.items.filter(i => (i.type === 'chair' || i.type === 'chair-sq') && i.statuses[0] === 'open');
+                select.innerHTML = chairs.map(c => `<option value="${c.label}">${c.label}</option>`).join('');
+                if (chairs.length === 0) select.innerHTML = '<option value="">No seats available</option>';
+            }
+        } catch (e) { console.error("Error loading seats", e); }
+    }
+
+    function transferSeat() { loadSeatsForTransfer(); openTransferModal(); }
+    function confirmTransferSeat() {
+        const newSeat = document.getElementById('seatSelect').value;
+        if (!newSeat) return;
+        alert("Seat transferred to " + newSeat);
+        closeTransferModal();
+        location.reload();
+    }
+
+    // UI Modals
+    function openExtendModal() { document.getElementById('extendModal').classList.add('active'); }
+    function closeExtendModal() { document.getElementById('extendModal').classList.remove('active'); }
+    function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
+    function closeTransferModal() { document.getElementById('transferModal').classList.remove('active'); }
+    function selectTime(btn) {
+        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // Init
+    if (timeRemaining > 0) {
+        updateTimerDisplay();
+        if (isPaused) {
+            pauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            pauseBtn.classList.add('paused');
+        }
+        startTimerLoop();
+    }
+</script>

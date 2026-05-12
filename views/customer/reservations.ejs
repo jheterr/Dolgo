@@ -3,278 +3,319 @@
 
 <%- contentFor('style') %>
 <style>
+    .content {
+        padding: 40px;
+        background-color: #f4f6f9;
+        min-height: 100vh;
+    }
 
-        .sidebar {
-            background-color: #242f3d !important;
-        }
-
-        .sidebar-logo-container {
-            display: flex;
-            align-items: center;
-            padding: 24px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            gap: 12px;
-        }
-
-        .sidebar-nav ul li a.active {
-            background-color: #384250;
-            color: white;
-            font-weight: 600;
-            border-left: 4px solid #d65c29;
-            border-radius: 0 8px 8px 0;
-            padding-left: 16px;
-        }
-
-        .sidebar-nav ul li a {
-            padding-left: 20px;
-            text-decoration: none;
-        }
-
-        .btn-logout-styled {
-            background-color: #384250;
-            color: #d65c29;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: 0.25s ease;
-        }
-
-        .btn-logout-styled:hover {
-            background-color: #4a5568;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .page-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 2rem;
-            font-weight: 800;
-            color: #d65c29;
-            margin-bottom: 24px;
-            letter-spacing: -0.02em;
-        }
-        
-        .active-session-card {
-            background-color: #b7dbbf;
-            border-radius: 12px;
-            padding: 32px 40px;
-            position: relative;
-            margin-bottom: 32px;
-        }
-
-        .badge-active {
-            background-color: #10b981;
-            color: white;
-            padding: 8px 24px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .badge-completed {
-            background-color: #71717a;
-            color: white;
-            padding: 8px 24px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        .session-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #27593c;
-            margin-bottom: 8px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .session-subtitle {
-            font-size: 1.1rem;
-            color: #27593c;
-            font-weight: 700;
-            margin-bottom: 36px;
-        }
-
-        .metric-group {
-            display: flex;
-            gap: 64px;
-        }
-
-        .metric-label {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #27593c;
-            margin-bottom: 4px;
-        }
-
-        .metric-value {
-            font-size: 4rem;
-            font-weight: 800;
-            color: #27593c;
-            line-height: 1;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .section-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #d65c29;
-            margin-bottom: 16px;
-        }
-
-        .reservations-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .reservations-table thead tr {
-            background-color: #cfd8f2;
-        }
-
-        .reservations-table th {
-            padding: 20px 24px;
-            font-size: 0.85rem;
-            font-weight: 800;
-            color: #475569;
-            text-transform: uppercase;
-        }
-
-        .reservations-table td {
-            padding: 24px;
-            font-weight: 700;
-            color: #1e293b;
-            font-size: 1rem;
-        }
-
-        .reservations-table tbody tr {
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .reservations-table tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        .btn-reserve {
-            background-color: #d65c29;
-            color: white;
-            border: none;
-            border-radius: 24px;
-            padding: 14px 32px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-        }
-
-        .btn-reserve:hover {
-            background-color: #c25021;
-        }
+    .page-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--orange);
+        margin-bottom: 24px;
+        letter-spacing: -0.02em;
+    }
     
+    /* Approved Green Session Card */
+    .active-session-card {
+        background-color: #b7dbbf;
+        border-radius: 12px;
+        padding: 32px 40px;
+        position: relative;
+        margin-bottom: 32px;
+        box-shadow: none;
+        border: none;
+    }
+
+    .badge-active {
+        background-color: #10b981;
+        color: white;
+        padding: 8px 24px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        position: absolute;
+        top: 32px;
+        right: 40px;
+    }
+
+    .session-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #27593c;
+        margin-bottom: 8px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .session-subtitle {
+        font-size: 1.1rem;
+        color: #27593c;
+        font-weight: 700;
+        margin-bottom: 36px;
+    }
+
+    .metric-group {
+        display: flex;
+        gap: 64px;
+    }
+
+    .metric-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .metric-label {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #27593c;
+        margin-bottom: 4px;
+    }
+
+    .metric-value {
+        font-size: 4rem;
+        font-weight: 800;
+        color: #27593c;
+        line-height: 1;
+        font-family: 'Poppins', sans-serif;
+        letter-spacing: -2px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .section-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #d65c29;
+    }
+
+    /* Modern Table Styling */
+    .table-container {
+        background: white;
+        border-radius: 20px;
+        padding: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .reservations-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .reservations-table th {
+        padding: 16px 20px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #f1f5f9;
+        text-align: left;
+    }
+
+    .reservations-table td {
+        padding: 20px;
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 0.95rem;
+        border-bottom: 1px solid #f8fafc;
+    }
+
+    .reservations-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .reservations-table tr:hover td {
+        background-color: #fcfcfd;
+    }
+
+    .status-pill {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .status-confirmed { background: #ecfdf5; color: #10b981; }
+    .status-pending { background: #fffbeb; color: #f59e0b; }
+    .status-completed { background: #f1f5f9; color: #64748b; }
+
+    .seat-badge {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .btn-action {
+        background-color: var(--orange);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+    }
+
+    .btn-action:hover {
+        background-color: #c25021;
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+        color: #94a3b8;
+    }
 </style>
 
 <div class="app">
-        <!-- Sidebar -->
-        <%- include('../partials/customer_sidebar', { active: '' }) %>
+    <%- include('../partials/customer_sidebar', { active: 'Reservations' }) %>
 
-        <main class="content" style="background-color: #f4f6f9;">
-            <h1 class="page-title">Reservations</h1>
-            
-            <!-- Active Session Card -->
+    <main class="content">
+        <h1 class="page-title">My Bookings</h1>
+        
+        <!-- Approved Active Session Card -->
+        <% if (session) { %>
             <div class="active-session-card">
-                <div style="position: absolute; top: 32px; right: 40px;">
-                    <span class="badge-active">Active</span>
-                </div>
+                <span class="badge-active"><%= session.is_paused ? 'Paused' : 'Active' %></span>
                 
                 <h2 class="session-title">Active Session</h2>
-                <p class="session-subtitle">Started at 12:30 PM - Ends at 2:30 PM / 3-hour package</p>
+                <p class="session-subtitle">
+                    Started at <%= new Date(session.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %> 
+                    - Ends at <%= new Date(session.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %> / 3-hour package
+                </p>
                 
                 <div class="metric-group">
-                    <div>
+                    <div class="metric-item">
                         <p class="metric-label">Remaining Time</p>
-                        <div class="metric-value" style="letter-spacing: -2px;">01:20</div>
+                        <div id="remainingTime" class="metric-value">00:00</div>
                     </div>
-                    <div style="margin-left: 40px;">
+                    <div class="metric-item" style="margin-left: 40px;">
                         <p class="metric-label">Assigned Seat</p>
-                        <div class="metric-value" style="padding-left: 20px;">5</div>
+                        <div class="metric-value"><%= activeSeat %></div>
                     </div>
                 </div>
             </div>
-            
-            <h2 class="section-title">Upcoming/Past Reservations</h2>
-            
-            <!-- Table -->
+        <% } else { %>
+            <div class="active-session-card" style="background-color: #e2e8f0;">
+                <h2 class="session-title" style="color: #64748b;">No Active Session</h2>
+                <p class="session-subtitle" style="color: #64748b;">Visit the counter to start a session.</p>
+            </div>
+        <% } %>
+        
+        <div class="section-header">
+            <h2 class="section-title">Reservation History</h2>
+            <button class="btn-action" onclick="window.location.href='/customer/reserve-new'">
+                <i class="fa-solid fa-plus"></i> New Reservation
+            </button>
+        </div>
+        
+        <!-- Modern Table Container -->
+        <div class="table-container">
             <table class="reservations-table">
                 <thead>
                     <tr>
-                        <th style="width: 25%;">DATE</th>
-                        <th style="width: 25%;">TIME</th>
-                        <th style="width: 15%;">DURATION</th>
-                        <th style="width: 15%; text-align: center;">SEAT</th>
-                        <th style="width: 20%; text-align: center;">STATUS</th>
+                        <th>DATE & TIME</th>
+                        <th>SEAT</th>
+                        <th>DURATION</th>
+                        <th>STATUS</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Today, Apr 12</td>
-                        <td>12:30 - 2:30 PM</td>
-                        <td>2 hours</td>
-                        <td style="text-align: center;">5</td>
-                        <td style="text-align: center;">
-                            <span class="badge-active" style="padding: 6px 20px; font-size: 0.8rem;">Active</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Apr 10</td>
-                        <td>2:30 - 5:30 PM</td>
-                        <td>3 hours</td>
-                        <td style="text-align: center;">8</td>
-                        <td style="text-align: center;">
-                            <span class="badge-completed" style="padding: 6px 20px; font-size: 0.8rem;">Completed</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Apr 7</td>
-                        <td>10:30 - 11:30 AM</td>
-                        <td>1 hour</td>
-                        <td style="text-align: center;">15</td>
-                        <td style="text-align: center;">
-                            <span class="badge-completed" style="padding: 6px 20px; font-size: 0.8rem;">Completed</span>
-                        </td>
-                    </tr>
+                    <% if (reservations.length > 0) { %>
+                        <% reservations.forEach(res => { %>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; flex-direction: column;">
+                                        <span style="font-weight: 800; color: #1e293b;">
+                                            <%= new Date(res.start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                        </span>
+                                        <span style="font-size: 0.8rem; color: #64748b;">
+                                            <%= new Date(res.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %> - 
+                                            <%= new Date(res.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="seat-badge"><%= res.seat_label %></span>
+                                </td>
+                                <td>
+                                    <span style="color: #475569;"><%= res.duration_hours %> Hour(s)</span>
+                                </td>
+                                <td>
+                                    <% 
+                                        const statusClass = res.status === 'confirmed' ? 'status-confirmed' : 
+                                                          (res.status === 'pending' ? 'status-pending' : 'status-completed');
+                                    %>
+                                    <span class="status-pill <%= statusClass %>">
+                                        <i class="fa-solid <%= res.status === 'confirmed' ? 'fa-circle-check' : 'fa-circle-info' %>"></i>
+                                        <%= res.status %>
+                                    </span>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    <i class="fa-regular fa-calendar-xmark" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i>
+                                    <p>You haven't made any reservations yet.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
                 </tbody>
             </table>
-            
-            <div style="text-align: center; margin-top: 32px;">
-                <button class="btn-reserve" onclick="window.location.href='reserve_new.html'">
-                    <i class="fa-solid fa-plus"></i> Reserve New Time Slot
-                </button>
-            </div>
-        </main>
-    </div>
+        </div>
+    </main>
+</div>
 
 <%- contentFor('script') %>
 <script>
-        function logout() {
-            if (confirm("Are you sure you want to logout?")) {
-                window.location.reload();
+    <% if (session) { %>
+        let timeLeft = 0;
+        <% if (session.is_paused) { %>
+            timeLeft = <%= session.remaining_seconds || 0 %>;
+        <% } else { %>
+            timeLeft = Math.max(0, Math.floor((new Date("<%= session.end_time %>").getTime() - Date.now()) / 1000));
+        <% } %>
+
+        function updateTimer() {
+            if (timeLeft <= 0) {
+                document.getElementById('remainingTime').textContent = "00:00";
+                return;
             }
+            const h = Math.floor(timeLeft / 3600);
+            const m = Math.floor((timeLeft % 3600) / 60);
+            document.getElementById('remainingTime').textContent = 
+                `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            
+            <% if (!session.is_paused) { %>
+                timeLeft--;
+            <% } %>
         }
-    </script>
+        setInterval(updateTimer, 1000);
+        updateTimer();
+    <% } %>
+</script>

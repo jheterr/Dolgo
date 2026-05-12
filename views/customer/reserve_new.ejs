@@ -3,931 +3,665 @@
 
 <%- contentFor('style') %>
 <style>
+    .content {
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        background-color: #f4f6f9;
+        min-height: 100vh;
+    }
 
-        .sidebar {
-            background-color: #242f3d !important;
-        }
+    .page-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--orange);
+        margin-bottom: 24px;
+        letter-spacing: -0.02em;
+    }
 
-        .sidebar-logo-container {
-            display: flex;
-            align-items: center;
-            padding: 24px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            gap: 12px;
-        }
+    /* Controls row */
+    .controls-row {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 24px;
+        align-items: center;
+    }
 
-        .sidebar-nav ul li a.active {
-            background-color: #384250;
-            color: white;
-            font-weight: 600;
-            border-left: 4px solid #d65c29;
-            border-radius: 0 8px 8px 0;
-            padding-left: 16px;
-        }
+    .segmented-control {
+        display: flex;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        overflow: hidden;
+        background: white;
+        padding: 4px;
+        gap: 4px;
+    }
 
-        .sidebar-nav ul li a {
-            padding-left: 20px;
-            text-decoration: none;
-        }
+    .seg-btn {
+        padding: 8px 24px;
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: 0.2s;
+    }
 
-        .btn-logout-styled {
-            background-color: #384250;
-            color: #d65c29;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: 0.25s ease;
-        }
+    .seg-btn.active {
+        background: #fef2f2;
+        color: var(--orange);
+    }
 
-        .btn-logout-styled:hover {
-            background-color: #4a5568;
-        }
+    .date-picker-btn {
+        background: white;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        outline: none;
+    }
 
-        .content {
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            background-color: #f4f6f9;
-        }
+    /* Layout */
+    .main-layout {
+        display: flex;
+        gap: 24px;
+        flex: 1;
+        background: transparent;
+        min-height: 600px;
+    }
 
-        .page-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 2rem;
-            font-weight: 800;
-            color: #d65c29;
-            margin-bottom: 24px;
-            letter-spacing: -0.02em;
-        }
+    .map-section {
+        flex: 1;
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+    }
 
-        /* Controls row */
-        .controls-row {
-            display: flex;
-            gap: 24px;
-            margin-bottom: 24px;
-            align-items: center;
-        }
+    .details-section {
+        width: 380px;
+        background: white;
+        padding: 32px;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+        position: relative;
+    }
 
-        .segmented-control {
-            display: flex;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            overflow: hidden;
-            background: white;
-        }
+    /* Map styling */
+    .legend {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 24px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #1e293b;
+    }
 
-        .seg-btn {
-            padding: 10px 24px;
-            background: white;
-            border: none;
-            font-weight: 600;
-            color: #1e293b;
-            cursor: pointer;
-            border-right: 1px solid #cbd5e1;
-            font-size: 0.95rem;
-        }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-        .seg-btn:last-child {
-            border-right: none;
-        }
-
-        .seg-btn.active {
-            background: #fca5a5; /* Light orange-pink bg from image */
-            color: #d65c29;
-        }
-
-        .date-picker-btn {
-            background: white;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            padding: 10px 20px;
-            font-weight: 600;
-            color: #1e293b;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            font-size: 0.95rem;
-        }
-
-        /* Layout */
-        .main-layout {
-            display: flex;
-            gap: 0;
-            flex: 1;
-            background: white;
-            border-top: 1px solid #cbd5e1;
-            margin: 0 -40px -40px -40px; /* pull to edges */
-            min-height: 700px;
-        }
-
-        .map-section {
-            flex: 1;
-            background: #94a3b8; /* gray-400 */
-            padding: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .details-section {
-            width: 360px;
-            background: white;
-            padding: 32px;
-            border-left: 1px solid #cbd5e1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Map styling */
-        .map-container {
-            background: white;
-            width: 100%;
-            max-width: 900px;
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .legend {
-            display: flex;
-            gap: 24px;
-            margin-bottom: 24px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: #1e293b;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .legend-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-        
-        .dot-green { background: #10b981; }
-        .dot-orange { background: #d65c29; }
-        .dot-dark { background: #1e293b; }
-        .dot-yellow { background: #eab308; }
-
-        .map-area {
-            position: relative;
-            width: 100%;
-            height: 500px;
-            border: 4px solid #cbd5e1;
-            border-radius: 8px;
-        }
-        
-        .canvas-viewport { width: 100%; height: 500px; overflow: auto; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 10px; position: relative; display: flex; justify-content: center; align-items: flex-start; padding: 10px; }
-        .canvas-board { position: relative; width: 800px; height: 450px; background: #f0f4f8; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px; cursor: default; transform-origin: 0 0; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .item-visual.chair-icon {
-            -webkit-mask-size: contain;
-            mask-size: contain;
-            -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-            -webkit-mask-position: center;
-            mask-position: center;
-        }
-        
-        .fp-item .item-label { position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); font-family: 'Poppins', sans-serif; font-size: 9px; font-weight: 700; color: #475569; white-space: nowrap; pointer-events: none; z-index: 10; }
-        .fp-item .item-label.center { top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px; }
-        
-        /* Map lines/dividers */
-        .map-line-h {
-            position: absolute;
-            background: #1e293b;
-            height: 4px;
-        }
-        .map-line-v {
-            position: absolute;
-            background: #1e293b;
-            width: 4px;
-        }
-
-        /* Tables and elements */
-        .counter {
-            position: absolute;
-            top: 40px;
-            left: 20px;
-            background: #e2e8f0;
-            padding: 8px 32px;
-            font-weight: 800;
-            color: #1e293b;
-        }
-
-        .entry-text {
-            position: absolute;
-            top: 200px;
-            left: -20px;
-            transform: rotate(-90deg);
-            font-weight: 800;
-            color: #475569;
-            letter-spacing: 2px;
-        }
-
-        .table-rect {
-            position: absolute;
-            background: white;
-            border: 2px solid #1e293b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            color: #1e293b;
-            border-radius: 4px;
-        }
-
-        .table-circle {
-            position: absolute;
-            background: white;
-            border: 2px solid #1e293b;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            color: #1e293b;
-        }
-
-        .seat {
-            position: absolute;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: white;
-            cursor: pointer;
-        }
-
-        .seat-circle {
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-        }
-
-        .seat-rect {
-            border-radius: 4px;
-            width: 38px;
-            height: 24px;
-        }
-
-        .bg-green { background: #10b981; }
-        .bg-orange { background: #d65c29; }
-        .bg-dark { background: #1e293b; }
-        .bg-yellow { background: #eab308; }
-
-        .meeting-room {
-            position: absolute;
-            top: 20px;
-            right: 140px;
-            width: 100px;
-            height: 180px;
-            background: #d65c29;
-            color: white;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-size: 0.9rem;
-            line-height: 1.2;
-            border-radius: 4px;
-        }
-
-        /* Right panel details */
-        .room-image {
-            width: 100%;
-            height: 180px;
-            border-radius: 8px;
-            object-fit: cover;
-            margin-bottom: 24px;
-        }
-
-        .seat-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #1e293b;
-            margin-bottom: 4px;
-        }
-
-        .seat-status {
-            font-weight: 700;
-            color: #10b981;
-            margin-bottom: 24px;
-            font-size: 0.9rem;
-        }
-
-        .divider {
-            height: 1px;
-            background: #e2e8f0;
-            margin-bottom: 24px;
-        }
-
-        .form-label {
-            font-weight: 800;
-            font-size: 0.85rem;
-            color: #1e293b;
-            margin-bottom: 12px;
-            display: block;
-        }
-
-        .form-input-native {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-weight: 600;
-            font-family: inherit;
-            color: #1e293b;
-            margin-bottom: 24px;
-            background: #f8fafc;
-            outline: none;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-
-        .form-input-native:focus {
-            border-color: #d65c29;
-        }
-
-        .time-inputs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-
-        .time-input-native {
-            flex: 1;
-            padding: 10px 16px;
-            background: #e2e8f0;
-            border: 1px solid transparent;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-family: inherit;
-            font-weight: 700;
-            color: #1e293b;
-            outline: none;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-
-        .time-input-native:focus {
-            border-color: #d65c29;
-        }
-        
-        ::-webkit-calendar-picker-indicator {
-            cursor: pointer;
-            opacity: 0.6;
-            transition: 0.2s;
-        }
-
-        ::-webkit-calendar-picker-indicator:hover {
-            opacity: 1;
-        }
-
-        .btn-confirm-booking {
-            background: #10b981;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 16px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: auto;
-            transition: 0.2s;
-        }
-        
-        .btn-confirm-booking:hover {
-            background: #059669;
-        }
-
-        .map-area.view-tables .map-line-h,
-        .map-area.view-tables .map-line-v,
-        .map-area.view-tables .counter,
-        .map-area.view-tables .entry-text,
-        .map-area.view-tables .meeting-room {
-            display: none;
-        }
-
-        .map-area.view-meeting .table-rect,
-        .map-area.view-meeting .table-circle,
-        .map-area.view-meeting .seat,
-        .map-area.view-meeting .counter,
-        .map-area.view-meeting .entry-text,
-        .map-area.view-meeting .map-line-h,
-        .map-area.view-meeting .map-line-v {
-            display: none;
-        }
-        
-        /* Make Meeting Room large and green when in meeting view */
-        .map-area.view-meeting .meeting-room {
-            background: #10b981;
-            width: 140px;
-            height: 180px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.1rem;
-            border-radius: 8px;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(30, 41, 59, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 32px;
-            width: 440px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        
-        .upload-box {
-            background: #e2e8f0;
-            width: 120px;
-            height: 90px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 24px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        
-        .upload-box:hover {
-            background: #cbd5e1;
-        }
-
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
+    }
     
+    .dot-green { background: #10b981; }
+    .dot-orange { background: #d65c29; }
+    .dot-dark { background: #1e293b; }
+    .dot-yellow { background: #facc15; }
+
+    .canvas-viewport {
+        width: 100%;
+        height: 500px;
+        overflow: auto;
+        background: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 10px;
+    }
+
+    .canvas-board {
+        position: relative;
+        width: 800px;
+        height: 450px;
+        background: #f0f4f8;
+        background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+        background-size: 20px 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .fp-item {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .fp-item:hover {
+        transform: scale(1.05);
+        z-index: 100 !important;
+    }
+
+    .fp-item.selected {
+        outline: 3px solid var(--orange);
+        outline-offset: 4px;
+        border-radius: 4px;
+    }
+
+    .item-visual {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .item-visual.chair-icon {
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+    }
+
+    .item-label {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: 'Poppins', sans-serif;
+        font-size: 9px;
+        font-weight: 700;
+        color: #475569;
+        white-space: nowrap;
+        pointer-events: none;
+    }
+
+    .item-label.center {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 10px;
+    }
+
+    /* Right panel details */
+    .room-image {
+        width: 100%;
+        height: 180px;
+        border-radius: 12px;
+        object-fit: cover;
+        margin-bottom: 20px;
+        background: #f1f5f9;
+    }
+
+    .seat-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+
+    .seat-status {
+        font-weight: 700;
+        margin-bottom: 24px;
+        font-size: 0.9rem;
+    }
+
+    .status-available { color: #10b981; }
+    .status-taken { color: #d65c29; }
+    .status-reserved { color: #1e293b; }
+
+    .divider {
+        height: 1px;
+        background: #e2e8f0;
+        margin-bottom: 24px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-label { font-weight: 800; font-size: 0.85rem; color: #1e293b; margin-bottom: 8px; display: block; }
+    
+    .form-input-native {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-weight: 600;
+        font-family: inherit;
+        color: #1e293b;
+        background: #f8fafc;
+        outline: none;
+    }
+
+    .time-inputs { display: flex; gap: 12px; }
+    .time-input-native {
+        flex: 1;
+        padding: 10px 16px;
+        background: #e2e8f0;
+        border: 1px solid transparent;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1e293b;
+        outline: none;
+    }
+
+    .btn-confirm-booking {
+        background: #10b981;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 16px;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: auto;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .btn-confirm-booking:hover { background: #059669; transform: translateY(-2px); }
+    .btn-confirm-booking:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(30, 41, 59, 0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-content {
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        width: 440px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    
+    .upload-box {
+        background: #f1f5f9;
+        width: 100%;
+        height: 100px;
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    
+    .upload-box:hover { background: #e2e8f0; border-color: var(--orange); }
+
+    .empty-selection {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #94a3b8;
+    }
 </style>
 
 <div class="app">
-        <!-- Sidebar -->
-        <%- include('../partials/customer_sidebar', { active: '' }) %>
+    <%- include('../partials/customer_sidebar', { active: 'Reserve New' }) %>
 
-        <main class="content">
-            <h1 class="page-title">Reserve New Time Slot</h1>
-            
-            <div class="controls-row">
-                <div class="segmented-control">
-                    <button class="seg-btn">All</button>
-                    <button class="seg-btn">Tables</button>
-                    <button class="seg-btn active">Meeting Room</button>
-                </div>
-                
-                <input type="date" id="topDatePicker" class="date-picker-btn" style="font-family: inherit; outline: none; border: 1px solid #cbd5e1; border-radius: 4px; padding: 10px 16px; font-weight: 600; color: #1e293b; background: white;" value="2026-04-20" onchange="syncDates('top')">
+    <main class="content">
+        <h1 class="page-title">Reserve New Time Slot</h1>
+        
+        <div class="controls-row">
+            <div class="segmented-control">
+                <button class="seg-btn active" data-filter="all">All</button>
+                <button class="seg-btn" data-filter="tables">Tables</button>
+                <button class="seg-btn" data-filter="rooms">Meeting Room</button>
             </div>
             
-            <div class="main-layout">
-                <!-- Left: Map Section -->
-                <div class="map-section">
-                    <div class="map-container">
-                        <div class="legend">
-                            <div class="legend-item"><div class="legend-dot dot-green"></div> Available</div>
-                            <div class="legend-item"><div class="legend-dot dot-orange"></div> Taken</div>
-                            <div class="legend-item"><div class="legend-dot dot-dark"></div> Reserved</div>
-                            <div class="legend-item"><div class="legend-dot dot-yellow"></div> Idle</div>
-                        </div>
-                        
-                        <div class="canvas-viewport">
-                            <div class="canvas-board mode-select" id="canvas"></div>
-                        </div>
-                    </div>
+            <input type="date" id="globalDatePicker" class="date-picker-btn" value="<%= new Date().toISOString().split('T')[0] %>">
+        </div>
+        
+        <div class="main-layout">
+            <!-- Left: Map Section -->
+            <div class="map-section">
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-dot dot-green"></div> Available</div>
+                    <div class="legend-item"><div class="legend-dot dot-orange"></div> Taken</div>
+                    <div class="legend-item"><div class="legend-dot dot-dark"></div> Reserved</div>
+                    <div class="legend-item"><div class="legend-dot dot-yellow"></div> Idle</div>
                 </div>
                 
-                <!-- Right: Details Section -->
-                <div class="details-section" style="position: relative;">
-                    <i class="fa-solid fa-xmark" style="position: absolute; top: 16px; right: 16px; font-size: 1.2rem; color: #1e293b; cursor: pointer; z-index: 10;"></i>
+                <div class="canvas-viewport">
+                    <div class="canvas-board" id="canvas"></div>
+                </div>
+            </div>
+            
+            <!-- Right: Details Section -->
+            <div class="details-section" id="detailsSection">
+                <div id="emptyDetails" class="empty-selection">
+                    <i class="fa-solid fa-hand-pointer" style="font-size: 3rem; margin-bottom: 16px;"></i>
+                    <p>Select a seat or room on the floor plan to see details and book.</p>
+                </div>
+
+                <div id="activeDetails" style="display: none; flex-direction: column; height: 100%;">
+                    <img id="detailImage" src="/images/coworking_room.png" class="room-image">
+                    <h2 class="seat-title" id="detailTitle">Select a Seat</h2>
+                    <p class="seat-status" id="detailStatus">Available</p>
                     
-                    <!-- TABLES DETAILS -->
-                    <div id="detailsTables" style="display: none; flex-direction: column; height: 100%;">
-                        <img src="/images/coworking_room.png" alt="Coworking Space" class="room-image" style="margin-top: 16px;">
-                        <h2 class="seat-title">Table 4 - Seat 2</h2>
-                        <p class="seat-status">Available</p>
-                        
-                        <div class="divider"></div>
-                        
-                        <label class="form-label">Available dates</label>
-                        <input type="date" id="sideDatePickerTables" class="form-input-native" value="2026-04-20" onchange="syncDates('sideTables')">
-                        
-                        <label class="form-label">Available times</label>
+                    <div class="divider"></div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Reservation Date</label>
+                        <input type="date" id="reservationDate" class="form-input-native">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Time Slot</label>
                         <div class="time-inputs">
-                            <input type="time" id="timeFromTables" class="time-input-native" value="10:30" onchange="syncTimes('fromTables')">
-                            <input type="time" id="timeToTables" class="time-input-native" value="11:30" onchange="syncTimes('toTables')">
+                            <input type="time" id="timeFrom" class="time-input-native" value="09:00">
+                            <input type="time" id="timeTo" class="time-input-native" value="10:00">
                         </div>
-                        
-                        <button class="btn-confirm-booking" onclick="confirmBooking('table')">Confirm</button>
                     </div>
 
-                    <!-- MEETING ROOM DETAILS -->
-                    <div id="detailsMeeting" style="display: flex; flex-direction: column; height: 100%;">
-                        <img src="/images/meeting_room.png" alt="Meeting Room" class="room-image" style="margin-top: 16px;">
-                        
-                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px;">
-                            <h2 class="seat-title" style="margin-bottom: 0;">Meeting Room</h2>
-                            <span style="font-size: 0.7rem; font-weight: 600; color: #64748b; margin-bottom: 4px;">Maximum of 5 people</span>
+                    <div id="meetingRoomExtras" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Meeting Purpose</label>
+                            <input type="text" id="meetingPurpose" class="form-input-native" placeholder="e.g. Team Standup">
                         </div>
-                        <p class="seat-status">Available</p>
-                        
-                        <div class="divider"></div>
-                        
-                        <label class="form-label">Available dates</label>
-                        <input type="date" id="sideDatePickerMeeting" class="form-input-native" value="2026-04-20" onchange="syncDates('sideMeeting')">
-                        
-                        <label class="form-label">Available times</label>
-                        <div class="time-inputs">
-                            <input type="time" id="timeFromMeeting" class="time-input-native" value="10:30" onchange="syncTimes('fromMeeting')">
-                            <input type="time" id="timeToMeeting" class="time-input-native" value="11:30" onchange="syncTimes('toMeeting')">
-                        </div>
-
-                        <label class="form-label">Add people</label>
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                            <div style="display: flex; gap: 8px; align-items: center; background: #e2e8f0; padding: 6px 8px; border-radius: 20px; flex: 1; flex-wrap: wrap;">
-                                <div class="person-pill" style="background: black; color: white; padding: 4px 10px; border-radius: 16px; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-                                    Roronoa Zoro <i class="fa-solid fa-xmark remove-person" style="cursor: pointer;"></i>
-                                </div>
-                                <div class="person-pill" style="background: black; color: white; padding: 4px 10px; border-radius: 16px; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-                                    Sanji San <i class="fa-solid fa-xmark remove-person" style="cursor: pointer;"></i>
-                                </div>
-                                <div id="addPersonBtn" style="background: #cbd5e1; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.8rem; cursor: pointer; margin-left: auto; margin-right: 2px;">
-                                    <i class="fa-solid fa-plus"></i>
-                                </div>
-                            </div>
-                            <div id="peopleCounter" style="font-size: 0.7rem; font-weight: 700; color: #64748b; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-                                <i class="fa-solid fa-user-group"></i> 2 people added
-                            </div>
-                        </div>
-                        
-                        <button class="btn-confirm-booking" style="margin-top: auto;" onclick="confirmBooking('meeting')">Confirm</button>
                     </div>
-                </div>
-            </div>
-        </main>
-        <!-- Payment Modal -->
-        <div id="paymentModal" class="modal-overlay">
-            <div class="modal-content" style="position: relative;">
-                <i class="fa-solid fa-xmark" onclick="closePaymentModal()" style="position: absolute; top: 24px; right: 24px; font-size: 1.2rem; color: #1e293b; cursor: pointer;"></i>
-                
-                <h2 style="font-size: 1.3rem; font-family: 'Poppins', sans-serif; font-weight: 800; color: #1e293b; align-self: flex-start; margin-bottom: 24px;">Payment</h2>
-                
-                <img src="/images/qr_code.png" alt="QR Code" style="width: 160px; height: 160px; margin-bottom: 12px; border-radius: 8px;">
-                
-                <p style="font-size: 0.75rem; font-weight: 600; color: #64748b; margin-bottom: 20px;">Transfer fees may apply.</p>
-                
-                <h3 style="color: #2563eb; font-size: 1.1rem; font-weight: 800; margin-bottom: 8px;">HA***D R** P.</h3>
-                
-                <h4 style="font-size: 1rem; font-weight: 800; color: #1e293b; margin-bottom: 4px;">Full Payment</h4>
-                <div id="modalMeetingSubtitle" style="font-size: 0.65rem; font-weight: 600; color: #94a3b8; margin-bottom: 12px; display: none;">(please refer to the front desk for confirmation)</div>
-                
-                <div id="modalPrice" style="font-size: 1.8rem; font-weight: 800; color: #d65c29; margin-bottom: 12px;">₱250</div>
-                
-                <div style="background: #e2e8f0; border-radius: 20px; padding: 6px 16px; font-size: 0.8rem; font-weight: 700; color: #94a3b8; margin-bottom: 20px;">
-                    Ref No. : XXXX-XXX-XXXXXX
-                </div>
-                
-                <p style="font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 12px;">Attach Image</p>
-                
-                <input type="file" id="paymentImageInput" style="display: none;" accept="image/*" onchange="handleImageUpload(this)">
-                <label for="paymentImageInput" class="upload-box">
-                    <i class="fa-solid fa-upload" style="color: #d65c29; font-size: 1.2rem; margin-bottom: 8px;"></i>
-                    <span id="uploadLabelText" style="color: #d65c29; font-size: 0.75rem; font-weight: 700;">Upload image</span>
-                </label>
-                
-                <div style="display: flex; gap: 16px; width: 100%; justify-content: center; align-items: center;">
-                    <button id="modalBtnLeft" onclick="closePaymentModal()" style="padding: 12px 32px; border-radius: 24px; font-size: 1rem; font-weight: 700; background: #e2e8f0; color: #475569; border: none; cursor: pointer; transition: 0.2s;">Cancel</button>
-                    <span id="modalOrText" style="font-size: 0.9rem; font-weight: 800; color: #1e293b; display: none;">Or</span>
-                    <button id="modalBtnRight" onclick="submitPayment()" style="padding: 12px 32px; border-radius: 24px; font-size: 1rem; font-weight: 700; background: #d65c29; color: white; border: none; cursor: pointer; transition: 0.2s;">Confirm</button>
+                    
+                    <button id="btnBook" class="btn-confirm-booking" onclick="openPaymentModal()">
+                        <i class="fa-solid fa-calendar-check"></i> Confirm Reservation
+                    </button>
                 </div>
             </div>
         </div>
+    </main>
 
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal-overlay">
+        <div class="modal-content" style="position: relative;">
+            <i class="fa-solid fa-xmark" onclick="closePaymentModal()" style="position: absolute; top: 24px; right: 24px; font-size: 1.2rem; color: #1e293b; cursor: pointer;"></i>
+            
+            <h2 style="font-size: 1.3rem; font-family: 'Poppins', sans-serif; font-weight: 800; color: #1e293b; align-self: flex-start; margin-bottom: 24px;">Confirm & Pay</h2>
+            
+            <img src="/images/qr_code.png" alt="QR Code" style="width: 160px; height: 160px; margin-bottom: 12px; border-radius: 8px;">
+            
+            <p style="font-size: 0.75rem; font-weight: 600; color: #64748b; margin-bottom: 20px;">Please pay to confirm your booking.</p>
+            
+            <h3 style="color: #2563eb; font-size: 1.1rem; font-weight: 800; margin-bottom: 8px;">THE LAST MUSTER INC.</h3>
+            
+            <div id="modalSummary" style="font-size: 0.9rem; font-weight: 700; color: #1e293b; margin-bottom: 12px;">
+                Seat T1-S1 • 1 Hour
+            </div>
+            
+            <div id="modalPrice" style="font-size: 1.8rem; font-weight: 800; color: var(--orange); margin-bottom: 12px;">₱50.00</div>
+            
+            <p style="font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 12px;">Upload Proof of Payment</p>
+            
+            <input type="file" id="paymentImageInput" style="display: none;" accept="image/*" onchange="handleImageUpload(this)">
+            <label for="paymentImageInput" class="upload-box">
+                <i class="fa-solid fa-upload" style="color: var(--orange); font-size: 1.2rem; margin-bottom: 8px;"></i>
+                <span id="uploadLabelText" style="color: var(--orange); font-size: 0.75rem; font-weight: 700;">Click to upload image</span>
+            </label>
+            
+            <div style="display: flex; gap: 16px; width: 100%;">
+                <button onclick="closePaymentModal()" style="flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; background: #e2e8f0; color: #475569; border: none; cursor: pointer;">Cancel</button>
+                <button id="btnFinalSubmit" onclick="submitReservation()" style="flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; background: var(--orange); color: white; border: none; cursor: pointer;">Submit</button>
+            </div>
+        </div>
     </div>
+</div>
 
 <%- contentFor('script') %>
 <script>
-        function logout() {
-            if (confirm("Are you sure you want to logout?")) {
-                window.location.reload();
-            }
-        }
-        
-        function syncDates(source) {
-            const topPicker = document.getElementById('topDatePicker');
-            const sideTables = document.getElementById('sideDatePickerTables');
-            const sideMeeting = document.getElementById('sideDatePickerMeeting');
-            
-            if (source === 'top') {
-                sideTables.value = topPicker.value;
-                sideMeeting.value = topPicker.value;
-            } else if (source === 'sideTables') {
-                topPicker.value = sideTables.value;
-                sideMeeting.value = sideTables.value;
-            } else if (source === 'sideMeeting') {
-                topPicker.value = sideMeeting.value;
-                sideTables.value = sideMeeting.value;
-            }
-        }
-        
-        function syncTimes(source) {
-            const fromTables = document.getElementById('timeFromTables');
-            const toTables = document.getElementById('timeToTables');
-            const fromMeeting = document.getElementById('timeFromMeeting');
-            const toMeeting = document.getElementById('timeToMeeting');
-            
-            if (source === 'fromTables') {
-                fromMeeting.value = fromTables.value;
-            } else if (source === 'fromMeeting') {
-                fromTables.value = fromMeeting.value;
-            } else if (source === 'toTables') {
-                toMeeting.value = toTables.value;
-            } else if (source === 'toMeeting') {
-                toTables.value = toMeeting.value;
-            }
-        }
-        
-        function confirmBooking(type) {
-            const modalMeetingSubtitle = document.getElementById('modalMeetingSubtitle');
-            const modalPrice = document.getElementById('modalPrice');
-            const modalBtnLeft = document.getElementById('modalBtnLeft');
-            const modalOrText = document.getElementById('modalOrText');
-            const modalBtnRight = document.getElementById('modalBtnRight');
-            
-            if (type === 'meeting') {
-                modalMeetingSubtitle.style.display = 'block';
-                modalPrice.style.display = 'none';
-                modalBtnLeft.innerText = 'Counter Payment';
-                modalBtnLeft.style.color = '#d65c29';
-                modalBtnLeft.onclick = counterPayment;
-                modalOrText.style.display = 'inline';
-                modalBtnRight.innerText = 'Confirm Payment';
-            } else {
-                modalMeetingSubtitle.style.display = 'none';
-                modalPrice.style.display = 'block';
-                modalBtnLeft.innerText = 'Cancel';
-                modalBtnLeft.style.color = '#475569';
-                modalBtnLeft.onclick = closePaymentModal;
-                modalOrText.style.display = 'none';
-                modalBtnRight.innerText = 'Confirm';
-            }
-            
-            document.getElementById('paymentModal').classList.add('active');
-        }
-        
-        function handleImageUpload(input) {
-            if (input.files && input.files[0]) {
-                const textSpan = document.getElementById('uploadLabelText');
-                if (textSpan) {
-                    textSpan.innerText = input.files[0].name;
-                }
-            }
-        }
-        
-        function closePaymentModal() {
-            document.getElementById('paymentModal').classList.remove('active');
-        }
-        
-        function submitPayment() {
-            alert("Payment and Booking have been confirmed!");
-            window.location.href = "reservations.html";
-        }
-        
-        function counterPayment() {
-            alert("Booking confirmed! Please proceed to the front desk for payment.");
-            window.location.href = "reservations.html";
-        }
-        
-        // Add people functionality
-        const addPersonBtn = document.getElementById('addPersonBtn');
-        const peopleCounter = document.getElementById('peopleCounter');
-        
-        function updatePeopleCounter() {
-            const count = document.querySelectorAll('.person-pill').length;
-            if (peopleCounter) {
-                peopleCounter.innerHTML = `<i class="fa-solid fa-user-group"></i> ${count} people added`;
-            }
-        }
-        
-        function addPerson() {
-            const name = prompt("Enter the name of the person to add:");
-            if (name && name.trim()) {
-                const pill = document.createElement('div');
-                pill.className = 'person-pill';
-                pill.style.cssText = 'background: black; color: white; padding: 4px 10px; border-radius: 16px; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; gap: 6px;';
-                pill.innerHTML = `${name.trim()} <i class="fa-solid fa-xmark remove-person" style="cursor: pointer;"></i>`;
-                
-                if (addPersonBtn) {
-                    addPersonBtn.parentNode.insertBefore(pill, addPersonBtn);
-                }
-                updatePeopleCounter();
-            }
-        }
-            
-        // Dynamic map logic
-        let items = [];
+    let allItems = [];
+    let selectedItem = null;
+    let currentFilter = 'all';
 
-        async function loadLayout() {
-            try {
-                const res = await fetch('/api/layout');
-                const data = await res.json();
-                if (data && data.items) {
-                    items = data.items;
-                    renderCanvas();
-                }
-            } catch (e) {
-                console.error(e);
+    async function loadLayout() {
+        try {
+            const res = await fetch('/api/layout');
+            const data = await res.json();
+            if (data && data.items) {
+                allItems = data.items;
+                renderCanvas();
             }
+        } catch (e) {
+            console.error(e);
         }
+    }
 
-        function handleSeatClick(item) {
-            if (item.type === 'room') {
-                document.getElementById('detailsTables').style.display = 'none';
-                document.getElementById('detailsMeeting').style.display = 'flex';
-                document.querySelector('#detailsMeeting .seat-title').innerText = item.label || 'Meeting Room';
-            } else {
-                document.getElementById('detailsMeeting').style.display = 'none';
-                document.getElementById('detailsTables').style.display = 'flex';
-                document.querySelector('#detailsTables .seat-title').innerText = item.label || 'Seat';
-            }
-        }
+    function renderCanvas() {
+        const canvas = document.getElementById('canvas');
+        canvas.innerHTML = '';
+        
+        const filtered = allItems.filter(item => {
+            if (currentFilter === 'tables') return ['chair', 'chair-sq', 'round-table', 'rect-table'].includes(item.type);
+            if (currentFilter === 'rooms') return item.type === 'room';
+            return true;
+        });
 
-        function renderCanvas() {
-            const canvas = document.getElementById('canvas');
-            canvas.innerHTML = '';
-            items.forEach(item => {
-                const el = document.createElement('div');
-                el.className = 'fp-item';
-                el.style.left = item.x + 'px';
-                el.style.top = item.y + 'px';
-                el.style.width = item.w + 'px';
-                el.style.height = item.h + 'px';
-                el.style.zIndex = (item.type === 'chair' || item.type === 'chair-sq') ? 5 : item.type.startsWith('block') ? 2 : 3;
+        filtered.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'fp-item' + (selectedItem && selectedItem.id === item.id ? ' selected' : '');
+            el.style.left = item.x + 'px';
+            el.style.top = item.y + 'px';
+            el.style.width = item.w + 'px';
+            el.style.height = item.h + 'px';
+            el.style.zIndex = (item.type === 'chair' || item.type === 'chair-sq') ? 5 : item.type.startsWith('block') ? 2 : 3;
 
-                const visual = document.createElement('div');
-                visual.className = 'item-visual';
-                visual.style.transform = 'rotate(' + (item.rot || 0) + 'deg)';
+            const visual = document.createElement('div');
+            visual.className = 'item-visual';
+            visual.style.transform = `rotate(${item.rot || 0}deg)`;
 
+            if (item.type === 'chair' || item.type === 'chair-sq') {
                 if (item.type === 'chair') {
                     visual.classList.add('chair-icon');
                     visual.style.webkitMaskImage = 'url(/images/chair.png)';
                     visual.style.maskImage = 'url(/images/chair.png)';
-                    const status = item.statuses ? item.statuses[0] : 'open';
-                    if (status === 'taken') {
-                        visual.style.backgroundColor = '#d65c29';
-                    } else if (status === 'reserved') {
-                        visual.style.backgroundColor = '#1e293b';
-                    } else if (status === 'idle') {
-                        visual.style.backgroundColor = '#facc15';
-                    } else {
-                        visual.style.backgroundColor = '#10b981';
-                    }
-                    el.onclick = (e) => { e.stopPropagation(); handleSeatClick(item); };
-                } else if (item.type === 'chair-sq') {
-                    const status = item.statuses ? item.statuses[0] : 'open';
-                    const sqColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981';
-                    visual.style.background = sqColor;
+                } else {
                     visual.style.borderRadius = '6px';
-                    el.onclick = (e) => { e.stopPropagation(); handleSeatClick(item); };
-                } else if (item.type === 'round-table') {
-                    visual.style.background = 'white';
-                    visual.style.borderRadius = '50%';
-                    visual.style.border = '2px solid #1e293b';
-                } else if (item.type === 'rect-table') {
-                    visual.style.background = 'white';
-                    visual.style.borderRadius = '8px';
-                    visual.style.border = '2px solid #1e293b';
-                } else if (item.type === 'room') {
-                    const status = item.statuses ? item.statuses[0] : 'open';
-                    const roomColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : item.color;
-                    visual.style.background = roomColor;
-                    visual.style.borderRadius = '8px';
-                    visual.style.border = '2px solid #16a34a';
-                    el.onclick = (e) => { e.stopPropagation(); handleSeatClick(item); };
-                } else {
-                    visual.style.background = item.color;
-                    visual.style.borderRadius = '4px';
-                    if (item.color === '#22c55e') visual.style.border = '2px solid #16a34a';
-                    else if (item.color === '#fde68a') visual.style.border = '1.5px solid #f59e0b';
                 }
-                el.appendChild(visual);
 
-                if (item.label || item.type === 'room') {
-                    const lbl = document.createElement('span');
-                    lbl.className = 'item-label';
-                    if (item.type !== 'chair' && item.type !== 'chair-sq') {
-                        lbl.classList.add('center');
-                        const status = item.statuses ? item.statuses[0] : 'open';
-                        const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
-                        lbl.style.color = isDark ? '#fff' : '#1e293b';
-                    }
-                    lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
-                    el.appendChild(lbl);
-                }
-                canvas.appendChild(el);
-            });
-        }
-        
-        window.addEventListener('DOMContentLoaded', loadLayout);
-        
-        if (addPersonBtn) {
-            addPersonBtn.addEventListener('click', addPerson);
-        }
-        
-        document.addEventListener('click', function(e) {
-            if (e.target && e.target.classList.contains('remove-person')) {
-                e.target.closest('.person-pill').remove();
-                updatePeopleCounter();
+                const status = item.statuses ? item.statuses[0] : 'open';
+                visual.style.backgroundColor = getStatusColor(status);
+                el.onclick = () => selectItem(item);
+            } else if (item.type === 'round-table' || item.type === 'rect-table') {
+                visual.style.background = 'white';
+                visual.style.borderRadius = item.type === 'round-table' ? '50%' : '8px';
+                visual.style.border = '2px solid #1e293b';
+            } else if (item.type === 'room') {
+                const status = item.statuses ? item.statuses[0] : 'open';
+                visual.style.background = status === 'open' ? '#22c55e' : getStatusColor(status);
+                visual.style.borderRadius = '8px';
+                visual.style.border = '2px solid #16a34a';
+                el.onclick = () => selectItem(item);
+            } else {
+                visual.style.background = item.color;
+                visual.style.borderRadius = '4px';
             }
-        });
-        
-        // Simple interactivity for the segmented control
-        document.querySelectorAll('.seg-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                const mapArea = document.querySelector('.map-area');
-                mapArea.classList.remove('view-tables', 'view-meeting');
 
-                const detailsTables = document.getElementById('detailsTables');
-                const detailsMeeting = document.getElementById('detailsMeeting');
-                
-                if (btn.innerText === 'Tables') {
-                    mapArea.classList.add('view-tables');
-                    detailsTables.style.display = 'flex';
-                    detailsMeeting.style.display = 'none';
-                } else if (btn.innerText === 'Meeting Room') {
-                    mapArea.classList.add('view-meeting');
-                    detailsTables.style.display = 'none';
-                    detailsMeeting.style.display = 'flex';
-                } else {
-                    // All
-                    detailsTables.style.display = 'flex';
-                    detailsMeeting.style.display = 'none';
-                }
-            });
+            el.appendChild(visual);
+
+            if (item.label || item.type === 'room') {
+                const lbl = document.createElement('span');
+                lbl.className = 'item-label' + (['chair', 'chair-sq'].includes(item.type) ? '' : ' center');
+                const status = item.statuses ? item.statuses[0] : 'open';
+                const isDark = (status !== 'open' || item.type === 'room');
+                lbl.style.color = isDark ? '#fff' : '#1e293b';
+                lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
+                el.appendChild(lbl);
+            }
+
+            canvas.appendChild(el);
         });
+    }
+
+    function getStatusColor(status) {
+        switch(status) {
+            case 'taken': return '#d65c29';
+            case 'reserved': return '#1e293b';
+            case 'idle': return '#facc15';
+            default: return '#10b981';
+        }
+    }
+
+    function selectItem(item) {
+        // Only allow selecting interactive items
+        if (!['chair', 'chair-sq', 'room'].includes(item.type)) return;
         
-        // Seat clicking interaction to demonstrate dynamic functionality
-        document.querySelectorAll('.seat').forEach(seat => {
-            seat.addEventListener('click', (e) => {
-                // If it's green, we can select it
-                if (seat.classList.contains('bg-green')) {
-                    // Deselect previous yellow
-                    const prevYellow = document.querySelector('.seat.bg-yellow');
-                    if (prevYellow) {
-                        prevYellow.classList.remove('bg-yellow');
-                        prevYellow.classList.add('bg-green'); // Assuming we only switch between green and yellow for demo
-                    }
-                    
-                    seat.classList.remove('bg-green');
-                    seat.classList.add('bg-yellow');
-                    
-                    // Update details text
-                    const seatName = seat.innerText;
-                    // Format like "T2-S1" -> "Table 2 - Seat 1"
-                    const parts = seatName.split('-');
-                    if (parts.length === 2) {
-                        const tableNum = parts[0].replace('T', '');
-                        const seatNum = parts[1].replace('S', '');
-                        document.querySelector('.seat-title').innerText = `Table ${tableNum} - Seat ${seatNum}`;
-                    }
-                }
+        selectedItem = item;
+        renderCanvas();
+
+        document.getElementById('emptyDetails').style.display = 'none';
+        document.getElementById('activeDetails').style.display = 'flex';
+        
+        document.getElementById('detailTitle').innerText = item.label || (item.type === 'room' ? 'Meeting Room' : 'Selected Seat');
+        
+        const status = item.statuses ? item.statuses[0] : 'open';
+        const statusEl = document.getElementById('detailStatus');
+        statusEl.innerText = status.charAt(0).toUpperCase() + status.slice(1);
+        statusEl.className = 'seat-status status-' + status;
+
+        document.getElementById('detailImage').src = item.type === 'room' ? '/images/meeting_room.png' : '/images/coworking_room.png';
+        
+        document.getElementById('meetingRoomExtras').style.display = item.type === 'room' ? 'block' : 'none';
+        
+        // Disable button if not open
+        document.getElementById('btnBook').disabled = (status !== 'open');
+        document.getElementById('btnBook').innerHTML = (status === 'open') 
+            ? '<i class="fa-solid fa-calendar-check"></i> Confirm Reservation' 
+            : '<i class="fa-solid fa-lock"></i> Not Available';
+
+        // Sync date
+        document.getElementById('reservationDate').value = document.getElementById('globalDatePicker').value;
+    }
+
+    function openPaymentModal() {
+        if (!selectedItem) return;
+        
+        const date = document.getElementById('reservationDate').value;
+        const from = document.getElementById('timeFrom').value;
+        const to = document.getElementById('timeTo').value;
+        
+        document.getElementById('modalSummary').innerText = `${selectedItem.label} • ${date} • ${from}-${to}`;
+        
+        // Calculate Price (Demo: 50 per hour)
+        const h1 = parseInt(from.split(':')[0]);
+        const h2 = parseInt(to.split(':')[0]);
+        const diff = Math.max(1, h2 - h1);
+        const price = diff * 50;
+        document.getElementById('modalPrice').innerText = `₱${price.toFixed(2)}`;
+        
+        document.getElementById('paymentModal').classList.add('active');
+    }
+
+    function closePaymentModal() {
+        document.getElementById('paymentModal').classList.remove('active');
+    }
+
+    function handleImageUpload(input) {
+        if (input.files && input.files[0]) {
+            document.getElementById('uploadLabelText').innerText = input.files[0].name;
+            document.getElementById('uploadLabelText').style.color = '#10b981';
+        }
+    }
+
+    async function submitReservation() {
+        const btn = document.getElementById('btnFinalSubmit');
+        btn.disabled = true;
+        btn.innerText = 'Processing...';
+
+        const data = {
+            elementId: selectedItem.id,
+            date: document.getElementById('reservationDate').value,
+            startTime: document.getElementById('timeFrom').value,
+            endTime: document.getElementById('timeTo').value,
+            purpose: document.getElementById('meetingPurpose').value
+        };
+
+        try {
+            const res = await fetch('/customer/reserve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
             });
+            const result = await res.json();
+            
+            if (result.success) {
+                alert('Reservation successful! Redirecting to your bookings...');
+                window.location.href = '/customer/reservations';
+            } else {
+                alert('Failed to book: ' + (result.message || 'Unknown error'));
+                btn.disabled = false;
+                btn.innerText = 'Submit';
+            }
+        } catch (e) {
+            console.error(e);
+            alert('An error occurred. Please try again.');
+            btn.disabled = false;
+            btn.innerText = 'Submit';
+        }
+    }
+
+    // Segmented Control
+    document.querySelectorAll('.seg-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderCanvas();
         });
-    </script>
+    });
+
+    // Global Date Sync
+    document.getElementById('globalDatePicker').addEventListener('change', (e) => {
+        document.getElementById('reservationDate').value = e.target.value;
+    });
+
+    window.addEventListener('DOMContentLoaded', loadLayout);
+</script>

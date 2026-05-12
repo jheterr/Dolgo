@@ -20,6 +20,9 @@ app.set('view engine', 'ejs');
 app.use(expressLayouts);
 app.set('layout', 'layouts/main');
 
+// limit JSON and form data to 10MB to allow for avatar uploads
+app.use(express.json({ limit: '10mb' })); // Allows reading JSON data
+app.use(express.urlencoded({ extended: true, limit: '10mb' })); // Allows reading form data
 
 app.use(logger('dev'));
 app.use(express.json());
