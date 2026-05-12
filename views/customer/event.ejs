@@ -14,6 +14,7 @@
 .modal-body{display:flex;flex-direction:column;gap:14px;}
 .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:8px;}
 
+<<<<<<< HEAD
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .cal-title{font-family:'Poppins',sans-serif;font-size:1rem;font-weight:700;}
 .cal-nav{display:flex;gap:6px;}
@@ -198,6 +199,337 @@
             <button class="cal-nav-btn" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
             <button class="cal-nav-btn" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
+=======
+
+        /* Event Page Specific Styles */
+        .page-title {
+            font-family: 'Poppins', sans-serif; font-size: 2.2rem;
+            color: #d65c29; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 24px;
+        }
+        
+        /* Shared Calendar Styles matching Staff/Admin UI */
+        :root {
+            --border: #e2e8f0;
+            --cream-lt: #FAF7F2;
+        }
+
+        .calendar-container {
+            background: white; 
+            border-radius: var(--radius); 
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .cal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .cal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .cal-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .cal-nav-btn {
+            width: 34px;
+            height: 34px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--white);
+            cursor: pointer;
+            color: var(--text-sm);
+            font-size: 14px;
+            transition: .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cal-nav-btn:hover {
+            border-color: var(--orange);
+            color: var(--orange);
+            background: var(--cream-lt);
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .cal-head {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-sm);
+            padding: 8px 0;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+        }
+
+        .cal-day {
+            min-height: 85px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 8px;
+            background: var(--white);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .15s;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cal-day:hover {
+            border-color: var(--orange);
+            background: var(--cream-lt);
+        }
+
+        .cal-day.empty {
+            background: #f8fafc;
+            border-color: transparent;
+            cursor: default;
+        }
+
+        .cal-day.today {
+            border-color: var(--orange);
+            background: rgba(207, 99, 34, 0.05);
+        }
+
+        .cal-day.today strong {
+            color: var(--orange);
+        }
+
+        .cal-tag {
+            font-size: 9px;
+            font-weight: 700;
+            border-radius: 4px;
+            padding: 2px 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4;
+        }
+
+        .cal-tag-event {
+            background: var(--orange);
+            color: #fff;
+        }
+
+        .cal-tag-reservation {
+            background: #8A8636;
+            color: #fff;
+        }
+
+        /* Modal Styles matching Staff UI */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 28px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.2);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .btn-close-x {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text-sm);
+            cursor: pointer;
+            transition: .2s;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .btn-close-x:hover {
+            color: var(--orange);
+        }
+
+        .modal-details p {
+            font-size: 0.95rem; color: #64748b; margin-bottom: 12px; line-height: 1.5; font-weight: 500;
+        }
+        .modal-details strong {
+            color: #64748b; font-weight: 700;
+        }
+        .btn-close-modal {
+            background-color: #d65c29; color: white; border: none; padding: 10px 32px; border-radius: 24px;
+            font-weight: 700; font-size: 0.95rem; cursor: pointer; display: block; margin: 32px auto 0; transition: background 0.2s ease;
+        }
+        .btn-close-modal:hover { background-color: #bf4d1f; }
+        
+
+        /* Lists */
+        .events-bottom-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+        }
+        .events-list-container {
+            background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .events-list-title {
+            font-size: 1.2rem; font-weight: 800; color: #1e293b; margin-bottom: 16px;
+        }
+        .event-card {
+            border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+        }
+        .event-card.past { background: #f8fafc; }
+        .event-card.upcoming { background: white; }
+        .event-card-title {
+            font-size: 1rem; font-weight: 800; color: #1e293b; margin-bottom: 4px;
+        }
+        .event-card-date {
+            font-size: 0.8rem; font-weight: 500; color: #64748b;
+        }
+        .status-pill {
+            padding: 6px 12px; border-radius: 16px; font-size: 0.75rem; font-weight: 700;
+        }
+        .status-pill.completed { background: #cbd5e1; color: #1e293b; }
+        .status-pill.upcoming { background: #fed7aa; color: #d65c29; }
+        .legend {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-sm);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+    
+</style>
+
+<div class="app">
+        <%- include('../partials/customer_sidebar') %>
+
+        <main class="content" style="background-color: #f4f6f9;">
+            <h1 class="page-title">Events</h1>
+            
+            <div class="calendar-container">
+                <div class="cal-header">
+                    <div class="cal-title" id="monthYearDisplay">April 2026</div>
+                    <div class="cal-nav">
+                        <button class="cal-nav-btn" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button class="cal-nav-btn" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                
+                <div class="cal-grid" id="calendarGrid">
+                    <!-- Calendar will be injected via JS -->
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: var(--orange);"></span>
+                        <span>Events</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: #8A8636;"></span>
+                        <span>Reservations</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="events-bottom-grid">
+                <div class="events-list-container">
+                    <h2 class="events-list-title">Past Events</h2>
+                    <div class="event-card past">
+                        <div>
+                            <div class="event-card-title">Business Meeting</div>
+                            <div class="event-card-date">March 28, 2026 at 10:00 AM - 5:00 PM</div>
+                        </div>
+                        <div class="status-pill completed">Completed</div>
+                    </div>
+                </div>
+                
+                <div class="events-list-container">
+                    <h2 class="events-list-title">Upcoming Events</h2>
+                    <div class="event-card upcoming">
+                        <div>
+                            <div class="event-card-title">The Last Muster 2nd Anniversary</div>
+                            <div class="event-card-date">April 19, 2026 - Whole Day</div>
+                        </div>
+                        <div class="status-pill upcoming">Upcoming</div>
+                    </div>
+                </div>
+            </div>
+            
+        </main>
+
+        <!-- Modal -->
+        <div id="eventModal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modalTitle"></h2>
+                    <button class="btn-close-x" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-details">
+                    <p><strong>Date:</strong> <span id="modalDate"></span></p>
+                    <p><strong>Time:</strong> <span id="modalTime"></span></p>
+                    <p><strong>Description:</strong> <span id="modalDesc"></span></p>
+                </div>
+            </div>
+>>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
         </div>
         <div class="cal-grid" id="calGrid"></div>
         <div class="legend">
@@ -272,10 +604,36 @@
 
 <%- contentFor('script') %>
 <script>
+<<<<<<< HEAD
     function openSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
     function closeSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
     function openModal(id){ document.getElementById(id).classList.add('open'); }
     function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+=======
+
+        // Calendar Logic
+        let currentYear = 2026;
+        let currentMonth = 3; // 0 = Jan, 3 = April
+        
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
+        const eventsData = {
+            '2026-04-12': [{ 
+                title: 'Reserved', 
+                class: 'reserved',
+                dateStr: 'April 12, 2026',
+                time: '10:00 AM - 12:00 PM',
+                desc: 'You have a reservation for Table 5.'
+            }],
+            '2026-04-19': [{ 
+                title: 'The Last Muster 2nd Anniversary', 
+                class: 'anniversary',
+                dateStr: 'April 19, 2026',
+                time: 'Whole Day',
+                desc: 'The study hub will celebrate the 2nd Anniversary.'
+            }]
+        };
+>>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
     // Data Mapping
     const dbEvents = <%- (locals.events) ? JSON.stringify(events) : '[]' %>;
@@ -367,6 +725,7 @@
         }).join('');
     }
 
+<<<<<<< HEAD
     function showReservationDetail(res){
         const body = document.getElementById('reservationDetailBody');
         body.innerHTML = `
@@ -420,6 +779,51 @@
         document.getElementById('scheduleModalBody').innerHTML = html;
         openModal('scheduleModal');
     }
+=======
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthYearDisplay = document.getElementById('monthYearDisplay');
+            
+            grid.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div class="cal-head">${d}</div>`).join('');
+            
+            monthYearDisplay.innerText = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            // Previous month inactive days
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += '<div class="cal-day empty"></div>';
+            }
+            
+            // Current month active days
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const today = new Date();
+                const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                const isToday = dateStr === todayStr;
+                
+                let tagsHtml = '';
+                if (eventsData[dateStr]) {
+                    eventsData[dateStr].forEach(ev => {
+                        const tagClass = ev.class === 'reserved' ? 'cal-tag-reservation' : 'cal-tag-event';
+                        const icon = ev.class === 'reserved' ? '📖' : '📅';
+                        tagsHtml += `<div class="cal-tag ${tagClass}" title="${ev.title}">${icon} ${ev.title.length > 15 ? ev.title.substring(0, 12) + '…' : ev.title}</div>`;
+                    });
+                }
+                
+                const dayCell = document.createElement('div');
+                dayCell.className = `cal-day${isToday ? ' today' : ''}`;
+                dayCell.innerHTML = `<strong>${d}</strong>${tagsHtml}`;
+                
+                if (eventsData[dateStr]) {
+                    dayCell.onclick = () => showModal(eventsData[dateStr][0]); // Show first event for now
+                }
+                
+                grid.appendChild(dayCell);
+            }
+        }
+>>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
     function renderCal(){
         document.getElementById('calTitle').textContent = MN[mo] + ' ' + yr;
@@ -438,6 +842,7 @@
             if(dayEv.length + dayR.length > 2) tags += `<div class="cal-tag" style="background:#f1f5f9; color:#64748b; font-size:7px;">+${(dayEv.length+dayR.length)-2} more</div>`;
             grid.innerHTML += `<div class="cal-day ${today?'today':''}" onclick="showScheduleModal('${dateStr}')"><strong>${d}</strong>${tags}</div>`;
         }
+<<<<<<< HEAD
     }
 
     function changeMonth(dir){ mo+=dir; if(mo>11){mo=0;yr++;} if(mo<0){mo=11;yr--;} renderCal(); }
@@ -445,3 +850,10 @@
 
     renderCal(); switchView();
 </script>
+=======
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', renderCalendar);
+    </script>
+
+>>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906

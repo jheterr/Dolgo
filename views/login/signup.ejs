@@ -221,33 +221,37 @@
     <div class="logo-container">
       <img src="/images/The_Last_Muster_logo1.png" alt="Logo">
     </div>
-    <p class="subtitle" style="margin-top: 10px;">Create your account</p>
+    <% if (locals.error) { %>
+      <div style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.8rem; font-weight: 600;">
+        <%= error %>
+      </div>
+    <% } %>
 
-    <form id="signupForm" onsubmit="handleSignup(event)">
+    <form action="/login/sign-up" method="POST">
       <div class="form-row">
         <div class="form-group">
           <i class="fas fa-user-tag"></i>
-          <input type="text" class="form-control" placeholder="First Name" required id="firstName">
+          <input type="text" name="firstName" class="form-control" placeholder="First Name" required>
         </div>
         <div class="form-group">
           <i class="fas fa-user-tag"></i>
-          <input type="text" class="form-control" placeholder="Last Name" required id="lastName">
+          <input type="text" name="lastName" class="form-control" placeholder="Last Name" required>
         </div>
       </div>
       
       <div class="form-group">
         <i class="fas fa-envelope"></i>
-        <input type="email" class="form-control" placeholder="Email Address" required id="email">
+        <input type="email" name="email" class="form-control" placeholder="Email Address" required>
       </div>
       
       <div class="form-group">
         <i class="fas fa-lock"></i>
-        <input type="password" class="form-control" placeholder="Password" required id="password">
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
       </div>
       
       <div class="form-group">
         <i class="fas fa-shield-alt"></i>
-        <input type="password" class="form-control" placeholder="Confirm Password" required id="confirmPassword">
+        <input type="password" name="confirmPassword" class="form-control" placeholder="Confirm Password" required>
       </div>
 
       <button type="submit" class="btn-signup">Create account</button>
@@ -271,31 +275,6 @@
 
 <%- contentFor('script') %>
 <script>
-    function handleSignup(e) {
-      e.preventDefault();
-      const pw = document.getElementById('password').value;
-      const cpw = document.getElementById('confirmPassword').value;
-      
-      if (pw !== cpw) {
-        alert("Passwords do not match!");
-        return;
-      }
-      
-      // Simulate submission
-      const data = {
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        email: document.getElementById('email').value,
-        date: new Date().toLocaleDateString(),
-        status: 'Pending'
-      };
-      
-      // Store in localStorage to simulate "database" for the demo
-      let pending = JSON.parse(localStorage.getItem('pendingRegistrations') || '[]');
-      pending.push(data);
-      localStorage.setItem('pendingRegistrations', JSON.stringify(pending));
-      
-      alert("Registration submitted! Please wait for staff or admin to verify your account.");
-      window.location.href = '/login';
-    }
+    // Server-side handled
 </script>
+

@@ -710,315 +710,127 @@
     </div>
   </div>
 
-<%- contentFor('script') %>
 <script>
-    // Staff Data with new fields
-    let staffData = [
-      { id: 1, firstName: "Daniel", lastName: "Padilla", email: "daniel.padilla@lastmuster.com", phone: "+63 912 3456 002", location: "Manila", role: "Staff", schedule: "Mon - Fri: 8:00 AM - 5:00 PM", status: "active" },
-      { id: 2, firstName: "Joshua", lastName: "Garcia", email: "joshua.garcia@lastmuster.com", phone: "+63 912 3456 003", location: "Quezon City", role: "Staff", schedule: "Mon - Sat: 7:00 AM - 3:00 PM", status: "inactive" },
-      { id: 3, firstName: "James", lastName: "Reid", email: "james.reid@lastmuster.com", phone: "+63 912 3456 005", location: "Makati", role: "Staff", schedule: "Tue - Sat: 9:00 AM - 6:00 PM", status: "inactive" }
-    ];
-    let nextId = 4;
-    let editId = null;
+    document.addEventListener('DOMContentLoaded', loadStaff);
 
-    function getFullName(staff) {
-      return `${staff.firstName} ${staff.lastName}`;
+    async function loadStaff() {
+      try {
+        // Fetch users with admin or staff roles
+        const res = await fetch('/api/users'); 
+        const data = await res.json();
+        
+        // Filter for management roles only
+        const staff = (data.users || []).filter(u => u.role === 'admin' || u.role === 'staff');
+        renderStaffTable(staff);
+      } catch (err) { 
+        console.error('Error loading staff:', err);
+        toast("Failed to load staff accounts", "error");
+      }
     }
 
-    function renderStaff() {
-      renderDesktopTable();
-      renderMobileCards();
-    }
-
-    function renderDesktopTable() {
+    function renderStaffTable(staff) {
       const tbody = document.getElementById('staffTableBody');
-      const activeStaff = staffData.filter(s => s.status === 'active');
-      const inactiveStaff = staffData.filter(s => s.status === 'inactive');
-      
-      let html = '';
-      
-      // Active Staff Section
-      html += `<tr class="section-divider"><td colspan="8" class="divider-active"><i class="fa-solid fa-circle-check"></i> Active Staff</td></tr>`;
-      if (activeStaff.length === 0) {
-        html += `<tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">No active staff</td></tr>`;
-      } else {
-        activeStaff.forEach(s => {
-          html += `
-            <tr data-id="${s.id}">
-              <td class="td-bold">${escapeHtml(getFullName(s))}</td>
-              <td>${escapeHtml(s.email)}</td>
-              <td>${escapeHtml(s.phone)}</td>
-              <td>${escapeHtml(s.role)}</td>
-              <td>${escapeHtml(s.location || '—')}</td>
-              <td>${escapeHtml(s.schedule)}</td>
-              <td><span onclick="toggleStatus(${s.id})" class="status-toggle" style="background:#d1fae5;color:var(--green);">Active</span></td>
-              <td><button class="btn btn-ghost btn-sm" onclick="openEditModal(${s.id})"><i class="fa-solid fa-pen"></i> Edit</button></td>
-            </tr>
-          `;
-        });
-      }
-      
-      // Inactive Staff Section
-      html += `<tr class="section-divider"><td colspan="8" class="divider-inactive"><i class="fa-solid fa-circle-xmark"></i> Inactive Staff</td></tr>`;
-      if (inactiveStaff.length === 0) {
-        html += `<tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">No inactive staff</td></tr>`;
-      } else {
-        inactiveStaff.forEach(s => {
-          html += `
-            <tr data-id="${s.id}">
-              <td class="td-bold">${escapeHtml(getFullName(s))}</td>
-              <td>${escapeHtml(s.email)}</td>
-              <td>${escapeHtml(s.phone)}</td>
-              <td>${escapeHtml(s.role)}</td>
-              <td>${escapeHtml(s.location || '—')}</td>
-              <td>${escapeHtml(s.schedule)}</td>
-              <td><span onclick="toggleStatus(${s.id})" class="status-toggle" style="background:#fee2e2;color:#e53e3e;">Inactive</span></td>
-              <td><button class="btn btn-ghost btn-sm" onclick="openEditModal(${s.id})"><i class="fa-solid fa-pen"></i> Edit</button></td>
-            </tr>
-          `;
-        });
-      }
-      
-      tbody.innerHTML = html;
-    }
-
-    function renderMobileCards() {
       const container = document.getElementById('staffCardsContainer');
-      const activeStaff = staffData.filter(s => s.status === 'active');
-      const inactiveStaff = staffData.filter(s => s.status === 'inactive');
-      
-      let html = '<div class="staff-sections">';
-      
-      // Active Section
-      html += `<div class="staff-section"><div class="section-header active"><i class="fa-solid fa-circle-check"></i> Active Staff</div><div class="staff-cards">`;
-      if (activeStaff.length === 0) {
-        html += '<div class="empty-state">No active staff</div>';
-      } else {
-        activeStaff.forEach(s => {
-          html += `
-            <div class="staff-card" data-id="${s.id}">
-              <div class="staff-info">
-                <div class="staff-name">${escapeHtml(getFullName(s))} <span class="staff-role">${escapeHtml(s.role)}</span></div>
-                <div class="staff-details">
-                  <span><i class="fa-solid fa-envelope"></i> ${escapeHtml(s.email)}</span>
-                  <span><i class="fa-solid fa-phone"></i> ${escapeHtml(s.phone)}</span>
-                  <span><i class="fa-solid fa-location-dot"></i> ${escapeHtml(s.location || '—')}</span>
-                  <span><i class="fa-regular fa-calendar"></i> ${escapeHtml(s.schedule)}</span>
-                </div>
-              </div>
-              <div class="staff-status">
-                <span onclick="toggleStatus(${s.id})" class="status-toggle" style="background:#d1fae5;color:var(--green);">Active</span>
-              </div>
-              <div class="staff-actions">
-                <button class="btn-icon" onclick="openEditModal(${s.id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
-              </div>
-            </div>
-          `;
-        });
+      tbody.innerHTML = '';
+      container.innerHTML = '';
+
+      if (staff.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px; color:#94a3b8;">No staff members found.</td></tr>';
+        return;
       }
-      html += `</div></div>`;
-      
-      // Inactive Section
-      html += `<div class="staff-section"><div class="section-header inactive"><i class="fa-solid fa-circle-xmark"></i> Inactive Staff</div><div class="staff-cards">`;
-      if (inactiveStaff.length === 0) {
-        html += '<div class="empty-state">No inactive staff</div>';
-      } else {
-        inactiveStaff.forEach(s => {
-          html += `
-            <div class="staff-card" data-id="${s.id}">
-              <div class="staff-info">
-                <div class="staff-name">${escapeHtml(getFullName(s))} <span class="staff-role">${escapeHtml(s.role)}</span></div>
-                <div class="staff-details">
-                  <span><i class="fa-solid fa-envelope"></i> ${escapeHtml(s.email)}</span>
-                  <span><i class="fa-solid fa-phone"></i> ${escapeHtml(s.phone)}</span>
-                  <span><i class="fa-solid fa-location-dot"></i> ${escapeHtml(s.location || '—')}</span>
-                  <span><i class="fa-regular fa-calendar"></i> ${escapeHtml(s.schedule)}</span>
-                </div>
-              </div>
-              <div class="staff-status">
-                <span onclick="toggleStatus(${s.id})" class="status-toggle" style="background:#fee2e2;color:#e53e3e;">Inactive</span>
-              </div>
-              <div class="staff-actions">
-                <button class="btn-icon" onclick="openEditModal(${s.id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
-              </div>
+
+      staff.forEach(s => {
+        const tr = document.createElement('tr');
+        const roleLabel = s.role.charAt(0).toUpperCase() + s.role.slice(1);
+        tr.innerHTML = `
+          <td class="td-bold">${escapeHtml(s.first_name)} ${escapeHtml(s.last_name)}</td>
+          <td>${escapeHtml(s.email)}</td>
+          <td>${escapeHtml(s.phone || '—')}</td>
+          <td><span class="staff-role" style="background:${s.role==='admin'?'#fee2e2':'#e2e8f0'};color:${s.role==='admin'?'#991b1b':'#475569'};">${roleLabel}</span></td>
+          <td>${escapeHtml(s.location || '—')}</td>
+          <td>${escapeHtml(s.schedule || '—')}</td>
+          <td><span class="status-toggle" style="background:${s.status==='active'?'#d1fae5':'#fee2e2'};color:${s.status==='active'?'#166534':'#991b1b'};">${s.status==='active'?'Active':'Inactive'}</span></td>
+          <td><button class="btn btn-ghost btn-sm" onclick="removeStaff(${s.id})"><i class="fa-solid fa-trash"></i> Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+
+        const card = document.createElement('div');
+        card.className = 'staff-card';
+        card.innerHTML = `
+          <div class="staff-info">
+            <div class="staff-name">${escapeHtml(s.first_name)} ${escapeHtml(s.last_name)} <span class="staff-role">${roleLabel}</span></div>
+            <div class="staff-details">
+              <span><i class="fa-solid fa-envelope"></i> ${s.email}</span>
+              <span><i class="fa-solid fa-phone"></i> ${s.phone || '—'}</span>
             </div>
-          `;
-        });
-      }
-      html += `</div></div></div>`;
-      
-      container.innerHTML = html;
-    }
-
-    function filterStaff() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      const filteredIds = staffData.filter(s => 
-        getFullName(s).toLowerCase().includes(searchTerm) || 
-        s.email.toLowerCase().includes(searchTerm) || 
-        s.phone.toLowerCase().includes(searchTerm)
-      ).map(s => s.id);
-      
-      // Filter desktop table
-      document.querySelectorAll('#staffTableBody tr:not(.section-divider)').forEach(row => {
-        const id = parseInt(row.getAttribute('data-id'));
-        if (id) {
-          row.style.display = filteredIds.includes(id) ? '' : 'none';
-        }
-      });
-      
-      // Filter mobile cards
-      document.querySelectorAll('.staff-card').forEach(card => {
-        const id = parseInt(card.getAttribute('data-id'));
-        card.style.display = filteredIds.includes(id) ? '' : 'none';
-      });
-      
-      // Show/hide section dividers
-      const hasActive = staffData.some(s => filteredIds.includes(s.id) && s.status === 'active');
-      const hasInactive = staffData.some(s => filteredIds.includes(s.id) && s.status === 'inactive');
-      
-      const rows = document.querySelectorAll('#staffTableBody tr');
-      let activeDividerShown = false;
-      let inactiveDividerShown = false;
-      
-      rows.forEach(row => {
-        if (row.classList.contains('section-divider')) {
-          const text = row.textContent.toLowerCase();
-          if (text.includes('active')) {
-            row.style.display = hasActive ? '' : 'none';
-            activeDividerShown = true;
-          } else if (text.includes('inactive')) {
-            row.style.display = hasInactive ? '' : 'none';
-            inactiveDividerShown = true;
-          }
-        }
+          </div>
+          <div class="staff-status"><span class="status-toggle" style="background:${s.status==='active'?'#d1fae5':'#fee2e2'};color:${s.status==='active'?'#166534':'#991b1b'};">${s.status==='active'?'Active':'Inactive'}</span></div>
+        `;
+        container.appendChild(card);
       });
     }
 
-    function openAddModal() {
-      document.getElementById('addStaffModal').classList.add('show');
-      document.getElementById('s-email').value = '';
-      document.getElementById('s-firstname').value = '';
-      document.getElementById('s-lastname').value = '';
-      document.getElementById('s-phone').value = '';
-      document.getElementById('s-location').value = '';
-      document.getElementById('s-role').value = 'Staff';
-      document.getElementById('s-sched').value = '';
-      document.getElementById('s-status').value = 'active';
-    }
-
-    function addStaff() {
+    async function addStaff() {
       const email = document.getElementById('s-email').value.trim();
       const firstName = document.getElementById('s-firstname').value.trim();
       const lastName = document.getElementById('s-lastname').value.trim();
       const phone = document.getElementById('s-phone').value.trim();
       const location = document.getElementById('s-location').value.trim();
-      const role = document.getElementById('s-role').value;
-      const schedule = document.getElementById('s-sched').value.trim();
+      const role = document.getElementById('s-role').value.toLowerCase();
       const status = document.getElementById('s-status').value;
+      const schedule = document.getElementById('s-sched').value.trim();
       
-      if (!email || !firstName || !lastName) { 
-        alert("Email, First Name, and Last Name are required!"); 
-        return; 
-      }
-      if (!email.includes('@')) {
-        alert("Please enter a valid email address!");
-        return;
-      }
+      if (!email || !firstName || !lastName) { alert("Required fields missing!"); return; }
       
-      staffData.push({ 
-        id: nextId++, 
-        firstName, 
-        lastName, 
-        email, 
-        phone: phone || '—', 
-        location: location || '—', 
-        role, 
-        schedule: schedule || '—', 
-        status 
-      });
-      renderStaff();
-      closeModal('addStaffModal');
-      alert(`Staff member ${firstName} ${lastName} has been added.`);
+      try {
+        const res = await fetch('/api/users/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email, 
+            firstName, 
+            lastName, 
+            phone, 
+            location, 
+            role, 
+            status,
+            type: 'member',
+            schedule 
+          })
+        });
+        if((await res.json()).success) {
+          toast("Staff member added!", "success");
+          closeModal('addStaffModal');
+          loadStaff();
+        } else {
+          alert("Failed to add staff member. Email might already be in use.");
+        }
+      } catch (err) { console.error(err); }
     }
 
-    function openEditModal(id) {
-      const staff = staffData.find(s => s.id === id);
-      if (!staff) return;
-      editId = id;
-      document.getElementById('es-email').value = staff.email;
-      document.getElementById('es-firstname').value = staff.firstName;
-      document.getElementById('es-lastname').value = staff.lastName;
-      document.getElementById('es-phone').value = staff.phone === '—' ? '' : staff.phone;
-      document.getElementById('es-location').value = staff.location === '—' ? '' : staff.location;
-      document.getElementById('es-role').value = staff.role;
-      document.getElementById('es-sched').value = staff.schedule === '—' ? '' : staff.schedule;
-      document.getElementById('es-status').value = staff.status;
-      document.getElementById('editStaffModal').classList.add('show');
+    async function removeStaff(id) {
+      if(!confirm("Delete this staff member?")) return;
+      try {
+        const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+        if((await res.json()).success) {
+          toast("Staff removed.", "info");
+          loadStaff();
+        }
+      } catch (err) { console.error(err); }
     }
 
-    function saveStaff() {
-      const staff = staffData.find(s => s.id === editId);
-      if (!staff) return;
-      
-      const email = document.getElementById('es-email').value.trim();
-      const firstName = document.getElementById('es-firstname').value.trim();
-      const lastName = document.getElementById('es-lastname').value.trim();
-      
-      if (!email || !firstName || !lastName) {
-        alert("Email, First Name, and Last Name are required!");
-        return;
-      }
-      if (!email.includes('@')) {
-        alert("Please enter a valid email address!");
-        return;
-      }
-      
-      staff.email = email;
-      staff.firstName = firstName;
-      staff.lastName = lastName;
-      staff.phone = document.getElementById('es-phone').value.trim() || '—';
-      staff.location = document.getElementById('es-location').value.trim() || '—';
-      staff.role = document.getElementById('es-role').value;
-      staff.schedule = document.getElementById('es-sched').value.trim() || '—';
-      staff.status = document.getElementById('es-status').value;
-      
-      renderStaff();
-      closeModal('editStaffModal');
-      alert("Staff information updated successfully.");
+    function openAddModal() { openModal('addStaffModal'); }
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+    function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+    function escapeHtml(s) { return s ? String(s).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])) : ''; }
+    function toast(m, t) {
+      const el = document.createElement('div');
+      el.style.cssText = `position:fixed;bottom:20px;right:20px;background:${t==='success'?'#059669':'#1e293b'};color:white;padding:10px 20px;border-radius:8px;z-index:9999;`;
+      el.textContent = m;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
     }
+</script>
 
-    function toggleStatus(id) {
-      const staff = staffData.find(s => s.id === id);
-      if (staff) {
-        staff.status = staff.status === 'active' ? 'inactive' : 'active';
-        renderStaff();
-        alert(`Staff status changed to ${staff.status}.`);
-      }
-    }
-
-    function closeModal(id) { 
-      document.getElementById(id).classList.remove('show'); 
-    }
-    
-    function escapeHtml(str) { 
-      if (!str) return ''; 
-      return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m); 
-    }
-
-    function openSidebar() { 
-      document.getElementById('sidebar').classList.add('mobile-open'); 
-      document.getElementById('mobileOverlay').classList.add('show'); 
-    }
-    
-    function closeSidebar() { 
-      document.getElementById('sidebar').classList.remove('mobile-open'); 
-      document.getElementById('mobileOverlay').classList.remove('show'); 
-    }
-    
-    function confirmLogout() { 
-      if (confirm("Are you sure you want to logout?")) 
-        alert("Logged out successfully!"); 
-    }
-
-    renderStaff();
-  </script>

@@ -11,6 +11,7 @@
         min-height: 100vh;
     }
 
+<<<<<<< HEAD
     .page-title {
         font-family: 'Poppins', sans-serif;
         font-size: 2rem;
@@ -69,6 +70,9 @@
         font-size: 0.95rem;
         outline: none;
     }
+=======
+
+>>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
     /* Layout */
     .main-layout {
@@ -349,7 +353,12 @@
 </style>
 
 <div class="app">
+<<<<<<< HEAD
     <%- include('../partials/customer_sidebar', { active: 'Reserve New' }) %>
+=======
+        <!-- Sidebar -->
+        <%- include('../partials/customer_sidebar') %>
+>>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
     <main class="content">
         <h1 class="page-title">Reserve New Time Slot</h1>
@@ -458,9 +467,126 @@
 
 <%- contentFor('script') %>
 <script>
+<<<<<<< HEAD
     let allItems = [];
     let selectedItem = null;
     let currentFilter = 'all';
+=======
+        
+        function syncDates(source) {
+            const topPicker = document.getElementById('topDatePicker');
+            const sideTables = document.getElementById('sideDatePickerTables');
+            const sideMeeting = document.getElementById('sideDatePickerMeeting');
+            
+            if (source === 'top') {
+                sideTables.value = topPicker.value;
+                sideMeeting.value = topPicker.value;
+            } else if (source === 'sideTables') {
+                topPicker.value = sideTables.value;
+                sideMeeting.value = sideTables.value;
+            } else if (source === 'sideMeeting') {
+                topPicker.value = sideMeeting.value;
+                sideTables.value = sideMeeting.value;
+            }
+        }
+        
+        function syncTimes(source) {
+            const fromTables = document.getElementById('timeFromTables');
+            const toTables = document.getElementById('timeToTables');
+            const fromMeeting = document.getElementById('timeFromMeeting');
+            const toMeeting = document.getElementById('timeToMeeting');
+            
+            if (source === 'fromTables') {
+                fromMeeting.value = fromTables.value;
+            } else if (source === 'fromMeeting') {
+                fromTables.value = fromMeeting.value;
+            } else if (source === 'toTables') {
+                toMeeting.value = toTables.value;
+            } else if (source === 'toMeeting') {
+                toTables.value = toMeeting.value;
+            }
+        }
+        
+        function confirmBooking(type) {
+            const modalMeetingSubtitle = document.getElementById('modalMeetingSubtitle');
+            const modalPrice = document.getElementById('modalPrice');
+            const modalBtnLeft = document.getElementById('modalBtnLeft');
+            const modalOrText = document.getElementById('modalOrText');
+            const modalBtnRight = document.getElementById('modalBtnRight');
+            
+            if (type === 'meeting') {
+                modalMeetingSubtitle.style.display = 'block';
+                modalPrice.style.display = 'none';
+                modalBtnLeft.innerText = 'Counter Payment';
+                modalBtnLeft.style.color = '#d65c29';
+                modalBtnLeft.onclick = counterPayment;
+                modalOrText.style.display = 'inline';
+                modalBtnRight.innerText = 'Confirm Payment';
+            } else {
+                modalMeetingSubtitle.style.display = 'none';
+                modalPrice.style.display = 'block';
+                modalBtnLeft.innerText = 'Cancel';
+                modalBtnLeft.style.color = '#475569';
+                modalBtnLeft.onclick = closePaymentModal;
+                modalOrText.style.display = 'none';
+                modalBtnRight.innerText = 'Confirm';
+            }
+            
+            document.getElementById('paymentModal').classList.add('active');
+        }
+        
+        function handleImageUpload(input) {
+            if (input.files && input.files[0]) {
+                const textSpan = document.getElementById('uploadLabelText');
+                if (textSpan) {
+                    textSpan.innerText = input.files[0].name;
+                }
+            }
+        }
+        
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+        
+        function submitPayment() {
+            alert("Payment and Booking have been confirmed!");
+            window.location.href = "reservations.html";
+        }
+        
+        function counterPayment() {
+            alert("Booking confirmed! Please proceed to the front desk for payment.");
+            window.location.href = "reservations.html";
+        }
+        
+        // Add people functionality
+        const addPersonBtn = document.getElementById('addPersonBtn');
+        const peopleCounter = document.getElementById('peopleCounter');
+        
+        function updatePeopleCounter() {
+            const count = document.querySelectorAll('.person-pill').length;
+            if (peopleCounter) {
+                peopleCounter.innerHTML = `<i class="fa-solid fa-user-group"></i> ${count} people added`;
+            }
+        }
+        
+        function addPerson() {
+            const name = prompt("Enter the name of the person to add:");
+            if (name && name.trim()) {
+                const pill = document.createElement('div');
+                pill.className = 'person-pill';
+                pill.style.cssText = 'background: black; color: white; padding: 4px 10px; border-radius: 16px; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; gap: 6px;';
+                pill.innerHTML = `${name.trim()} <i class="fa-solid fa-xmark remove-person" style="cursor: pointer;"></i>`;
+                
+                if (addPersonBtn) {
+                    addPersonBtn.parentNode.insertBefore(pill, addPersonBtn);
+                }
+                updatePeopleCounter();
+            }
+        }
+            
+        // Dynamic map logic
+        let items = [];
+>>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
     async function loadLayout() {
         try {
@@ -656,6 +782,7 @@
             currentFilter = btn.dataset.filter;
             renderCanvas();
         });
+<<<<<<< HEAD
     });
 
     // Global Date Sync
@@ -665,3 +792,7 @@
 
     window.addEventListener('DOMContentLoaded', loadLayout);
 </script>
+=======
+    </script>
+
+>>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906

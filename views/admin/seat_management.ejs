@@ -568,43 +568,73 @@
               </div>
             </div>
           </div>
-          <div class="active-cust-card">
+          <div class="active-cust-card" id="activeCustCard">
             <div class="section-title"><i class="fa-solid fa-users"></i> Active Customers</div>
             <div class="cust-list" id="custList"></div>
           </div>
+
+          <!-- Side Detail Panel (Figma Style) -->
+          <div class="detail-panel" id="sideDetailPanel" style="display:none; margin:0; flex:none; position:relative; padding:24px; font-family:'Montserrat', sans-serif;">
+            <button onclick="closeDetail()" style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.05); border:none; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#64748b; transition:0.2s; z-index:10;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div style="background: #f1f5f9; border-radius: 14px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+              <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=400" id="detailImg" style="width: 100%; height: 160px; object-fit: cover;">
+            </div>
+            
+            <div class="detail-name" id="detailName" style="font-family:'Poppins', sans-serif; font-size: 1.4rem; font-weight:700; color: var(--text); margin-bottom: 4px;"></div>
+            <div id="detailStatusBadge" style="display:inline-block; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 24px; letter-spacing: 0.05em;">Available</div>
+
+            <!-- Selection Actions -->
+            <div id="detailActions" style="display:flex; flex-direction:column; gap:12px;">
+              <button class="btn btn-primary" id="btnAssign" onclick="showAssignForm()" style="width:100%; justify-content: center; padding:14px; border-radius:12px; font-weight:700;">
+                <i class="fa-solid fa-user-plus"></i> Assign User
+              </button>
+              <button class="btn btn-ghost" onclick="doTransfer()" style="width:100%; justify-content: center; padding:12px; border-radius:12px; border:1px solid var(--border);">
+                <i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer Seat
+              </button>
+            </div>
+
+            <!-- Assignment Form -->
+            <div id="assignForm" style="display: none;">
+              <div style="font-size: 11px; font-weight: 800; color: var(--orange); text-transform: uppercase; margin-bottom: 18px; letter-spacing:0.05em;">Customer Assignment</div>
+              
+              <div style="margin-bottom: 18px;">
+                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-md); margin-bottom: 8px;">Select Customer</label>
+                <select id="assignCustSelect" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; font-family:'Montserrat', sans-serif; background:white;">
+                  <option value="">-- Choose Customer --</option>
+                  <!-- Customers will be populated via JS -->
+                </select>
+              </div>
+              
+              <div style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-md); margin-bottom: 8px;">Subscription Plan</label>
+                <select id="assignPlan" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; font-family:'Montserrat', sans-serif; background: white;">
+                  <option value="1">1 Hour Plan - ₱40</option>
+                  <option value="3">3 Hours Plan - ₱100</option>
+                  <option value="5">5 Hours Plan (Half Day) - ₱150</option>
+                  <option value="10">10 Hours Plan (Full Day) - ₱250</option>
+                </select>
+              </div>
+
+              <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" style="flex:2; justify-content: center; padding:14px; border-radius:12px;" onclick="confirmAssignment()">
+                  <i class="fa-solid fa-check"></i> Confirm
+                </button>
+                <button class="btn btn-ghost" style="flex:1; justify-content: center; padding:14px; border-radius:12px; border:1px solid var(--border);" onclick="cancelAssignment()">
+                  Back
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
       <div id="hintText" style="text-align:center;color:var(--text-sm);font-size:11px;margin-top:12px;opacity:0.8">
         <i class="fa-regular fa-hand-pointer"></i> Select a tool, then click canvas to place. Click items to edit.
       </div>
     </main>
-  </div>
-
-  
-  <!-- Booking Modal -->
-  <div class="modal-overlay" id="bookingModal">
-    <div class="booking-modal">
-      <div class="booking-title"><i class="fa-solid fa-couch" style="color:var(--orange)"></i> Manage Seat</div>
-      <div style="font-size:12px;font-weight:700;color:var(--text-sm);margin-bottom:14px" id="bookingSeatLabel"></div>
-      <div class="booking-field">
-        <label>Customer Name</label>
-        <input type="text" id="bookingCustomer" placeholder="Search or enter customer name...">
-      </div>
-      <div class="booking-field">
-        <label>Action</label>
-        <select id="seatAction">
-          <option value="open">✅ Mark as Available (Green)</option>
-          <option value="taken">📍 Mark as Taken (Orange)</option>
-          <option value="reserve">🔵 Mark as Reserved (Dark)</option>
-          <option value="idle">🟡 Mark as Idle (Yellow)</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:20px">
-        <button class="btn btn-primary" style="flex:1" onclick="saveBooking()"><i class="fa-solid fa-check"></i>
-          Save</button>
-        <button class="btn" style="flex:1;background:#f1f5f9" onclick="closeBooking()">Cancel</button>
-      </div>
-    </div>
   </div>
 
   <!-- Unsaved Changes Modal -->
@@ -624,7 +654,7 @@
 <%- contentFor('script') %>
 <script>
     // Sidebar
-    function confirmLogout() { if (confirm('Logout?')) setTimeout(() => location.reload(), 1e3) }
+    
     function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show') }
     function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show') }
     function acceptTransfer() { confirm('Accept transfer?') }
@@ -635,7 +665,7 @@
     let mode = 'select';
     let isEditMode = false;
     let trackInterval = null;
-    let originalItems = null; // Copy of items when entering Edit Mode
+    let originalItems = null; 
     let selectedId = null;
     let dragging = null;
     let dragOff = { x: 0, y: 0 };
@@ -682,10 +712,24 @@
       { id: 54, type: 'rect-table', x: 510, y: 242, w: 80, h: 50, rot: 0, color: '#fdba74', label: 'T8' },
     ];
 
-
     async function init() {
       await loadData();
       setAppMode('track');
+    }
+
+    let allCustomers = [];
+    async function fetchCustomersForSelect() {
+      try {
+        const res = await fetch('/api/users?role=customer');
+        allCustomers = await res.json();
+        const select = document.getElementById('assignCustSelect');
+        if (select) {
+          select.innerHTML = '<option value="">-- Choose Customer --</option>';
+          allCustomers.forEach(c => {
+            select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+          });
+        }
+      } catch (e) { console.error('Error fetching customers:', e); }
     }
 
     async function loadData() {
@@ -700,6 +744,7 @@
         }
         render();
         buildCustList();
+        fetchCustomersForSelect();
       } catch (e) {
         console.error(e);
       }
@@ -793,41 +838,34 @@
         el.style.height = item.h + 'px';
         el.style.zIndex = (item.type === 'chair' || item.type === 'chair-sq') ? 5 : item.type.startsWith('block') ? 2 : 3;
 
-        // Visual container that handles rotation
         const visual = document.createElement('div');
         visual.className = 'item-visual';
         visual.style.transform = 'rotate(' + (item.rot || 0) + 'deg)';
 
         if (item.type === 'chair') {
           if (isEditMode) {
-            // Default look for editing
-            visual.classList.remove('chair-icon');
-            visual.style.webkitMaskImage = 'none';
-            visual.style.maskImage = 'none';
             visual.style.backgroundImage = 'url(/images/chair.png)';
             visual.style.backgroundSize = 'contain';
             visual.style.backgroundRepeat = 'no-repeat';
             visual.style.backgroundPosition = 'center';
-            visual.style.backgroundColor = 'transparent';
           } else {
-            // Status-colored look for tracking
             visual.classList.add('chair-icon');
             visual.style.webkitMaskImage = 'url(/images/chair.png)';
             visual.style.maskImage = 'url(/images/chair.png)';
-            if (!item.statuses) item.statuses = ['open'];
-            const status = item.statuses[0];
+            const status = (item.statuses && item.statuses[0]) || 'open';
             if (status === 'taken') visual.style.backgroundColor = '#d65c29';
             else if (status === 'reserved') visual.style.backgroundColor = '#1e293b';
             else if (status === 'idle') visual.style.backgroundColor = '#facc15';
             else visual.style.backgroundColor = '#10b981';
           }
-          el.onclick = (e) => { e.stopPropagation(); if (mode === 'select') handleSeatClick(e, item.id, 0) };
+          el.onclick = (e) => { e.stopPropagation(); handleItemClick(e, item.id) };
         } else if (item.type === 'chair-sq') {
           const status = (item.statuses && item.statuses[0]) || 'open';
           const sqColor = isEditMode ? '#faecd4' : (status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981');
           visual.style.background = sqColor;
           visual.style.borderRadius = '6px';
-          el.onclick = (e) => { e.stopPropagation(); if (mode === 'select') handleSeatClick(e, item.id, 0) };
+          visual.style.border = '2px solid #8B4513';
+          el.onclick = (e) => { e.stopPropagation(); handleItemClick(e, item.id) };
         } else if (item.type === 'round-table') {
           visual.style.background = item.color;
           visual.style.borderRadius = '50%';
@@ -842,7 +880,7 @@
           visual.style.background = roomColor;
           visual.style.borderRadius = '8px';
           visual.style.border = '2px solid #16a34a';
-          el.onclick = (e) => { e.stopPropagation(); if (mode === 'select') handleSeatClick(e, item.id, 0) };
+          el.onclick = (e) => { e.stopPropagation(); handleItemClick(e, item.id) };
         } else {
           visual.style.background = item.color;
           visual.style.borderRadius = '4px';
@@ -856,26 +894,76 @@
           lbl.className = 'item-label';
           if (item.type !== 'chair' && item.type !== 'chair-sq') {
             lbl.classList.add('center');
-            // Better contrast for centered labels
             const status = (item.statuses && item.statuses[0]) || 'open';
             const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
             lbl.style.color = isDark ? '#fff' : '#1e293b';
+          } else if (item.type === 'chair-sq') {
+            lbl.classList.add('center');
+            const status = (item.statuses && item.statuses[0]) || 'open';
+            const isDark = (status === 'taken' || status === 'reserved');
+            lbl.style.color = isDark ? '#fff' : '#1e293b';
           }
-          let text = item.label || (item.type === 'room' ? 'Room' : '');
-          lbl.textContent = text;
+          lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
           el.appendChild(lbl);
         }
 
         const del = document.createElement('button');
         del.className = 'delete-btn';
         del.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-        del.title = "Delete Item";
         del.onmousedown = e => { e.stopPropagation(); deleteItem(item.id) };
-        // Also keep onclick just in case of touch devices, but stop propagation
-        del.onclick = e => { e.stopPropagation(); };
         el.appendChild(del);
         canvas.appendChild(el);
       });
+    }
+
+    function handleItemClick(e, itemId) {
+      if (isEditMode) {
+        if (mode === 'select') canvasDown(e);
+        return;
+      }
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      const status = (item.statuses && item.statuses[0]) || 'open';
+      showDetail(item.label || 'Seat', item.label || 'ID: ' + itemId, 'Now', status === 'open');
+    }
+
+    function showDetail(name, seatLabel, time, isAvailable = false) {
+      document.getElementById('detailName').textContent = name;
+      const badge = document.getElementById('detailStatusBadge');
+      badge.textContent = isAvailable ? 'Available' : 'Occupied';
+      badge.style.background = isAvailable ? '#dcfce7' : '#fee2e2';
+      badge.style.color = isAvailable ? '#16a34a' : '#ef4444';
+
+      document.getElementById('activeCustCard').style.display = 'none';
+      document.getElementById('sideDetailPanel').style.display = 'block';
+      document.getElementById('propsPanel').classList.remove('show');
+      cancelAssignment();
+      document.getElementById('btnAssign').style.display = isAvailable ? 'flex' : 'none';
+    }
+
+    function closeDetail() {
+      document.getElementById('sideDetailPanel').style.display = 'none';
+      document.getElementById('activeCustCard').style.display = 'block';
+    }
+
+    function showAssignForm() {
+      document.getElementById('assignForm').style.display = 'block';
+      document.getElementById('detailActions').style.display = 'none';
+    }
+
+    function cancelAssignment() {
+      document.getElementById('assignForm').style.display = 'none';
+      document.getElementById('detailActions').style.display = 'flex';
+    }
+
+    function confirmAssignment() {
+      const select = document.getElementById('assignCustSelect');
+      const customerName = select.options[select.selectedIndex].text;
+      if (!select.value) { alert('Please select a customer'); return; }
+      if (confirm(`Assign ${customerName} to this seat?`)) {
+        alert('Assignment successful!');
+        cancelAssignment(); closeDetail();
+      }
     }
 
     function setMode(m) {
@@ -887,30 +975,8 @@
       if (m !== 'select') { selectedId = null; render(); hideProps() }
     }
 
-    // In view mode, clicking a seat opens booking modal; in edit mode normal select
-    function handleSeatClick(e, itemId, seatIndex) {
-      e.stopPropagation();
-      const item = items.find(i => i.id === itemId);
-      if (!item) return;
-
-      if (!isEditMode) {
-        openBooking(itemId, seatIndex);
-      } else {
-        // status cycling only in edit mode
-        const cycle = ['open', 'taken', 'reserved'];
-        if (item.type === 'chair' || item.type === 'chair-sq' || item.type === 'room') {
-          const count = 1;
-          if (!item.statuses) item.statuses = Array(count).fill('open');
-          const cur = item.statuses[seatIndex] || 'open';
-          item.statuses[seatIndex] = cycle[(cycle.indexOf(cur) + 1) % cycle.length];
-          render();
-        }
-      }
-    }
-
-    // In edit mode, clicking canvas places item; in view mode, clicking canvas deselects
     function canvasDown(e) {
-      if (!isEditMode) return; // view mode: seat clicks handled by handleSeatClick
+      if (!isEditMode) return;
       const rect = canvas.getBoundingClientRect();
       const mx = e.clientX - rect.left, my = e.clientY - rect.top;
 
@@ -948,21 +1014,14 @@
       const rect = canvas.getBoundingClientRect();
       const item = items.find(i => i.id === dragging);
       if (!item) return;
-      
-      // Calculate new position within the 800x450 board
-      let newX = e.clientX - rect.left - dragOff.x;
-      let newY = e.clientY - rect.top - dragOff.y;
-      
-      item.x = Math.max(0, Math.min(800 - item.w, newX));
-      item.y = Math.max(0, Math.min(450 - item.h, newY));
-      
+      item.x = Math.max(0, Math.min(800 - item.w, e.clientX - rect.left - dragOff.x));
+      item.y = Math.max(0, Math.min(450 - item.h, e.clientY - rect.top - dragOff.y));
       const el = canvas.querySelector(`[data-id="${dragging}"]`);
       if (el) { el.style.left = item.x + 'px'; el.style.top = item.y + 'px' }
     }
 
     function canvasUp() { dragging = null }
 
-    // Props panel — only relevant in edit mode
     function showProps(item) {
       if (!isEditMode) return;
       const p = document.getElementById('propsPanel');
@@ -972,21 +1031,13 @@
       document.getElementById('propH').value = item.h;
       document.getElementById('propRot').value = item.rot;
       document.getElementById('propColor').value = item.color;
-      
       const seatsGroup = document.getElementById('propSeatsGroup');
-      if (item.type === 'room' || item.type === 'block-green') {
+      if (item.type === 'room') {
         seatsGroup.style.display = 'block';
         document.getElementById('propSeats').value = item.seats || 0;
       } else {
         seatsGroup.style.display = 'none';
       }
-
-      // Auto-focus label for immediate editing
-      setTimeout(() => {
-        const labelInput = document.getElementById('propLabel');
-        labelInput.focus();
-        labelInput.select();
-      }, 50);
     }
     function hideProps() { document.getElementById('propsPanel').classList.remove('show') }
 
@@ -1012,48 +1063,27 @@
           body: JSON.stringify({ items })
         });
         if (res.ok) {
-          alert('Layout saved dynamically to the database!');
-          originalItems = JSON.parse(JSON.stringify(items)); // Update baseline after save
-          setAppMode('track'); // Auto-return to tracking after save
+          alert('Layout saved!');
+          originalItems = JSON.parse(JSON.stringify(items));
+          setAppMode('track');
         }
         else alert('Error saving layout');
-      } catch (e) {
-        console.error(e);
-        alert('Error saving layout');
-      }
+      } catch (e) { console.error(e); alert('Error saving layout'); }
     }
+
     async function clearAll() {
       if (!confirm('Clear all items?')) return;
       items = []; selectedId = null; hideProps(); render();
       await saveLayout();
     }
 
-    function toggleSeatStatus(itemId, seatIndex) {
-      const item = items.find(i => i.id === itemId);
-      if (!item) return;
-      const count = item.type === 'chair' ? 1 : (item.type === 'chairs-2' ? 2 : 3);
-      if (!item.statuses) item.statuses = Array(count).fill('open');
-
-      const cycle = ['open', 'taken', 'reserved'];
-      let current = item.statuses[seatIndex] || 'open';
-      let next = cycle[(cycle.indexOf(current) + 1) % cycle.length];
-      item.statuses[seatIndex] = next;
-      render();
-    }
-
-    // Customer list
-    const customers = [
-      { seat: 'T1-S1', name: 'Monkey D. Luffy', time: '09:30 AM' },
-      { seat: 'T1-S3', name: 'Brook', time: '09:10 AM' },
-      { seat: 'T2-S1', name: 'Zoro Roronoa', time: '08:45 AM' },
-      { seat: 'T2-S3', name: 'Sanji Vinsmoke', time: '11:00 AM' },
-      { seat: 'T2-S4', name: 'Nami Catburglar', time: '10:15 AM' },
-      { seat: 'T2-S6', name: 'Robin', time: '08:00 AM' },
-      { seat: 'T2-S7', name: 'Franky', time: '10:30 AM' },
-      { seat: 'T3-S1', name: 'Jinbe', time: '09:50 AM' },
-    ];
     function buildCustList() {
       const el = document.getElementById('custList'); el.innerHTML = '';
+      const customers = [
+        { seat: 'T1-S1', name: 'Monkey D. Luffy', time: '09:30 AM' },
+        { seat: 'T1-S3', name: 'Brook', time: '09:10 AM' },
+        { seat: 'T2-S1', name: 'Zoro Roronoa', time: '08:45 AM' },
+      ];
       customers.forEach(c => {
         const d = document.createElement('div'); d.className = 'cust-row';
         d.innerHTML = `<div><div class="cust-row-name">${c.name}</div><div class="cust-row-sub"><i class="fa-solid fa-couch" style="font-size:10px"></i> ${c.seat} · ${c.time}</div></div>`;
@@ -1061,41 +1091,11 @@
       });
     }
 
-    // Keyboard
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Delete' && selectedId) deleteSelected();
-      if (e.key === 'Escape') { selectedId = null; render(); hideProps() }
-    });
-
     window.onload = init;
   </script>
-<script>
-    function openBooking(itemId, seatIndex) {
-      if (isEditMode) return;
-      currentBookingItem = itemId;
-      currentBookingSeat = seatIndex;
-      const item = items.find(i => i.id === itemId);
-      const label = item ? (item.label || item.type) : 'Seat';
-      let seatLabel = label;
-      if (item && item.type === 'room' && item.seats) seatLabel += ` (Capacity: ${item.seats})`;
-      document.getElementById('bookingSeatLabel').textContent = seatLabel;
-      const status = item && item.statuses ? item.statuses[seatIndex] : 'open';
-      document.getElementById('seatAction').value = status === 'taken' ? 'taken' : status === 'reserved' ? 'reserve' : 'book';
-      document.getElementById('bookingModal').classList.add('show');
-    }
-    function closeBooking() {
-      document.getElementById('bookingModal').classList.remove('show');
-    }
-    function saveBooking() {
-      const action = document.getElementById('seatAction').value;
-      const item = items.find(i => i.id === currentBookingItem);
-      if (item) {
-        if (!item.statuses) item.statuses = ['open'];
-        item.statuses[currentBookingSeat] = action;
-        render();
-      }
-      closeBooking();
-    }
-    let currentBookingItem = null, currentBookingSeat = 0;
-    // Remove old override - handleSeatClick handles routing now
-  </script>
+<% if (locals.scripts) { %>
+    <%- locals.scripts %>
+<% } %>
+</body>
+</html>
+

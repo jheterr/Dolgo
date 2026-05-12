@@ -4,6 +4,10 @@
 <%- contentFor('style') %>
 <style>
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
         /* Reserve History Page Specific Styles */
         .content {
             background-color: #f4f6f9;
@@ -79,7 +83,7 @@
 </style>
 
 <div class="app">
-        <%- include('../partials/customer_sidebar', { active: 'Reserve History' }) %>
+        <%- include('../partials/customer_sidebar') %>
 
         <main class="content">
             <h1 class="page-title">Reserve History</h1>
@@ -130,10 +134,5 @@
     </div>
 
 <%- contentFor('script') %>
-<script>
-        function logout() {
-            if (confirm("Are you sure you want to logout?")) {
-                window.location.href = "login.html"; // Redirect to login page
-            }
-        }
-    </script>
+
+

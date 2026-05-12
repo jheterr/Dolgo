@@ -25,6 +25,16 @@
   .canvas-viewport { width: 100%; height: 500px; overflow: auto; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 10px; position: relative; display: flex; justify-content: center; align-items: flex-start; padding: 10px; }
   .canvas-board { position: relative; width: 800px; height: 450px; background: #f0f4f8; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px; cursor: default; transform-origin: 0 0; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
   .fp-item { position: absolute; user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  
+  .item-visual {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+  }
+
   .item-visual.chair-icon {
     -webkit-mask-size: contain;
     mask-size: contain;
@@ -32,6 +42,27 @@
     mask-repeat: no-repeat;
     -webkit-mask-position: center;
     mask-position: center;
+  }
+
+  .fp-item .item-label {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Poppins', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    color: #475569;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .fp-item .item-label.center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
   }
   
   .map-legend div span {
@@ -54,11 +85,14 @@
     <main class="content">
       <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
 
-      <div class="page-header">
-        <h1 class="page-title">Seat Management</h1>
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h1 class="page-title" style="margin:0">Seat Management</h1>
+          <p style="font-size:12px;color:var(--text-sm)">Real-time status tracking</p>
+        </div>
       </div>
       <div class="seat-page">
-        <div class="card">
+        <div class="card" style="padding:0;overflow:hidden;box-shadow:var(--shadow-md);border:none;background:rgba(255,255,255,0.7);backdrop-filter:blur(5px)">
           
           <div class="map-legend" style="display:flex;gap:12px;padding:8px 12px;background:rgba(255,255,255,0.6);border-radius:8px;font-size:10px;font-weight:600;margin-bottom:10px;">
             <div><span style="background:#10b981"></span>Available</div>
@@ -66,6 +100,7 @@
             <div><span style="background:#1e293b"></span>Reserved</div>
             <div><span style="background:#facc15"></span>Idle</div>
             <div><span style="background:#22c55e"></span>Meeting Room</div>
+            <span style="color:var(--orange)"><i class="fa-solid fa-hand-pointer" style="font-size:9px"></i> Click seat to view details</span>
           </div>
           
           <div class="canvas-viewport">
@@ -84,21 +119,71 @@
               </div>
             </div>
           </div>
-          <div class="active-cust-card">
+      <div class="active-cust-card" id="activeCustCard">
             <div class="section-title"><i class="fa-solid fa-users"></i> Active Customers</div>
             <div class="cust-list" id="custList"></div>
           </div>
+
+          <!-- Side Detail Panel (Figma Style) -->
+          <div class="detail-panel" id="sideDetailPanel" style="display:none; margin:0; flex:none; position:relative; padding:24px; font-family:'Montserrat', sans-serif;">
+            <button onclick="closeDetail()" style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.05); border:none; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#64748b; transition:0.2s; z-index:10;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div style="background: #f1f5f9; border-radius: 14px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+              <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=400" id="detailImg" style="width: 100%; height: 160px; object-fit: cover;">
+            </div>
+            
+            <div class="detail-name" id="detailName" style="font-family:'Poppins', sans-serif; font-size: 1.4rem; font-weight:700; color: var(--text); margin-bottom: 4px;"></div>
+            <div id="detailStatusBadge" style="display:inline-block; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 24px; letter-spacing: 0.05em;">Available</div>
+
+            <!-- Selection Actions -->
+            <div id="detailActions" style="display:flex; flex-direction:column; gap:12px;">
+              <button class="btn btn-primary" id="btnAssign" onclick="showAssignForm()" style="width:100%; justify-content: center; padding:14px; border-radius:12px; font-weight:700;">
+                <i class="fa-solid fa-user-plus"></i> Assign User
+              </button>
+              <button class="btn btn-ghost" onclick="doTransfer()" style="width:100%; justify-content: center; padding:12px; border-radius:12px; border:1px solid var(--border);">
+                <i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer Seat
+              </button>
+            </div>
+
+            <!-- Assignment Form (Hidden by default) -->
+            <div id="assignForm" style="display: none;">
+              <div style="font-size: 11px; font-weight: 800; color: var(--orange); text-transform: uppercase; margin-bottom: 18px; letter-spacing:0.05em;">Customer Assignment</div>
+              
+              <div style="margin-bottom: 18px;">
+                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-md); margin-bottom: 8px;">Select Customer</label>
+                <select id="assignCustSelect" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; font-family:'Montserrat', sans-serif; background:white;">
+                  <option value="">-- Choose Customer --</option>
+                  <!-- Customers will be populated via JS -->
+                </select>
+              </div>
+              
+              <div style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-md); margin-bottom: 8px;">Subscription Plan</label>
+                <select id="assignPlan" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; font-family:'Montserrat', sans-serif; background: white;">
+                  <option value="1">1 Hour Plan - ₱40</option>
+                  <option value="3">3 Hours Plan - ₱100</option>
+                  <option value="5">5 Hours Plan (Half Day) - ₱150</option>
+                  <option value="10">10 Hours Plan (Full Day) - ₱250</option>
+                </select>
+              </div>
+
+              <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" style="flex:2; justify-content: center; padding:14px; border-radius:12px;" onclick="confirmAssignment()">
+                  <i class="fa-solid fa-check"></i> Confirm
+                </button>
+                <button class="btn btn-ghost" style="flex:1; justify-content: center; padding:14px; border-radius:12px; border:1px solid var(--border);" onclick="cancelAssignment()">
+                  Back
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-      <div class="detail-panel" id="detailPanel" style="display:none">
-        <div class="detail-name" id="detailName"></div>
-        <div class="detail-meta" id="detailMeta"></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-primary btn-sm" onclick="doTransfer()"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer Seat</button>
-          <button class="btn btn-ghost btn-sm" onclick="closeDetail()"><i class="fa-solid fa-xmark"></i> Close</button>
-        </div>
-      </div>
-      <p id="hintText" style="text-align:center;color:var(--text-sm);font-size:12px;">
+
+      <p id="hintText" style="text-align:center;color:var(--text-sm);font-size:12px;margin-top:12px;opacity:0.8">
         <i class="fa-regular fa-hand-pointer"></i> Click a seat or customer to view details
       </p>
     </main>
@@ -106,11 +191,6 @@
 
 <%- contentFor('script') %>
 <script>
-function confirmLogout(){
-  if(confirm('Are you sure you want to logout?')){
-    setTimeout(()=>location.reload(),1500);
-  }
-}
 
 function openSidebar(){
   document.getElementById('sidebar').classList.add('mobile-open');
@@ -133,16 +213,70 @@ const customers = [
   {seat:'RT3-S4',name:'Robin',time:'08:00 AM'},
 ];
 
-function showDetail(name,seat,time){
+let allCustomers = [];
+
+async function fetchCustomersForSelect() {
+  try {
+    const res = await fetch('/api/users?role=customer');
+    allCustomers = await res.json();
+    const select = document.getElementById('assignCustSelect');
+    select.innerHTML = '<option value="">-- Choose Customer --</option>';
+    allCustomers.forEach(c => {
+      select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+    });
+  } catch (e) { console.error('Error fetching customers:', e); }
+}
+
+function showDetail(name,seat,time, isAvailable = false){
   document.getElementById('detailName').textContent = name;
-  document.getElementById('detailMeta').innerHTML = `Seat: <strong>${seat}</strong> · Started: ${time}`;
-  document.getElementById('detailPanel').style.display = 'block';
-  document.getElementById('hintText').style.display = 'none';
+  
+  const badge = document.getElementById('detailStatusBadge');
+  badge.textContent = isAvailable ? 'Available' : 'Occupied';
+  badge.style.background = isAvailable ? '#dcfce7' : '#fee2e2';
+  badge.style.color = isAvailable ? '#16a34a' : '#ef4444';
+
+  // Toggle visibility of the side cards
+  document.getElementById('activeCustCard').style.display = 'none';
+  document.getElementById('sideDetailPanel').style.display = 'block';
+  
+  // Reset form
+  cancelAssignment();
+  
+  // Only show assign button if available
+  document.getElementById('btnAssign').style.display = isAvailable ? 'flex' : 'none';
+  
+  // Pre-fetch customers for the select
+  fetchCustomersForSelect();
+}
+
+function showAssignForm() {
+  document.getElementById('assignForm').style.display = 'block';
+  document.getElementById('detailActions').style.display = 'none';
+}
+
+function cancelAssignment() {
+  document.getElementById('assignForm').style.display = 'none';
+  document.getElementById('detailActions').style.display = 'flex';
+}
+
+function confirmAssignment() {
+  const select = document.getElementById('assignCustSelect');
+  const customerId = select.value;
+  const customerName = select.options[select.selectedIndex].text;
+  
+  if(!customerId) { alert('Please select a customer'); return; }
+  
+  if(confirm(`Assign ${customerName} to this seat?`)) {
+    alert(`Successfully assigned ${customerName}!`);
+    cancelAssignment();
+    closeDetail();
+    // Real DB update would happen here
+  }
 }
 
 function closeDetail(){
-  document.getElementById('detailPanel').style.display = 'none';
-  document.getElementById('hintText').style.display = 'block';
+  document.getElementById('sideDetailPanel').style.display = 'none';
+  document.getElementById('activeCustCard').style.display = 'block';
 }
 
 function doTransfer(){
@@ -196,6 +330,12 @@ function doTransferFor(name){
 
 let items = [];
 
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 async function loadLayout() {
   try {
     const res = await fetch('/api/layout');
@@ -230,22 +370,18 @@ function renderCanvas() {
       visual.style.webkitMaskImage = 'url(/images/chair.png)';
       visual.style.maskImage = 'url(/images/chair.png)';
       const status = item.statuses ? item.statuses[0] : 'open';
-      if (status === 'taken') {
-        visual.style.backgroundColor = '#d65c29';
-      } else if (status === 'reserved') {
-        visual.style.backgroundColor = '#1e293b';
-      } else if (status === 'idle') {
-        visual.style.backgroundColor = '#facc15';
-      } else {
-        visual.style.backgroundColor = '#10b981';
-      }
-      el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Seat', item.label, '9:30 AM'); };
+      if (status === 'taken') visual.style.backgroundColor = '#d65c29';
+      else if (status === 'reserved') visual.style.backgroundColor = '#1e293b';
+      else if (status === 'idle') visual.style.backgroundColor = '#facc15';
+      else visual.style.backgroundColor = '#10b981';
+      el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Seat', item.label, '9:30 AM', status === 'open'); };
     } else if (item.type === 'chair-sq') {
       const status = item.statuses ? item.statuses[0] : 'open';
       const sqColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981';
       visual.style.background = sqColor;
       visual.style.borderRadius = '6px';
-      el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Seat', item.label, '9:30 AM'); };
+      visual.style.border = '2px solid #8B4513';
+      el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Seat', item.label, '9:30 AM', status === 'open'); };
     } else if (item.type === 'round-table') {
       visual.style.background = item.color;
       visual.style.borderRadius = '50%';
@@ -277,6 +413,11 @@ function renderCanvas() {
         const status = item.statuses ? item.statuses[0] : 'open';
         const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
         lbl.style.color = isDark ? '#fff' : '#1e293b';
+      } else if (item.type === 'chair-sq') {
+        lbl.classList.add('center');
+        const status = item.statuses ? item.statuses[0] : 'open';
+        const isDark = (status === 'taken' || status === 'reserved');
+        lbl.style.color = isDark ? '#fff' : '#1e293b';
       }
       lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
       el.appendChild(lbl);
@@ -290,3 +431,4 @@ window.onload = () => {
   loadLayout();
 };
 </script>
+

@@ -19,6 +19,7 @@
       text-transform: uppercase;
     }
 
+<<<<<<< HEAD
     /* Modal Design Sync */
     .modal-overlay {
       position: fixed;
@@ -138,6 +139,149 @@
     
     <main class="content">
       <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+=======
+
+        /* Profile Page Specific Styles */
+        .content {
+            background-color: #f4f6f9;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 32px;
+        }
+        .page-title {
+            font-family: 'Poppins', sans-serif; font-size: 2.2rem;
+            color: #d65c29; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 24px;
+        }
+        
+        .profile-layout {
+            display: flex; gap: 24px; align-items: flex-start;
+        }
+        .profile-card {
+            background: white; border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0; padding: 40px;
+        }
+        
+        /* Left Column */
+        .profile-summary {
+            flex: 0 0 320px; display: flex; flex-direction: column; align-items: center; padding: 48px 32px;
+        }
+        .profile-avatar {
+            width: 140px; height: 140px; border-radius: 50%; object-fit: cover; margin-bottom: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .profile-name {
+            font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 800;
+            color: #1e293b; margin-bottom: 4px; text-align: center; letter-spacing: -0.01em;
+        }
+        .profile-email {
+            font-size: 0.9rem; color: #64748b; font-weight: 600; margin-bottom: 16px; text-align: center;
+        }
+        .profile-plan-pill {
+            background-color: #d65c29; color: white; padding: 6px 24px; border-radius: 20px;
+            font-size: 0.9rem; font-weight: 700; margin-bottom: 40px; box-shadow: 0 4px 6px -2px rgba(214, 92, 41, 0.3);
+        }
+        .btn-edit-profile {
+            background: white; color: #1e293b; border: 1px solid #cbd5e1;
+            padding: 10px 24px; border-radius: 24px; font-weight: 700; font-size: 0.95rem;
+            cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+        }
+        .btn-edit-profile:hover {
+            background: #f8fafc; border-color: #94a3b8;
+        }
+        
+        /* Right Column */
+        .account-info {
+            flex: 1; padding: 48px;
+        }
+        .info-title {
+            font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 800;
+            color: #1e293b; margin-bottom: 8px; padding-bottom: 16px; border-bottom: 1px solid #1e293b;
+        }
+        .info-list {
+            display: flex; flex-direction: column;
+        }
+        .info-item {
+            display: flex; align-items: center; gap: 24px; padding: 20px 0; border-bottom: 1px solid #e2e8f0;
+        }
+        .info-item:last-child {
+            border-bottom: none; padding-bottom: 0;
+        }
+        .info-icon {
+            width: 44px; height: 44px; background-color: #e0e7ff; color: #d65c29;
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.15rem; flex-shrink: 0;
+        }
+        .info-text {
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .info-label {
+            font-size: 0.8rem; font-weight: 600; color: #64748b;
+        }
+        .info-value {
+            font-size: 1.05rem; font-weight: 700; color: #1e293b; line-height: 1.3;
+        }
+        
+        /* Edit Profile Modal */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: white; border-radius: 12px; padding: 32px; width: 90%; max-width: 480px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .edit-photo-container {
+            display: flex; justify-content: center; margin-bottom: 24px;
+        }
+        .edit-photo-circle {
+            width: 80px; height: 80px; background-color: #f1f5f9; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #475569; font-size: 0.65rem; font-weight: 700; text-align: center; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .edit-photo-circle:hover { background-color: #e2e8f0; }
+        .edit-photo-circle i {
+            font-size: 1.1rem; margin-bottom: 4px; color: #1e293b;
+        }
+        .edit-profile-form {
+            display: flex; flex-direction: column; gap: 16px;
+        }
+        .form-row {
+            display: flex; gap: 16px;
+        }
+        .form-group {
+            display: flex; flex-direction: column; flex: 1;
+        }
+        .form-group label {
+            font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 6px;
+        }
+        .form-input {
+            padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem;
+            color: #64748b; font-family: inherit; outline: none; transition: border-color 0.2s; font-weight: 500;
+        }
+        .form-input:focus { border-color: #d65c29; }
+        .form-actions {
+            display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;
+        }
+        .btn-cancel {
+            background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 24px;
+            border-radius: 6px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-size: 0.95rem;
+        }
+        .btn-cancel:hover { background: #f8fafc; }
+        .btn-save {
+            background: #d65c29; border: none; color: white; padding: 8px 32px;
+            border-radius: 6px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-size: 0.95rem;
+        }
+        .btn-save:hover { background: #bf4d1f; }
+    
+</style>
+
+<div class="app">
+        <%- include('../partials/customer_sidebar') %>
+>>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
       <h1 class="page-title">Profile</h1>
 
@@ -328,6 +472,7 @@
 
       console.log("Sending data:", data);
 
+<<<<<<< HEAD
       try {
         // IMPORTANT: Ensure the path starts with /customer/ if your router is mounted there
         const response = await fetch('/customer/profile/update', {
@@ -416,3 +561,7 @@
       } catch (err) { alert("Error saving image"); }
     });
 </script>
+=======
+    </script>
+
+>>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906

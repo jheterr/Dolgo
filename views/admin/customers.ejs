@@ -435,16 +435,26 @@
         </div>
       </div>
       
-      <!-- WiFi Edit Modal -->
+      <!-- Session Time Edit Modal -->
       <div class="modal-overlay" id="wifiEditModal">
         <div class="modal">
-          <div class="modal-header"><div class="modal-title"><i class="fa-solid fa-wifi"></i> Adjust WiFi Hours</div><button class="modal-close" onclick="closeModal('wifiEditModal')">&times;</button></div>
+          <div class="modal-header"><div class="modal-title"><i class="fa-solid fa-clock"></i> Extend Session Time</div><button class="modal-close" onclick="closeModal('wifiEditModal')">&times;</button></div>
           <div class="modal-body">
+            <input type="hidden" id="wifiCustomerId">
             <div class="form-group"><label class="form-label">Customer Name</label><input class="form-control" id="wifiCustomerName" type="text" readonly disabled></div>
-            <div class="form-group"><label class="form-label">Current WiFi Hours</label><input class="form-control" id="wifiCurrentHours" type="text" readonly disabled></div>
-            <div class="form-group"><label class="form-label">New WiFi Hours</label><input class="form-control" id="wifiNewHours" type="number" step="0.5" min="0" placeholder="Enter new hours"></div>
+            <div class="form-group"><label class="form-label">Current Session Ends</label><input class="form-control" id="wifiCurrentHours" type="text" readonly disabled></div>
+            <div class="form-group">
+                <label class="form-label">Add Minutes</label>
+                <select class="form-control" id="wifiAddMinutes">
+                    <option value="30">30 minutes</option>
+                    <option value="60">1 hour</option>
+                    <option value="90">1 hour 30 mins</option>
+                    <option value="120">2 hours</option>
+                    <option value="180">3 hours</option>
+                </select>
+            </div>
           </div>
-          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('wifiEditModal')">Cancel</button><button class="btn btn-primary" onclick="updateWifiHours()">Update Hours</button></div>
+          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('wifiEditModal')">Cancel</button><button class="btn btn-primary" onclick="updateWifiHours()">Extend Session</button></div>
         </div>
       </div>
       
@@ -459,22 +469,182 @@
     </main>
   </div>
 
-<%- contentFor('script') %>
 <script>
-    // Seat data for modal
     const rows = ['A', 'B', 'C', 'D'];
     const seatsPerRow = 7;
-    let occupiedSeats = ["A3", "B2", "C5", "A7", "A2", "D3", "C1", "B4", "D6"];
-    let reservedSeats = ["A3", "B2", "C5", "D3", "D6"];
+    let occupiedSeats = []; // Will be fetched later
     let selectedSeatForWalkin = null;
     let currentMacCount = 1;
-    let currentWifiCell = null;
-    let currentCustomerName = '';
 
-    function getSeatStatus(seatId) {
-      if (occupiedSeats.includes(seatId)) return 'occupied';
-      if (reservedSeats.includes(seatId)) return 'reserved';
-      return 'available';
+    document.addEventListener('DOMContentLoaded', () => {
+      loadRealUsers();
+      renderPendingTable();
+    });
+
+    async function loadRealUsers() {
+      try {
+        // Load All Customers (role=customer)
+        const resMem = await fetch('/api/users?role=customer');
+        const dataMem = await resMem.json();
+        const allCustomers = dataMem.users || [];
+        
+        // Load Active Sessions (for time info)
+        const resAct = await fetch('/api/active-customers');
+        const dataAct = await resAct.json();
+        const activeSessions = dataAct.customers || [];
+        
+        const memberBody = document.getElementById('custBody');
+        const walkinBody = document.getElementById('walkinsBody');
+        memberBody.innerHTML = '';
+        walkinBody.innerHTML = '';
+        
+        allCustomers.forEach(user => {
+          const session = activeSessions.find(s => s.id === user.id);
+          const endTime = session ? new Date(session.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'No active session';
+          
+          const tr = document.createElement('tr');
+          tr.setAttribute('data-type', user.type === 'member' ? 'Member' : 'Walk-in');
+          tr.setAttribute('data-status', session ? 'Active' : 'Inactive');
+          
+          tr.innerHTML = `
+            <td>${session?.seat_label || '—'}</td>
+            <td class="td-bold">${escapeHtml(user.first_name)} ${escapeHtml(user.last_name)}</td>
+            <td>${escapeHtml(user.email)}</td>
+            <td>${user.type === 'member' ? 'Member' : 'Walk-in'}</td>
+            <td>—</td>
+            <td class="wifi-cell">
+                ${endTime} 
+                ${session ? `<button class="wifi-edit-btn" onclick="openWifiEditModal(this, '${user.first_name} ${user.last_name}', '${endTime}', ${user.id})"><i class="fa-solid fa-pen"></i></button>` : ''}
+            </td>
+            <td>${session?.mac_address || '—'}</td>
+            <td><span class="badge badge-${session ? 'green' : 'red'}">${session ? 'Active' : 'Inactive'}</span></td>
+            <td>
+              <div style="display:flex;gap:5px">
+                <button class="btn btn-ghost btn-sm" title="View"><i class="fa-solid fa-eye"></i></button>
+                <button class="btn btn-ghost btn-sm" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-danger btn-sm" onclick="removeUser(${user.id})" title="Delete"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </td>
+          `;
+          
+          if (user.type === 'walkin') {
+            walkinBody.appendChild(tr);
+          } else {
+            memberBody.appendChild(tr);
+          }
+        });
+
+      } catch (err) { console.error(err); }
+    }
+
+    function openWifiEditModal(btn, name, currentEndTime, id) {
+        document.getElementById('wifiCustomerName').value = name;
+        document.getElementById('wifiCurrentHours').value = currentEndTime;
+        document.getElementById('wifiCustomerId').value = id;
+        openModal('wifiEditModal');
+    }
+
+    async function updateWifiHours() {
+        const id = document.getElementById('wifiCustomerId').value;
+        const minutes = document.getElementById('wifiAddMinutes').value;
+        
+        try {
+            const res = await fetch('/api/session/extend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: id, minutes: parseInt(minutes) })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast("Session extended!", "success");
+                closeModal('wifiEditModal');
+                loadRealUsers();
+            } else {
+                alert("Failed to extend session.");
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async function renderPendingTable() {
+      const tbody = document.getElementById('pendingBody');
+      const badge = document.getElementById('pendingBadge');
+      try {
+        const res = await fetch('/api/users?status=pending');
+        const data = await res.json();
+        const pending = data.users || [];
+
+        tbody.innerHTML = '';
+        if (pending.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:#94a3b8;">No pending registrations.</td></tr>';
+          badge.style.display = 'none';
+          return;
+        }
+
+        badge.textContent = pending.length;
+        badge.style.display = 'inline';
+
+        pending.forEach(req => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${new Date(req.created_at).toLocaleDateString()}</td>
+            <td class="td-bold">${escapeHtml(req.first_name)} ${escapeHtml(req.last_name)}</td>
+            <td>${escapeHtml(req.email)}</td>
+            <td><span class="badge badge-orange">Pending</span></td>
+            <td>
+              <div style="display:flex;gap:5px">
+                <button class="btn btn-primary btn-sm" style="background:#059669" onclick="approvePending(${req.id})">Approve</button>
+                <button class="btn btn-danger btn-sm" onclick="removeUser(${req.id}, 'Application rejected')">Reject</button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    async function approvePending(id) {
+      if(!confirm("Approve this user?")) return;
+      try {
+        const res = await fetch(`/api/users/approve/${id}`, { method: 'POST' });
+        if((await res.json()).success) {
+          toast("User approved!", "success");
+          renderPendingTable();
+          loadRealUsers();
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    async function removeUser(id, msg = "User removed") {
+      if(!confirm("Are you sure?")) return;
+      try {
+        const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+        if((await res.json()).success) {
+          toast(msg, "info");
+          loadRealUsers();
+          renderPendingTable();
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    async function addWalkin() {
+      const email = document.getElementById('wi-email').value.trim();
+      const firstName = document.getElementById('wi-firstname').value.trim();
+      const lastName = document.getElementById('wi-lastname').value.trim();
+      if (!firstName || !lastName || !email) { alert("Required fields missing."); return; }
+      try {
+        const res = await fetch('/api/users/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstName, lastName, email, role: 'customer', type: 'walkin' })
+        });
+        if((await res.json()).success) {
+          toast("Customer added!", "success");
+          closeModal('addWalkinModal');
+          loadRealUsers();
+        }
+      } catch (err) { console.error(err); }
     }
 
     function renderModalSeatLayout() {
@@ -485,354 +655,52 @@
         html += `<div class="modal-seat-row"><div class="modal-row-label">${r}</div><div class="modal-seats">`;
         for (let i = 1; i <= seatsPerRow; i++) {
           const seatId = `${r}${i}`;
-          const status = getSeatStatus(seatId);
-          const isSelected = (selectedSeatForWalkin === seatId);
-          html += `<div class="modal-seat ${status} ${isSelected ? 'selected' : ''}" data-seat="${seatId}" data-status="${status}"><span>${seatId}</span><span>${status === 'available' ? 'Free' : (status === 'occupied' ? 'Occ' : 'Res')}</span></div>`;
+          html += `<div class="modal-seat available" data-seat="${seatId}"><span>${seatId}</span><span>Free</span></div>`;
         }
         html += `</div></div>`;
       }
       html += '</div>';
       container.innerHTML = html;
-      
-      document.querySelectorAll('#modalSeatLayout .modal-seat').forEach(seatEl => {
-        if (seatEl.getAttribute('data-status') === 'available') {
-          seatEl.onclick = () => {
-            document.querySelectorAll('#modalSeatLayout .modal-seat').forEach(s => s.classList.remove('selected'));
-            seatEl.classList.add('selected');
-            selectedSeatForWalkin = seatEl.getAttribute('data-seat');
-            document.getElementById('selectedSeat').value = selectedSeatForWalkin;
-            document.getElementById('selectedSeatDisplay').innerHTML = `Selected seat: <strong>${selectedSeatForWalkin}</strong>`;
-          };
-        }
+      document.querySelectorAll('.modal-seat.available').forEach(el => {
+        el.onclick = () => {
+          document.querySelectorAll('.modal-seat').forEach(s => s.classList.remove('selected'));
+          el.classList.add('selected');
+          selectedSeatForWalkin = el.dataset.seat;
+          document.getElementById('selectedSeatDisplay').innerHTML = `Selected: <strong>${selectedSeatForWalkin}</strong>`;
+        };
       });
-    }
-
-    function updateMacFieldsUI() {
-      const container = document.getElementById('macFieldsContainer');
-      if(!container) return;
-      container.innerHTML = '<div class="mac-input-group"><input type="text" class="mac-input" placeholder="AA:BB:CC:DD:EE:FF"><button type="button" class="remove-mac-btn" style="display:none;"><i class="fa-solid fa-minus"></i></button></div>';
-      currentMacCount = 1;
-      const addBtn = document.getElementById('addMacBtn');
-      if(addBtn) addBtn.style.display = 'inline-flex';
     }
 
     function addNewMacField() {
-      if (currentMacCount >= 3) { alert("Maximum 3 MAC addresses allowed."); return; }
+      if (currentMacCount >= 3) return;
       const container = document.getElementById('macFieldsContainer');
       const div = document.createElement('div');
       div.className = 'mac-input-group';
-      div.innerHTML = `<input type="text" class="mac-input" placeholder="AA:BB:CC:DD:EE:FF"><button type="button" class="remove-mac-btn" onclick="this.parentElement.remove(); currentMacCount--; document.getElementById('addMacBtn').style.display = 'inline-flex';"><i class="fa-solid fa-minus"></i></button>`;
+      div.innerHTML = `<input type="text" class="mac-input" placeholder="AA:BB:CC:DD:EE:FF"><button type="button" class="remove-mac-btn" onclick="this.parentElement.remove(); currentMacCount--;"><i class="fa-solid fa-minus"></i></button>`;
       container.appendChild(div);
       currentMacCount++;
-      if (currentMacCount >= 3) document.getElementById('addMacBtn').style.display = 'none';
     }
 
-    function simulateRFIDScan() {
-      const mockRFID = "RFID_" + Math.random().toString(36).substring(2, 10).toUpperCase();
-      document.getElementById('wi-rfid').value = mockRFID;
-      alert(`✅ RFID Scanned Successfully!\nUID: ${mockRFID}`);
-    }
-
-    function addWalkin() {
-      const email = document.getElementById('wi-email').value.trim();
-      const firstName = document.getElementById('wi-firstname').value.trim();
-      const lastName = document.getElementById('wi-lastname').value.trim();
-      const seat = selectedSeatForWalkin;
-      if (!firstName || !lastName || !email || !seat) { alert("Please fill required fields."); return; }
-      if (!email.includes('@')) { alert("Valid email required."); return; }
-      if (getSeatStatus(seat) !== 'available') { alert(`Seat ${seat} unavailable.`); renderModalSeatLayout(); return; }
-      
-      const fullName = `${firstName} ${lastName}`;
-      const wifiHours = parseFloat(document.getElementById('wi-hours').value) || 2;
-      const rfid = document.getElementById('wi-rfid').value.trim() || '—';
-      const macInputs = document.querySelectorAll('.mac-input');
-      const macs = [];
-      macInputs.forEach(inp => { let val = inp.value.trim().toUpperCase(); if (val) macs.push(val); });
-      const macDisplay = macs.join(', ') || '—';
-      const status = document.getElementById('wi-status').value;
-      const displayStatus = status === 'active' ? 'Active' : 'Inactive';
-      const badgeClass = status === 'active' ? 'badge-green' : 'badge-red';
-      
-      const tbody = document.getElementById('walkinsBody');
-      const newRow = document.createElement('tr');
-      newRow.setAttribute('data-status', displayStatus);
-      newRow.innerHTML = `
-        <tr>
-          <td class="td-bold">${escapeHtml(seat)}</td>
-          <td class="td-bold">${escapeHtml(fullName)}</td>
-          <td>${escapeHtml(email)}</td>
-          <td>Walk-in</td>
-          <td>${escapeHtml(rfid)}</td>
-          <td class="wifi-cell" data-current-hours="${wifiHours}">${wifiHours} hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, '${escapeHtml(fullName)}', ${wifiHours})"><i class="fa-solid fa-pen"></i></button></td>
-          <td style="font-size:11px">${escapeHtml(macDisplay)}</td>
-          <td><span class="badge ${badgeClass}">${displayStatus}</span></td>
-          <td><div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)"><i class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm" onclick="openEditWalkinModal(this)"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm" onclick="removeWalkin(this)"><i class="fa-solid fa-trash"></i></button></div></td>
-        </tr>
-      `;
-      tbody.appendChild(newRow);
-      occupiedSeats.push(seat);
-      
-      document.getElementById('wi-email').value = '';
-      document.getElementById('wi-firstname').value = '';
-      document.getElementById('wi-lastname').value = '';
-      document.getElementById('wi-rfid').value = '';
-      document.getElementById('wi-hours').value = '2';
-      selectedSeatForWalkin = null;
-      document.getElementById('selectedSeat').value = '';
-      document.getElementById('selectedSeatDisplay').innerHTML = "No seat selected";
-      updateMacFieldsUI();
-      closeModal('addWalkinModal');
-      filterWalkins();
-      toast(`✓ Walk-in ${fullName} added to seat ${seat}`, 'success');
-    }
-
-    function openEditCustomerModal(btn) {
-      const row = btn.closest('tr');
-      const cells = row.querySelectorAll('td');
-      document.getElementById('editRowId').value = row.rowIndex;
-      document.getElementById('editSeat').value = cells[0].textContent.trim();
-      const fullName = cells[1].textContent.trim();
-      const nameParts = fullName.split(' ');
-      document.getElementById('editFirstName').value = nameParts[0] || '';
-      document.getElementById('editLastName').value = nameParts.slice(1).join(' ') || '';
-      document.getElementById('editEmail').value = cells[2].textContent.trim();
-      document.getElementById('editRfid').value = cells[4].textContent.trim();
-      document.getElementById('editMac').value = cells[6].textContent.trim();
-      const statusSpan = cells[7].querySelector('span');
-      let status = 'Active';
-      if(statusSpan.classList.contains('badge-orange')) status = 'Idle';
-      if(statusSpan.classList.contains('badge-red')) status = 'Inactive';
-      document.getElementById('editStatus').value = status;
-      openModal('editCustomerModal');
-    }
-
-    function saveCustomerEdit() {
-      const rowIndex = parseInt(document.getElementById('editRowId').value);
-      const row = document.querySelectorAll('#custBody tr')[rowIndex];
-      if(!row) return;
-      const cells = row.querySelectorAll('td');
-      const firstName = document.getElementById('editFirstName').value.trim();
-      const lastName = document.getElementById('editLastName').value.trim();
-      const fullName = `${firstName} ${lastName}`;
-      const newStatus = document.getElementById('editStatus').value;
-      const badgeClass = newStatus === 'Active' ? 'badge-green' : (newStatus === 'Idle' ? 'badge-orange' : 'badge-red');
-      
-      cells[0].textContent = document.getElementById('editSeat').value.trim();
-      cells[1].textContent = fullName;
-      cells[2].textContent = document.getElementById('editEmail').value.trim();
-      cells[4].textContent = document.getElementById('editRfid').value.trim() || '—';
-      cells[6].textContent = document.getElementById('editMac').value.trim() || '—';
-      cells[7].innerHTML = `<span class="badge ${badgeClass}">${newStatus}</span>`;
-      row.setAttribute('data-status', newStatus);
-      closeModal('editCustomerModal');
-      filterMembers();
-      toast('Customer updated successfully', 'success');
-    }
-
-    function openEditWalkinModal(btn) {
-      const row = btn.closest('tr');
-      const cells = row.querySelectorAll('td');
-      document.getElementById('editWalkinRowId').value = row.rowIndex;
-      document.getElementById('editWalkinSeat').value = cells[0].textContent.trim();
-      const fullName = cells[1].textContent.trim();
-      const nameParts = fullName.split(' ');
-      document.getElementById('editWalkinFirstName').value = nameParts[0] || '';
-      document.getElementById('editWalkinLastName').value = nameParts.slice(1).join(' ') || '';
-      document.getElementById('editWalkinEmail').value = cells[2].textContent.trim();
-      document.getElementById('editWalkinMac').value = cells[6].textContent.trim();
-      const wifiCell = cells[5];
-      const wifiHours = wifiCell.getAttribute('data-current-hours') || '2';
-      document.getElementById('editWalkinWifiHours').value = wifiHours;
-      const statusSpan = cells[7].querySelector('span');
-      let status = 'Active';
-      if(statusSpan.classList.contains('badge-orange')) status = 'Idle';
-      if(statusSpan.classList.contains('badge-red')) status = 'Inactive';
-      document.getElementById('editWalkinStatus').value = status;
-      openModal('editWalkinModal');
-    }
-
-    function saveWalkinEdit() {
-      const rowIndex = parseInt(document.getElementById('editWalkinRowId').value);
-      const row = document.querySelectorAll('#walkinsBody tr')[rowIndex];
-      if(!row) return;
-      const cells = row.querySelectorAll('td');
-      const firstName = document.getElementById('editWalkinFirstName').value.trim();
-      const lastName = document.getElementById('editWalkinLastName').value.trim();
-      const fullName = `${firstName} ${lastName}`;
-      const wifiHours = parseFloat(document.getElementById('editWalkinWifiHours').value) || 2;
-      const newStatus = document.getElementById('editWalkinStatus').value;
-      const badgeClass = newStatus === 'Active' ? 'badge-green' : (newStatus === 'Idle' ? 'badge-orange' : 'badge-red');
-      const wifiCell = cells[5];
-      
-      cells[0].textContent = document.getElementById('editWalkinSeat').value.trim();
-      cells[1].textContent = fullName;
-      cells[2].textContent = document.getElementById('editWalkinEmail').value.trim();
-      cells[6].textContent = document.getElementById('editWalkinMac').value.trim() || '—';
-      wifiCell.setAttribute('data-current-hours', wifiHours);
-      wifiCell.innerHTML = `${wifiHours} hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, '${escapeHtml(fullName)}', ${wifiHours})"><i class="fa-solid fa-pen"></i></button>`;
-      cells[7].innerHTML = `<span class="badge ${badgeClass}">${newStatus}</span>`;
-      row.setAttribute('data-status', newStatus);
-      closeModal('editWalkinModal');
-      filterWalkins();
-      toast('Walk-in updated successfully', 'success');
-    }
-
-    function openWifiEditModal(btn, customerName, currentHours) {
-      currentWifiCell = btn.closest('.wifi-cell');
-      currentCustomerName = customerName;
-      document.getElementById('wifiCustomerName').value = customerName;
-      document.getElementById('wifiCurrentHours').value = currentHours + ' hr(s)';
-      document.getElementById('wifiNewHours').value = currentHours;
-      openModal('wifiEditModal');
-    }
-
-    function updateWifiHours() {
-      if(!currentWifiCell) return;
-      const newHours = parseFloat(document.getElementById('wifiNewHours').value);
-      if(isNaN(newHours) || newHours < 0) { toast('Please enter a valid number of hours', 'error'); return; }
-      currentWifiCell.innerHTML = newHours + ' hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, \'' + escapeHtml(currentCustomerName) + '\', ' + newHours + ')"><i class="fa-solid fa-pen"></i></button>';
-      currentWifiCell.setAttribute('data-current-hours', newHours);
-      closeModal('wifiEditModal');
-      toast(`WiFi hours updated to ${newHours} hr(s) for ${currentCustomerName}`, 'success');
-    }
-
-    function viewCustomer(btn) {
-      const row = btn.closest('tr');
-      const cells = row.querySelectorAll('td');
-      showDetailModal(cells[1].textContent, cells[2].textContent, cells[3].textContent, cells[7].querySelector('span')?.textContent || 'Active', cells[5].textContent.split(' ')[0] + ' hrs', cells[4].textContent, cells[6].textContent, cells[0].textContent);
-    }
-
-    function viewWalkinCustomer(btn) {
-      const row = btn.closest('tr');
-      const cells = row.querySelectorAll('td');
-      showDetailModal(cells[1].textContent, cells[2].textContent, cells[3].textContent, cells[7].querySelector('span')?.textContent || 'Active', cells[5].textContent.split(' ')[0] + ' hrs', cells[4].textContent, cells[6].textContent, cells[0].textContent);
-    }
-
-    function showDetailModal(name, email, type, status, wifi, rfid, mac, seat) {
-      document.getElementById('viewCustBody').innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:12px;font-size:12.5px">
-          <div><small>Seat</small><div><strong>${escapeHtml(seat) || '—'}</strong></div></div>
-          <div><small>Name</small><div><strong>${escapeHtml(name)}</strong></div></div>
-          <div><small>Email</small><div><strong>${escapeHtml(email)}</strong></div></div>
-          <div><small>Type</small><div><strong>${escapeHtml(type)}</strong></div></div>
-          <div><small>Status</small><div><strong>${escapeHtml(status)}</strong></div></div>
-          <div><small>WiFi Hours</small><div><strong>${escapeHtml(wifi)}</strong></div></div>
-          <div><small>RFID</small><div><strong>${escapeHtml(rfid) || '—'}</strong></div></div>
-          <div><small>MAC Address</small><div><strong>${escapeHtml(mac) || '—'}</strong></div></div>
-        </div>
-      `;
-      openModal('viewCustModal');
-    }
-
-    function removeCustomer(btn) { if(confirm('Remove this customer?')) { btn.closest('tr').remove(); filterMembers(); toast('Customer removed', 'info'); } }
-    function removeWalkin(btn) { if(confirm('Remove this walk-in customer?')) { btn.closest('tr').remove(); filterWalkins(); toast('Walk-in removed', 'info'); } }
-
-    function filterMembers() {
-      const typeFilter = document.getElementById('memberTypeFilter').value;
-      const statusFilter = document.getElementById('memberStatusFilter').value;
-      document.querySelectorAll('#custBody tr').forEach(row => {
-        const rowType = row.getAttribute('data-type') || '';
-        const rowStatus = row.getAttribute('data-status') || '';
-        const typeMatch = typeFilter === 'all' || rowType === typeFilter;
-        const statusMatch = statusFilter === 'all' || rowStatus === statusFilter;
-        row.style.display = (typeMatch && statusMatch) ? '' : 'none';
-      });
-    }
-
-    function filterWalkins() {
-      const filterValue = document.getElementById('walkinStatusFilter').value;
-      document.querySelectorAll('#walkinsBody tr').forEach(row => {
-        const status = row.getAttribute('data-status') || '';
-        row.style.display = (filterValue === 'all' || status === filterValue) ? '' : 'none';
-      });
-    }
-
-    function searchCustomers() {
-      const q = document.getElementById('custSearch').value.toLowerCase();
-      document.querySelectorAll('#custBody tr, #walkinsBody tr').forEach(r => {
-        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
-      });
-      filterMembers();
-      filterWalkins();
-    }
-
-    function openAddWalkinModal() { renderModalSeatLayout(); updateMacFieldsUI(); selectedSeatForWalkin = null; document.getElementById('selectedSeatDisplay').innerHTML = "No seat selected"; openModal('addWalkinModal'); }
-    function openModal(id) { document.getElementById(id).classList.add('open'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-    function confirmLogout() { if(confirm('Are you sure you want to logout?')) toast('Logged out successfully', 'success'); }
-    function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
-    function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
     function switchTab(event, id) { 
-      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active')); 
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); 
+      document.querySelectorAll('.tab-panel, .tab-btn').forEach(el => el.classList.remove('active')); 
       document.getElementById(id).classList.add('active'); 
       event.currentTarget.classList.add('active'); 
       if (id === 'tab-pending') renderPendingTable();
     }
 
-    function renderPendingTable() {
-      const pending = JSON.parse(localStorage.getItem('pendingRegistrations') || '[]');
-      const tbody = document.getElementById('pendingBody');
-      const badge = document.getElementById('pendingBadge');
-      
-      tbody.innerHTML = '';
-      if (pending.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:#94a3b8;">No pending registrations found.</td></tr>';
-        badge.style.display = 'none';
-        return;
-      }
-
-      badge.textContent = pending.length;
-      badge.style.display = 'inline';
-
-      pending.forEach((req, idx) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${escapeHtml(req.date)}</td>
-          <td class="td-bold">${escapeHtml(req.firstName)} ${escapeHtml(req.lastName)}</td>
-          <td>${escapeHtml(req.email)}</td>
-          <td><span class="badge badge-orange">Pending Verification</span></td>
-          <td>
-            <div style="display:flex;gap:5px">
-              <button class="btn btn-primary btn-sm" style="background:#059669" onclick="approvePending(${idx})"><i class="fa-solid fa-check"></i> Approve</button>
-              <button class="btn btn-danger btn-sm" onclick="rejectPending(${idx})"><i class="fa-solid fa-xmark"></i> Reject</button>
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    function openAddWalkinModal() { renderModalSeatLayout(); openModal('addWalkinModal'); }
+    function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+    function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+    function escapeHtml(s) { return s ? String(s).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])) : ''; }
+    function toast(m, t) {
+      const el = document.createElement('div');
+      el.style.cssText = `position:fixed;bottom:20px;right:20px;background:${t==='success'?'#059669':'#1e293b'};color:white;padding:10px 20px;border-radius:8px;z-index:9999;`;
+      el.textContent = m;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
     }
-
-    function approvePending(idx) {
-      let pending = JSON.parse(localStorage.getItem('pendingRegistrations') || '[]');
-      const approved = pending.splice(idx, 1)[0];
-      localStorage.setItem('pendingRegistrations', JSON.stringify(pending));
-      
-      // Simulate adding to members list
-      toast(`✓ Account for ${approved.firstName} approved!`, 'success');
-      renderPendingTable();
-    }
-
-    function rejectPending(idx) {
-      if (!confirm("Are you sure you want to reject this registration?")) return;
-      let pending = JSON.parse(localStorage.getItem('pendingRegistrations') || '[]');
-      pending.splice(idx, 1);
-      localStorage.setItem('pendingRegistrations', JSON.stringify(pending));
-      toast(`Account rejected and removed.`, 'info');
-      renderPendingTable();
-    }
-
-    // Initial badge check
-    window.onload = () => {
-      const pending = JSON.parse(localStorage.getItem('pendingRegistrations') || '[]');
-      if (pending.length > 0) {
-        const badge = document.getElementById('pendingBadge');
-        badge.textContent = pending.length;
-        badge.style.display = 'inline';
-      }
-    };
-    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m)); }
-    function toast(msg, type) { const toastEl = document.createElement('div'); toastEl.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1e293b;color:white;padding:10px 20px;border-radius:8px;font-size:12px;z-index:9999;'; if(type === 'error') toastEl.style.background = '#dc2626'; if(type === 'success') toastEl.style.background = '#059669'; toastEl.innerHTML = msg; document.body.appendChild(toastEl); setTimeout(() => toastEl.remove(), 2000); }
-
     document.getElementById('addMacBtn')?.addEventListener('click', addNewMacField);
-  </script>
+</script>
+

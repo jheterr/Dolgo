@@ -366,12 +366,6 @@ function setEventBanner(eventId, imageData) {
   localStorage.setItem('eventCustomBanners', JSON.stringify(eventCustomBanners));
 }
 
-function confirmLogout(){
-  if(confirm('Are you sure you want to logout?')){
-    alert('Logging out...');
-    setTimeout(()=>location.reload(),1500);
-  }
-}
 
 function openSidebar(){
   document.getElementById('sidebar').classList.add('mobile-open');
@@ -732,3 +726,4 @@ function escapeHtml(str){ if(!str)return ''; return String(str).replace(/[&<>]/g
 
 renderCal(); switchView();
 </script>
+

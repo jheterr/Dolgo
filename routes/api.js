@@ -62,4 +62,108 @@ router.post('/layout', async (req, res) => {
     }
 });
 
+// Get users by status/role
+router.get('/users', async (req, res) => {
+    const { status, role, type } = req.query;
+    let query = 'SELECT id, email, first_name, last_name, role, type, status, phone, location, schedule, created_at FROM users WHERE role != "super_admin"';
+    const params = [];
+
+    if (status) { query += ' AND status = ?'; params.push(status); }
+    if (role) { query += ' AND role = ?'; params.push(role); }
+    if (type) { query += ' AND type = ?'; params.push(type); }
+
+    try {
+        const [users] = await db.query(query, params);
+        res.json({ users });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Approve user
+router.post('/users/approve/:id', async (req, res) => {
+    try {
+        await db.query('UPDATE users SET status = "active" WHERE id = ?', [req.params.id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
+// Add user (Admin/Staff)
+router.post('/users/add', async (req, res) => {
+    const { firstName, lastName, email, role, type, password, phone, location, schedule } = req.body;
+    const bcrypt = require('bcryptjs');
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password || '123456', salt); // Default pass if none provided
+
+        await db.query(
+            'INSERT INTO users (username, email, password_hash, role, type, status, first_name, last_name, phone, location, schedule) VALUES (?, ?, ?, ?, ?, "active", ?, ?, ?, ?, ?)',
+            [email, email, hashedPassword, role || 'customer', type || 'member', firstName, lastName, phone || null, location || null, schedule || null]
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
+// Delete user
+router.delete('/users/:id', async (req, res) => {
+    try {
+        await db.query('DELETE FROM users WHERE id = ?', [req.params.id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
+// Extend active session
+router.post('/session/extend', async (req, res) => {
+    const { minutes, userId } = req.body;
+    // Admin/Staff can specify userId, otherwise use session user (for customer self-extend)
+    const targetUserId = userId || (req.session.user ? req.session.user.id : null);
+    
+    if (!targetUserId || !minutes) {
+        return res.status(400).json({ success: false, error: 'Invalid request' });
+    }
+    
+    try {
+        await db.query(
+            'UPDATE active_sessions SET end_time = DATE_ADD(end_time, INTERVAL ? MINUTE) WHERE user_id = ? AND status = "active"',
+            [minutes, targetUserId]
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
+// Get active customers with their sessions and seats
+router.get('/active-customers', async (req, res) => {
+    try {
+        const [customers] = await db.query(`
+            SELECT u.id, u.first_name, u.last_name, u.email, u.role, u.type, 
+                   s.start_time, s.end_time, s.mac_address, s.ip_address,
+                   fe.label as seat_label
+            FROM users u
+            JOIN active_sessions s ON u.id = s.user_id
+            LEFT JOIN reservations r ON u.id = r.user_id AND r.status = 'confirmed'
+            LEFT JOIN floor_elements fe ON r.element_id = fe.id
+            WHERE s.status = 'active'
+            ORDER BY s.created_at DESC
+        `);
+        res.json({ customers });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 module.exports = router;
