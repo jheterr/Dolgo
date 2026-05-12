@@ -9,7 +9,6 @@
         min-height: 100vh;
     }
 
-<<<<<<< HEAD
     .page-title {
         font-family: 'Poppins', sans-serif;
         font-size: 2rem;
@@ -18,147 +17,6 @@
         margin-bottom: 24px;
         letter-spacing: -0.02em;
     }
-=======
-
-
-        .content {
-            padding: 40px;
-        }
-
-        .page-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 2rem;
-            font-weight: 800;
-            color: #d65c29;
-            margin-bottom: 24px;
-            letter-spacing: -0.02em;
-        }
-        
-        .active-session-card {
-            background-color: #b7dbbf;
-            border-radius: 12px;
-            padding: 32px 40px;
-            position: relative;
-            margin-bottom: 32px;
-        }
-
-        .badge-active {
-            background-color: #10b981;
-            color: white;
-            padding: 8px 24px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .badge-completed {
-            background-color: #71717a;
-            color: white;
-            padding: 8px 24px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        .session-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #27593c;
-            margin-bottom: 8px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .session-subtitle {
-            font-size: 1.1rem;
-            color: #27593c;
-            font-weight: 700;
-            margin-bottom: 36px;
-        }
-
-        .metric-group {
-            display: flex;
-            gap: 64px;
-        }
-
-        .metric-label {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #27593c;
-            margin-bottom: 4px;
-        }
-
-        .metric-value {
-            font-size: 4rem;
-            font-weight: 800;
-            color: #27593c;
-            line-height: 1;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .section-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #d65c29;
-            margin-bottom: 16px;
-        }
-
-        .reservations-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .reservations-table thead tr {
-            background-color: #cfd8f2;
-        }
-
-        .reservations-table th {
-            padding: 20px 24px;
-            font-size: 0.85rem;
-            font-weight: 800;
-            color: #475569;
-            text-transform: uppercase;
-        }
-
-        .reservations-table td {
-            padding: 24px;
-            font-weight: 700;
-            color: #1e293b;
-            font-size: 1rem;
-        }
-
-        .reservations-table tbody tr {
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .reservations-table tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        .btn-reserve {
-            background-color: #d65c29;
-            color: white;
-            border: none;
-            border-radius: 24px;
-            padding: 14px 32px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-        }
-
-        .btn-reserve:hover {
-            background-color: #c25021;
-        }
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
     
     /* Approved Green Session Card */
     .active-session-card {
@@ -332,12 +190,7 @@
 </style>
 
 <div class="app">
-<<<<<<< HEAD
     <%- include('../partials/customer_sidebar', { active: 'Reservations' }) %>
-=======
-        <!-- Sidebar -->
-        <%- include('../partials/customer_sidebar') %>
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
     <main class="content">
         <h1 class="page-title">My Bookings</h1>
@@ -439,7 +292,6 @@
 </div>
 
 <%- contentFor('script') %>
-<<<<<<< HEAD
 <script>
     <% if (session) { %>
         let timeLeft = 0;
@@ -467,8 +319,3 @@
         updateTimer();
     <% } %>
 </script>
-=======
-    <script>
-    </script>
-
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906

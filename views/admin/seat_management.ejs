@@ -558,14 +558,7 @@
           <div class="transfer-card">
             <div class="transfer-title"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer Seat Request</div>
             <div class="transfer-info">
-              <div class="transfer-name">Monkey D. Luffy</div>
-              <div class="transfer-sub">Current: T3-S1 → Requested: RT2-S2</div>
-              <div class="transfer-btns">
-                <button class="btn btn-success btn-sm" onclick="acceptTransfer()" style="flex:1"><i
-                    class="fa-solid fa-check"></i> Accept</button>
-                <button class="btn btn-danger btn-sm" onclick="declineTransfer()" style="flex:1"><i
-                    class="fa-solid fa-xmark"></i> Decline</button>
-              </div>
+              <!-- Dynamically populated -->
             </div>
           </div>
           <div class="active-cust-card" id="activeCustCard">
@@ -579,8 +572,12 @@
               <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <div style="background: #f1f5f9; border-radius: 14px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <div style="background: #f1f5f9; border-radius: 14px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
               <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=400" id="detailImg" style="width: 100%; height: 160px; object-fit: cover;">
+              <button onclick="document.getElementById('seat-img-input').click()" style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:20px; padding:6px 12px; font-size:10px; cursor:pointer; backdrop-filter:blur(4px);">
+                <i class="fa-solid fa-camera"></i> Change
+              </button>
+              <input type="file" id="seat-img-input" style="display:none" accept="image/*" onchange="changeSeatImage(event)">
             </div>
             
             <div class="detail-name" id="detailName" style="font-family:'Poppins', sans-serif; font-size: 1.4rem; font-weight:700; color: var(--text); margin-bottom: 4px;"></div>
@@ -591,7 +588,7 @@
               <button class="btn btn-primary" id="btnAssign" onclick="showAssignForm()" style="width:100%; justify-content: center; padding:14px; border-radius:12px; font-weight:700;">
                 <i class="fa-solid fa-user-plus"></i> Assign User
               </button>
-              <button class="btn btn-ghost" onclick="doTransfer()" style="width:100%; justify-content: center; padding:12px; border-radius:12px; border:1px solid var(--border);">
+              <button class="btn btn-ghost" id="btnTransfer" onclick="startManualTransfer()" style="width:100%; justify-content: center; padding:12px; border-radius:12px; border:1px solid var(--border);">
                 <i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer Seat
               </button>
             </div>
@@ -657,8 +654,22 @@
     
     function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show') }
     function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show') }
-    function acceptTransfer() { confirm('Accept transfer?') }
-    function declineTransfer() { confirm('Decline transfer?') }
+    
+    async function acceptTransfer(id) {
+        if(!confirm('Accept transfer?')) return;
+        try {
+            const res = await fetch(`/api/transfer-requests/${id}/approve`, { method: 'POST' });
+            if((await res.json()).success) { loadData(); loadTransferRequests(); }
+        } catch(e) { console.error(e); }
+    }
+    
+    async function declineTransfer(id) {
+        if(!confirm('Decline transfer?')) return;
+        try {
+            const res = await fetch(`/api/transfer-requests/${id}/decline`, { method: 'POST' });
+            if((await res.json()).success) { loadTransferRequests(); }
+        } catch(e) { console.error(e); }
+    }
 
     // State
     let items = [];
@@ -714,7 +725,32 @@
 
     async function init() {
       await loadData();
+      await loadTransferRequests();
       setAppMode('track');
+    }
+
+    async function loadTransferRequests() {
+        try {
+            const res = await fetch('/api/transfer-requests');
+            const data = await res.json();
+            const container = document.querySelector('.transfer-card');
+            const info = container.querySelector('.transfer-info');
+            
+            if (data.requests && data.requests.length > 0) {
+                container.style.display = 'block';
+                const r = data.requests[0]; // Show first pending
+                info.innerHTML = `
+                    <div class="transfer-name">${r.first_name} ${r.last_name}</div>
+                    <div class="transfer-sub">Current: ${r.current_label} → Requested: ${r.requested_label}</div>
+                    <div class="transfer-btns">
+                        <button class="btn btn-success btn-sm" onclick="acceptTransfer(${r.id})" style="flex:1"><i class="fa-solid fa-check"></i> Accept</button>
+                        <button class="btn btn-danger btn-sm" onclick="declineTransfer(${r.id})" style="flex:1"><i class="fa-solid fa-xmark"></i> Decline</button>
+                    </div>
+                `;
+            } else {
+                container.style.display = 'none';
+            }
+        } catch(e) { console.error(e); }
     }
 
     let allCustomers = [];
@@ -726,7 +762,7 @@
         if (select) {
           select.innerHTML = '<option value="">-- Choose Customer --</option>';
           allCustomers.forEach(c => {
-            select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+            select.innerHTML += `<option value="${c.id}">${c.first_name} ${c.last_name}</option>`;
           });
         }
       } catch (e) { console.error('Error fetching customers:', e); }
@@ -793,7 +829,10 @@
         hideProps();
         document.getElementById('hintText').innerHTML = '<i class="fa-solid fa-radar"></i> Live Tracking: Auto-refreshing statuses every 5s.';
         if (trackInterval) clearInterval(trackInterval);
-        trackInterval = setInterval(loadData, 5000);
+        trackInterval = setInterval(() => {
+          loadData();
+          loadTransferRequests();
+        }, 5000);
       }
       render();
     }
@@ -852,7 +891,7 @@
             visual.classList.add('chair-icon');
             visual.style.webkitMaskImage = 'url(/images/chair.png)';
             visual.style.maskImage = 'url(/images/chair.png)';
-            const status = (item.statuses && item.statuses[0]) || 'open';
+            const status = item.status || 'open';
             if (status === 'taken') visual.style.backgroundColor = '#d65c29';
             else if (status === 'reserved') visual.style.backgroundColor = '#1e293b';
             else if (status === 'idle') visual.style.backgroundColor = '#facc15';
@@ -860,7 +899,7 @@
           }
           el.onclick = (e) => { e.stopPropagation(); handleItemClick(e, item.id) };
         } else if (item.type === 'chair-sq') {
-          const status = (item.statuses && item.statuses[0]) || 'open';
+          const status = item.status || 'open';
           const sqColor = isEditMode ? '#faecd4' : (status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981');
           visual.style.background = sqColor;
           visual.style.borderRadius = '6px';
@@ -875,7 +914,7 @@
           visual.style.borderRadius = '8px';
           visual.style.border = '2px solid #f97316';
         } else if (item.type === 'room') {
-          const status = (item.statuses && item.statuses[0]) || 'open';
+          const status = item.status || 'open';
           const roomColor = status === 'taken' ? '#9ca3af' : status === 'reserved' ? '#ef4444' : item.color;
           visual.style.background = roomColor;
           visual.style.borderRadius = '8px';
@@ -894,12 +933,12 @@
           lbl.className = 'item-label';
           if (item.type !== 'chair' && item.type !== 'chair-sq') {
             lbl.classList.add('center');
-            const status = (item.statuses && item.statuses[0]) || 'open';
+            const status = item.status || 'open';
             const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
             lbl.style.color = isDark ? '#fff' : '#1e293b';
           } else if (item.type === 'chair-sq') {
             lbl.classList.add('center');
-            const status = (item.statuses && item.statuses[0]) || 'open';
+            const status = item.status || 'open';
             const isDark = (status === 'taken' || status === 'reserved');
             lbl.style.color = isDark ? '#fff' : '#1e293b';
           }
@@ -923,22 +962,56 @@
       }
       const item = items.find(i => i.id === itemId);
       if (!item) return;
-      const status = (item.statuses && item.statuses[0]) || 'open';
-      showDetail(item.label || 'Seat', item.label || 'ID: ' + itemId, 'Now', status === 'open');
+      const status = item.status || 'open';
+      showDetail(item.label || 'Seat', item.label || 'ID: ' + itemId, 'Now', status === 'open', item.id, item.image);
     }
 
-    function showDetail(name, seatLabel, time, isAvailable = false) {
+    let currentSelectedElementId = null;
+    let currentSelectedElementLabel = null;
+    function showDetail(name, seatLabel, time, isAvailable = false, elementId, image) {
+      currentSelectedElementId = elementId;
+      currentSelectedElementLabel = seatLabel;
       document.getElementById('detailName').textContent = name;
       const badge = document.getElementById('detailStatusBadge');
       badge.textContent = isAvailable ? 'Available' : 'Occupied';
       badge.style.background = isAvailable ? '#dcfce7' : '#fee2e2';
       badge.style.color = isAvailable ? '#16a34a' : '#ef4444';
 
+      const detailImg = document.getElementById('detailImg');
+      detailImg.src = image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=400';
+
       document.getElementById('activeCustCard').style.display = 'none';
       document.getElementById('sideDetailPanel').style.display = 'block';
       document.getElementById('propsPanel').classList.remove('show');
       cancelAssignment();
       document.getElementById('btnAssign').style.display = isAvailable ? 'flex' : 'none';
+    }
+
+    async function changeSeatImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const imageData = e.target.result;
+            try {
+                const res = await fetch('/api/floor-elements/image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ label: currentSelectedElementLabel, image: imageData })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('detailImg').src = imageData;
+                    // Update local items array too
+                    const item = items.find(i => i.id === currentSelectedElementId);
+                    if (item) item.image = imageData;
+                }
+            } catch (err) {
+                console.error('Error uploading image:', err);
+            }
+        };
+        reader.readAsDataURL(file);
     }
 
     function closeDetail() {
@@ -956,13 +1029,28 @@
       document.getElementById('detailActions').style.display = 'flex';
     }
 
-    function confirmAssignment() {
+    async function confirmAssignment() {
       const select = document.getElementById('assignCustSelect');
+      const planSelect = document.getElementById('assignPlan');
+      const userId = select.value;
+      const hours = parseInt(planSelect.value);
+      
+      if (!userId) { alert('Please select a customer'); return; }
+      
       const customerName = select.options[select.selectedIndex].text;
-      if (!select.value) { alert('Please select a customer'); return; }
-      if (confirm(`Assign ${customerName} to this seat?`)) {
-        alert('Assignment successful!');
-        cancelAssignment(); closeDetail();
+      if (confirm(`Assign ${customerName} to this seat for ${hours} hour(s)?`)) {
+        try {
+            const res = await fetch('/api/session/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, elementId: currentSelectedElementId, hours })
+            });
+            if ((await res.json()).success) {
+                alert('Assignment successful!');
+                cancelAssignment(); closeDetail();
+                loadData();
+            }
+        } catch(e) { console.error(e); }
       }
     }
 
@@ -1077,18 +1165,132 @@
       await saveLayout();
     }
 
-    function buildCustList() {
+    async function buildCustList() {
       const el = document.getElementById('custList'); el.innerHTML = '';
-      const customers = [
-        { seat: 'T1-S1', name: 'Monkey D. Luffy', time: '09:30 AM' },
-        { seat: 'T1-S3', name: 'Brook', time: '09:10 AM' },
-        { seat: 'T2-S1', name: 'Zoro Roronoa', time: '08:45 AM' },
-      ];
-      customers.forEach(c => {
-        const d = document.createElement('div'); d.className = 'cust-row';
-        d.innerHTML = `<div><div class="cust-row-name">${c.name}</div><div class="cust-row-sub"><i class="fa-solid fa-couch" style="font-size:10px"></i> ${c.seat} · ${c.time}</div></div>`;
-        el.appendChild(d);
-      });
+      try {
+          const res = await fetch('/api/active-customers');
+          const data = await res.json();
+          if (data.customers && data.customers.length > 0) {
+              data.customers.forEach(c => {
+                  const d = document.createElement('div'); d.className = 'cust-row';
+                  const startTime = new Date(c.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                  
+                  d.innerHTML = `
+                    <div style="flex:1" onclick="highlightUserSeat('${c.seat_label}', '${c.first_name} ${c.last_name}', '${c.id}')">
+                        <div class="cust-row-name">${c.first_name} ${c.last_name}</div>
+                        <div class="cust-row-sub"><i class="fa-solid fa-couch" style="font-size:10px"></i> ${c.seat_label || 'No Seat'} · ${startTime}</div>
+                    </div>
+                    <button class="btn btn-ghost btn-icon" onclick="startManualTransferFromList(${JSON.stringify(c).replace(/"/g, '&quot;')})" title="Transfer Seat">
+                        <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                    </button>
+                  `;
+                  el.appendChild(d);
+              });
+          } else {
+              el.innerHTML = '<div style="text-align:center; padding:20px; font-size:11px; color:#94a3b8;">No active customers</div>';
+          }
+      } catch(e) { console.error(e); }
+    }
+
+    function highlightUserSeat(label, name, userId) {
+        const item = items.find(i => i.label === label);
+        if (item) {
+            selectedId = item.id;
+            render();
+            showDetail(name, label, '', false, item.id);
+        }
+    }
+
+    let manualTransferSource = null;
+
+    function startManualTransfer() {
+        // This is called from the detail panel when an occupied seat is selected
+        const item = items.find(i => i.id === currentSelectedElementId);
+        // We need the user's name. Currently showDetail doesn't store the full user object.
+        // Let's assume we can find them from the active customers list if needed, or just use the name from the title.
+        const name = document.getElementById('detailName').textContent;
+        
+        manualTransferSource = {
+            elementId: currentSelectedElementId,
+            label: item.label,
+            userName: name
+        };
+        
+        toast(`Transferring ${name}. Select a new seat on the floor plan.`, "info");
+        closeDetail();
+    }
+
+    function startManualTransferFromList(customer) {
+        const item = items.find(i => i.label === customer.seat_label);
+        manualTransferSource = {
+            elementId: item ? item.id : null,
+            label: customer.seat_label,
+            userName: `${customer.first_name} ${customer.last_name}`,
+            userId: customer.id
+        };
+        toast(`Transferring ${manualTransferSource.userName}. Select a new seat on the floor plan.`, "info");
+    }
+
+    // Update handleItemClick to handle manual transfer target selection
+    function handleItemClick(e, itemId) {
+      if (isEditMode) {
+        if (mode === 'select') canvasDown(e);
+        return;
+      }
+      
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+
+      if (manualTransferSource) {
+          const status = (item.statuses && item.statuses[0]) || 'open';
+          if (status !== 'open') {
+              toast("Seat is not available!", "error");
+              return;
+          }
+          confirmManualTransfer(item);
+          return;
+      }
+
+      const status = (item.statuses && item.statuses[0]) || 'open';
+      showDetail(item.label || 'Seat', item.label || 'ID: ' + itemId, 'Now', status === 'open', item.id);
+    }
+
+    async function confirmManualTransfer(targetItem) {
+        if (!confirm(`Transfer ${manualTransferSource.userName} from ${manualTransferSource.label} to ${targetItem.label}?`)) {
+            manualTransferSource = null;
+            return;
+        }
+
+        try {
+            // We need the userId. If we don't have it, we might need to fetch it or ensure it's passed.
+            // Let's check if we have it.
+            let userId = manualTransferSource.userId;
+            if (!userId) {
+                // Try to find in active customers if we only have the name
+                const res = await fetch('/api/active-customers');
+                const data = await res.json();
+                const cust = data.customers.find(c => c.seat_label === manualTransferSource.label);
+                if (cust) userId = cust.id;
+            }
+
+            if (!userId) { toast("User session not found!", "error"); manualTransferSource = null; return; }
+
+            const res = await fetch('/api/transfer-requests/manual', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    userId, 
+                    currentElementId: manualTransferSource.elementId, 
+                    newElementId: targetItem.id 
+                })
+            });
+
+            if ((await res.json()).success) {
+                toast("Seat transferred successfully!", "success");
+                manualTransferSource = null;
+                loadData();
+            }
+        } catch(e) { console.error(e); }
     }
 
     window.onload = init;

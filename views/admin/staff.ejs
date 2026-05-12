@@ -750,7 +750,12 @@
           <td>${escapeHtml(s.location || '—')}</td>
           <td>${escapeHtml(s.schedule || '—')}</td>
           <td><span class="status-toggle" style="background:${s.status==='active'?'#d1fae5':'#fee2e2'};color:${s.status==='active'?'#166534':'#991b1b'};">${s.status==='active'?'Active':'Inactive'}</span></td>
-          <td><button class="btn btn-ghost btn-sm" onclick="removeStaff(${s.id})"><i class="fa-solid fa-trash"></i> Delete</button></td>
+          <td>
+            <div style="display:flex; gap:5px;">
+                <button class="btn btn-ghost btn-sm" onclick='openEditModal(${JSON.stringify(s)})'><i class="fa-solid fa-pen"></i> Edit</button>
+                <button class="btn btn-ghost btn-sm" onclick="removeStaff(${s.id})"><i class="fa-solid fa-trash"></i> Delete</button>
+            </div>
+          </td>
         `;
         tbody.appendChild(tr);
 
@@ -817,6 +822,49 @@
           loadStaff();
         }
       } catch (err) { console.error(err); }
+    }
+
+    let editingStaffId = null;
+    function openEditModal(s) {
+        editingStaffId = s.id;
+        document.getElementById('es-email').value = s.email;
+        document.getElementById('es-firstname').value = s.first_name;
+        document.getElementById('es-lastname').value = s.last_name;
+        document.getElementById('es-phone').value = s.phone || '';
+        document.getElementById('es-location').value = s.location || '';
+        document.getElementById('es-role').value = s.role.charAt(0).toUpperCase() + s.role.slice(1);
+        document.getElementById('es-status').value = s.status;
+        document.getElementById('es-sched').value = s.schedule || '';
+        openModal('editStaffModal');
+    }
+
+    async function saveStaff() {
+        const email = document.getElementById('es-email').value.trim();
+        const firstName = document.getElementById('es-firstname').value.trim();
+        const lastName = document.getElementById('es-lastname').value.trim();
+        const phone = document.getElementById('es-phone').value.trim();
+        const location = document.getElementById('es-location').value.trim();
+        const role = document.getElementById('es-role').value.toLowerCase();
+        const status = document.getElementById('es-status').value;
+        const schedule = document.getElementById('es-sched').value.trim();
+
+        if (!email || !firstName || !lastName) { alert("Required fields missing!"); return; }
+
+        try {
+            const res = await fetch(`/api/users/${editingStaffId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    email, firstName, lastName, phone, location, role, status, schedule,
+                    type: 'staff' // Default type for staff
+                })
+            });
+            if ((await res.json()).success) {
+                toast("Staff updated!", "success");
+                closeModal('editStaffModal');
+                loadStaff();
+            }
+        } catch (err) { console.error(err); }
     }
 
     function openAddModal() { openModal('addStaffModal'); }

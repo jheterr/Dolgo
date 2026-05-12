@@ -2,9 +2,39 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
+// Auto-cleanup for expired sessions/reservations
+async function autoCleanup() {
+    try {
+        // 1. Find expired reservations that are still "confirmed"
+        const [expired] = await db.query(`
+            SELECT id, element_id FROM reservations 
+            WHERE status = 'confirmed' AND end_time < NOW()
+        `);
+        
+        if (expired.length > 0) {
+            console.log(`Auto-cleaning ${expired.length} expired reservations...`);
+            for (const r of expired) {
+                // Mark reservation as completed
+                await db.query('UPDATE reservations SET status = "completed" WHERE id = ?', [r.id]);
+                // Open the seat
+                await db.query('UPDATE floor_elements SET status = "open" WHERE id = ?', [r.element_id]);
+            }
+        }
+        
+        // 2. Mark active sessions as completed
+        await db.query('UPDATE active_sessions SET status = "completed" WHERE status = "active" AND end_time < NOW()');
+        
+    } catch (e) {
+        console.error('Auto-Cleanup Error:', e);
+    }
+}
+
 // Get layout
 router.get('/layout', async (req, res) => {
     try {
+        // Run cleanup before fetching
+        await autoCleanup();
+
         // Find active floor plan
         const [plans] = await db.query('SELECT * FROM floor_plans WHERE is_active = 1 LIMIT 1');
         if (plans.length === 0) {
@@ -123,6 +153,21 @@ router.delete('/users/:id', async (req, res) => {
     }
 });
 
+// Update user
+router.put('/users/:id', async (req, res) => {
+    const { firstName, lastName, email, role, type, status, phone, location, schedule } = req.body;
+    try {
+        await db.query(
+            'UPDATE users SET first_name=?, last_name=?, email=?, role=?, type=?, status=?, phone=?, location=?, schedule=? WHERE id=?',
+            [firstName, lastName, email, role, type, status, phone, location, schedule, req.params.id]
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
 // Extend active session
 router.post('/session/extend', async (req, res) => {
     const { minutes, userId } = req.body;
@@ -148,13 +193,18 @@ router.post('/session/extend', async (req, res) => {
 // Get active customers with their sessions and seats
 router.get('/active-customers', async (req, res) => {
     try {
+        await autoCleanup();
         const [customers] = await db.query(`
             SELECT u.id, u.first_name, u.last_name, u.email, u.role, u.type, 
                    s.start_time, s.end_time, s.mac_address, s.ip_address,
                    fe.label as seat_label
             FROM users u
             JOIN active_sessions s ON u.id = s.user_id
-            LEFT JOIN reservations r ON u.id = r.user_id AND r.status = 'confirmed'
+            LEFT JOIN (
+                SELECT r1.user_id, r1.element_id FROM reservations r1
+                WHERE r1.status = 'confirmed'
+                AND r1.id = (SELECT MAX(id) FROM reservations r2 WHERE r2.user_id = r1.user_id AND r2.status = 'confirmed')
+            ) r ON u.id = r.user_id
             LEFT JOIN floor_elements fe ON r.element_id = fe.id
             WHERE s.status = 'active'
             ORDER BY s.created_at DESC
@@ -165,5 +215,262 @@ router.get('/active-customers', async (req, res) => {
         res.status(500).json({ error: 'Database error' });
     }
 });
+
+// Get seat transfer requests
+router.get('/transfer-requests', async (req, res) => {
+    try {
+        const [requests] = await db.query(`
+            SELECT tr.*, u.first_name, u.last_name, fe1.label as current_label, fe2.label as requested_label
+            FROM seat_transfer_requests tr
+            JOIN users u ON tr.user_id = u.id
+            JOIN floor_elements fe1 ON tr.current_element_id = fe1.id
+            JOIN floor_elements fe2 ON tr.requested_element_id = fe2.id
+            WHERE tr.status = 'pending'
+        `);
+        res.json({ requests });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Approve transfer
+router.post('/transfer-requests/:id/approve', async (req, res) => {
+    try {
+        const [requests] = await db.query('SELECT * FROM seat_transfer_requests WHERE id = ?', [req.params.id]);
+        if (requests.length === 0) return res.status(404).json({ error: 'Request not found' });
+        
+        const reqData = requests[0];
+        
+        // 1. Update reservation
+        await db.query('UPDATE reservations SET element_id = ? WHERE user_id = ? AND status = "confirmed"', [reqData.requested_element_id, reqData.user_id]);
+        
+        // 2. Update floor elements status
+        await db.query('UPDATE floor_elements SET status = "open" WHERE id = ?', [reqData.current_element_id]);
+        await db.query('UPDATE floor_elements SET status = "taken" WHERE id = ?', [reqData.requested_element_id]);
+        
+        // 3. Update request status
+        await db.query('UPDATE seat_transfer_requests SET status = "approved" WHERE id = ?', [req.params.id]);
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Decline transfer
+router.post('/transfer-requests/:id/decline', async (req, res) => {
+    try {
+        await db.query('UPDATE seat_transfer_requests SET status = "declined" WHERE id = ?', [req.params.id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Start Session (Assign User)
+router.post('/session/start', async (req, res) => {
+    const { userId, elementId, hours } = req.body;
+    try {
+        const startTime = new Date();
+        const endTime = new Date(startTime.getTime() + hours * 60 * 60 * 1000);
+        
+        // 1. Create session
+        await db.query('INSERT INTO active_sessions (user_id, start_time, end_time, status) VALUES (?, ?, ?, "active")', [userId, startTime, endTime]);
+        
+        // 2. Create reservation/booking record
+        await db.query('INSERT INTO reservations (user_id, element_id, start_time, end_time, status) VALUES (?, ?, ?, ?, "confirmed")', [userId, elementId, startTime, endTime]);
+        
+        // 3. Update element status
+        await db.query('UPDATE floor_elements SET status = "taken" WHERE id = ?', [elementId]);
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Get reservations
+router.get('/reservations', async (req, res) => {
+    try {
+        console.log('Fetching all reservations...');
+        const [rows] = await db.query(`
+            SELECT r.*, u.first_name, u.last_name, u.email, fe.label as seat_label
+            FROM reservations r
+            LEFT JOIN users u ON r.user_id = u.id
+            LEFT JOIN floor_elements fe ON r.element_id = fe.id
+            ORDER BY r.created_at DESC
+        `);
+        console.log(`Found ${rows.length} reservations.`);
+        res.json({ reservations: rows });
+    } catch (error) {
+        console.error('Error fetching reservations:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Update reservation status
+router.post('/reservations/:id/status', async (req, res) => {
+    const { status, payment_status } = req.body;
+    try {
+        console.log(`Updating reservation ${req.params.id} to status: ${status}`);
+        
+        // 1. Get the reservation to find the element_id
+        const [rows] = await db.query('SELECT element_id FROM reservations WHERE id = ?', [req.params.id]);
+        if (rows.length > 0) {
+            const elementId = rows[0].element_id;
+            
+            // 2. Update reservation
+            await db.query('UPDATE reservations SET status = ?, payment_status = ? WHERE id = ?', [status, payment_status, req.params.id]);
+            
+            // 3. Update floor element status if applicable
+            if (status === 'confirmed') {
+                await db.query('UPDATE floor_elements SET status = "taken" WHERE id = ?', [elementId]);
+            } else if (status === 'cancelled' || status === 'completed') {
+                await db.query('UPDATE floor_elements SET status = "open" WHERE id = ?', [elementId]);
+            }
+        }
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error(`Error updating reservation ${req.params.id}:`, error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Get WiFi extensions
+router.get('/wifi-extensions', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT w.*, u.first_name, u.last_name, u.email
+            FROM wifi_extension_requests w
+            JOIN users u ON w.user_id = u.id
+            ORDER BY w.created_at DESC
+        `);
+        res.json({ requests: rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Update WiFi extension status
+router.post('/wifi-extensions/:id/status', async (req, res) => {
+    const { status } = req.body;
+    try {
+        await db.query('UPDATE wifi_extension_requests SET status = ? WHERE id = ?', [status, req.params.id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Get Plan upgrades
+router.get('/plan-upgrades', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT p.*, u.first_name, u.last_name, u.email, m1.name as current_plan, m2.name as requested_plan
+            FROM plan_upgrade_requests p
+            JOIN users u ON p.user_id = u.id
+            LEFT JOIN membership_plans m1 ON p.current_plan_id = m1.id
+            JOIN membership_plans m2 ON p.requested_plan_id = m2.id
+            ORDER BY p.created_at DESC
+        `);
+        res.json({ requests: rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Update Plan upgrade status
+router.post('/plan-upgrades/:id/status', async (req, res) => {
+    const { status } = req.body;
+    try {
+        await db.query('UPDATE plan_upgrade_requests SET status = ? WHERE id = ?', [status, req.params.id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Manual transfer by staff
+router.post('/transfer-requests/manual', async (req, res) => {
+    const { userId, currentElementId, newElementId } = req.body;
+    try {
+        // 1. Update reservation
+        await db.query('UPDATE reservations SET element_id = ? WHERE user_id = ? AND status = "confirmed"', [newElementId, userId]);
+        
+        // 2. Update floor elements status
+        if (currentElementId) {
+            await db.query('UPDATE floor_elements SET status = "open" WHERE id = ?', [currentElementId]);
+        }
+        await db.query('UPDATE floor_elements SET status = "taken" WHERE id = ?', [newElementId]);
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
+// Get events
+router.get('/events', async (req, res) => {
+    try {
+        const [rows] = await db.query('SELECT * FROM events ORDER BY event_date ASC');
+        res.json({ events: rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Create event
+router.post('/events', async (req, res) => {
+    const { title, description, date, location, price, maxAttendees, image, createdBy } = req.body;
+    try {
+        await db.query(
+            'INSERT INTO events (title, description, event_date, location, price, max_attendees, image, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [title, description, date, location, price, maxAttendees, image, createdBy]
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Update event
+router.put('/events/:id', async (req, res) => {
+    const { title, description, date, location, price, maxAttendees, image } = req.body;
+    try {
+        await db.query(
+            'UPDATE events SET title=?, description=?, event_date=?, location=?, price=?, max_attendees=?, image=? WHERE id=?',
+            [title, description, date, location, price, maxAttendees, image, req.params.id]
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Delete event
+router.delete('/events/:id', async (req, res) => {
+    try {
+        await db.query('DELETE FROM events WHERE id = ?', [req.params.id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+
 
 module.exports = router;

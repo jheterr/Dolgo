@@ -12,6 +12,11 @@ CREATE TABLE IF NOT EXISTS users (
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     phone VARCHAR(20),
+    location VARCHAR(100),
+    mac_address VARCHAR(17),
+    profile_picture LONGTEXT,
+    type ENUM('member', 'walkin', 'staff') DEFAULT 'member',
+    schedule TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -73,10 +78,41 @@ CREATE TABLE IF NOT EXISTS reservations (
     element_id INT NOT NULL,
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
+    amount DECIMAL(10,2) DEFAULT 0.00,
+    payment_method ENUM('cashier', 'gcash') DEFAULT 'cashier',
+    payment_status ENUM('unpaid', 'paid') DEFAULT 'unpaid',
+    reference_number VARCHAR(100),
+    proof_image LONGTEXT,
     status ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (element_id) REFERENCES floor_elements(id) ON DELETE CASCADE
+);
+
+-- WiFi Extension Requests
+CREATE TABLE IF NOT EXISTS wifi_extension_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    requested_hours DECIMAL(5,2) NOT NULL,
+    fee DECIMAL(10,2) NOT NULL,
+    payment_method ENUM('cashier', 'gcash') DEFAULT 'cashier',
+    status ENUM('pending', 'paid', 'declined') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Plan Upgrade Requests
+CREATE TABLE IF NOT EXISTS plan_upgrade_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    current_plan_id INT,
+    requested_plan_id INT NOT NULL,
+    fee DECIMAL(10,2) NOT NULL,
+    payment_method ENUM('cashier', 'gcash') DEFAULT 'cashier',
+    status ENUM('pending', 'paid', 'declined') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (requested_plan_id) REFERENCES membership_plans(id)
 );
 
 -- Walk-in Sessions (For Mikrotik Hotspot and Staff Panel)
@@ -88,6 +124,8 @@ CREATE TABLE IF NOT EXISTS active_sessions (
     status ENUM('active', 'completed') DEFAULT 'active',
     mac_address VARCHAR(17), -- MikroTik router integration
     ip_address VARCHAR(45),
+    is_paused BOOLEAN DEFAULT FALSE,
+    remaining_seconds INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -99,6 +137,8 @@ CREATE TABLE IF NOT EXISTS events (
     description TEXT,
     event_date DATETIME NOT NULL,
     location VARCHAR(100),
+    image LONGTEXT,
+    price DECIMAL(10,2) DEFAULT 0.00,
     max_attendees INT,
     created_by INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -146,6 +186,19 @@ CREATE TABLE IF NOT EXISTS messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Seat Transfer Requests
+CREATE TABLE IF NOT EXISTS seat_transfer_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    current_element_id INT NOT NULL,
+    requested_element_id INT NOT NULL,
+    status ENUM('pending', 'approved', 'declined') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (current_element_id) REFERENCES floor_elements(id) ON DELETE CASCADE,
+    FOREIGN KEY (requested_element_id) REFERENCES floor_elements(id) ON DELETE CASCADE
 );
 
 -- Insert Default Admin

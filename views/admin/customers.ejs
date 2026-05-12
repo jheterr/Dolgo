@@ -520,8 +520,8 @@
             <td><span class="badge badge-${session ? 'green' : 'red'}">${session ? 'Active' : 'Inactive'}</span></td>
             <td>
               <div style="display:flex;gap:5px">
-                <button class="btn btn-ghost btn-sm" title="View"><i class="fa-solid fa-eye"></i></button>
-                <button class="btn btn-ghost btn-sm" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-ghost btn-sm" onclick='viewCustomer(${JSON.stringify(user)})' title="View"><i class="fa-solid fa-eye"></i></button>
+                <button class="btn btn-ghost btn-sm" onclick='openEditCustomerModal(${JSON.stringify(user)})' title="Edit"><i class="fa-solid fa-pen"></i></button>
                 <button class="btn btn-danger btn-sm" onclick="removeUser(${user.id})" title="Delete"><i class="fa-solid fa-trash"></i></button>
               </div>
             </td>
@@ -535,6 +535,51 @@
         });
 
       } catch (err) { console.error(err); }
+    }
+
+    function openEditCustomerModal(user) {
+        document.getElementById('editRowId').value = user.id;
+        document.getElementById('editFirstName').value = user.first_name;
+        document.getElementById('editLastName').value = user.last_name;
+        document.getElementById('editEmail').value = user.email;
+        document.getElementById('editStatus').value = user.status || 'Active';
+        openModal('editCustomerModal');
+    }
+
+    async function saveCustomerEdit() {
+        const id = document.getElementById('editRowId').value;
+        const firstName = document.getElementById('editFirstName').value;
+        const lastName = document.getElementById('editLastName').value;
+        const email = document.getElementById('editEmail').value;
+        const status = document.getElementById('editStatus').value;
+
+        try {
+            const res = await fetch(`/api/users/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ firstName, lastName, email, status, role: 'customer', type: 'member' })
+            });
+            if ((await res.json()).success) {
+                toast("Customer updated!", "success");
+                closeModal('editCustomerModal');
+                loadRealUsers();
+            }
+        } catch (err) { console.error(err); }
+    }
+
+    function viewCustomer(user) {
+        const body = document.getElementById('viewCustBody');
+        body.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <p><strong>Name:</strong> ${user.first_name} ${user.last_name}</p>
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Role:</strong> ${user.role}</p>
+                <p><strong>Type:</strong> ${user.type}</p>
+                <p><strong>Status:</strong> ${user.status}</p>
+                <p><strong>Joined:</strong> ${new Date(user.created_at).toLocaleDateString()}</p>
+            </div>
+        `;
+        openModal('viewCustModal');
     }
 
     function openWifiEditModal(btn, name, currentEndTime, id) {

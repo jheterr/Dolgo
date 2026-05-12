@@ -1,19 +1,14 @@
 const express = require('express');
 const router = express.Router();
-<<<<<<< HEAD
-const db = require('../db'); 
-=======
-const pool = require('../db');
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
+const db = require('../db');
 
 // 1. Default Redirect
 router.get('/', (req, res) => res.redirect('/customer/dashboard'));
 
-<<<<<<< HEAD
 // 2. DASHBOARD (GET)
 router.get('/dashboard', async (req, res) => {
     try {
-        const userId = (req.session && req.session.userId) ? req.session.userId : 2; 
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2); 
 
         // Get User Info
         const [users] = await db.execute('SELECT first_name, profile_picture FROM users WHERE id = ?', [userId]);
@@ -55,7 +50,7 @@ router.get('/dashboard', async (req, res) => {
 // 3. TOGGLE PAUSE (POST)
 router.post('/session/pause-toggle', async (req, res) => {
     try {
-        const userId = (req.session && req.session.userId) ? req.session.userId : 2;
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2);
         const { isPaused, remainingSeconds } = req.body;
 
         if (isPaused) {
@@ -84,7 +79,7 @@ router.post('/session/pause-toggle', async (req, res) => {
 // 4. EXTEND TIME (POST)
 router.post('/session/extend', async (req, res) => {
     try {
-        const userId = (req.session && req.session.userId) ? req.session.userId : 2;
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2);
         const { minutes } = req.body;
 
         // Add minutes to both end_time (for active) and remaining_seconds (for paused)
@@ -106,7 +101,7 @@ router.post('/session/extend', async (req, res) => {
 // 5. PROFILE ROUTES
 router.get('/profile', async (req, res) => {
     try {
-        const userId = (req.session && req.session.userId) ? req.session.userId : 2; 
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2); 
         const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [userId]);
         res.render('customer/profile', { active: 'Profile', role: 'customer', user: rows[0] });
     } catch (err) { res.status(500).send(err.message); }
@@ -114,7 +109,7 @@ router.get('/profile', async (req, res) => {
 
 router.post('/profile/update', async (req, res) => {
     try {
-        const userId = (req.session && req.session.userId) ? req.session.userId : 2;
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2);
         const { fullName, email, phone, location, mac_address } = req.body;
         const n = fullName.split(' ');
         await db.execute(
@@ -127,7 +122,7 @@ router.post('/profile/update', async (req, res) => {
 
 router.post('/profile/avatar', async (req, res) => {
     try {
-        const userId = (req.session && req.session.userId) ? req.session.userId : 2;
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2);
         await db.execute('UPDATE users SET profile_picture=? WHERE id=?', [req.body.image, userId]);
         res.json({ success: true });
     } catch (err) { res.status(500).json({ success: false }); }
@@ -136,7 +131,7 @@ router.post('/profile/avatar', async (req, res) => {
 // 6. EVENTS ROUTE
 router.get('/events', async (req, res) => {
     try {
-        const userId = (req.session && req.session.userId) ? req.session.userId : 2;
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2);
         const [events] = await db.execute('SELECT * FROM events ORDER BY event_date ASC');
         const [reservations] = await db.execute(`
             SELECT r.*, fe.label as seat_label 
@@ -145,14 +140,16 @@ router.get('/events', async (req, res) => {
             WHERE r.user_id = ?
         `, [userId]);
         res.render('customer/event', { active: 'Event', role: 'customer', events, reservations });
-    } catch (err) { res.status(500).send(err.message); }
+    } catch (err) { 
+        console.error(err);
+        res.status(500).send(err.message); 
+    }
 });
 
-// routes/customer.js
-
+// 7. RESERVATIONS ROUTE
 router.get('/reservations', async (req, res) => {
     try {
-        const userId = (req.session && req.session.userId) ? req.session.userId : 2; // Default to Jheter
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2); 
 
         // 1. Get Active Session (The green card)
         const [sessions] = await db.execute(
@@ -161,7 +158,6 @@ router.get('/reservations', async (req, res) => {
         );
 
         // 2. Get All Reservations (The table)
-        // We join with floor_elements to get labels like "T1-S1"
         const [reservations] = await db.execute(`
             SELECT r.*, fe.label as seat_label, 
             TIMESTAMPDIFF(HOUR, r.start_time, r.end_time) as duration_hours
@@ -193,81 +189,50 @@ router.get('/reservations', async (req, res) => {
     }
 });
 
-// 7. GENERIC PAGES
+// 8. GENERIC PAGES
 const pages = [
   { route: '/dashboard_static', view: 'customer/dashboard',      active: 'Dashboard' },
-  { route: '/reservations',     view: 'customer/reservations',   active: 'Reservations' },
   { route: '/membership',       view: 'customer/membership',     active: 'Membership' },
   { route: '/notifications',    view: 'customer/notifications',  active: 'Notifications' },
   { route: '/reserve-history',  view: 'customer/reserve_history',active: 'Reserve History' },
   { route: '/reserve-new',      view: 'customer/reserve_new',    active: 'Reserve New' },
-=======
-router.get('/dashboard', async (req, res) => {
-    try {
-        const userId = req.session.user.id;
-        
-        // Fetch active session
-        const [sessions] = await pool.query(
-            'SELECT * FROM active_sessions WHERE user_id = ? AND status = "active" ORDER BY created_at DESC LIMIT 1',
-            [userId]
-        );
-        
-        const activeSession = sessions.length > 0 ? sessions[0] : null;
-        
-        res.render('customer/dashboard', { 
-            active: 'Dashboard', 
-            role: 'customer',
-            activeSession 
-        });
-    } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-const pages = [
-  { route: '/reservations',    view: 'customer/reservations',   active: 'Reservations' },
-  { route: '/events',          view: 'customer/event',          active: 'Events' },
-  { route: '/membership',      view: 'customer/membership',     active: 'Membership' },
-  { route: '/notifications',   view: 'customer/notifications',  active: 'Notifications' },
-  { route: '/reserve-history', view: 'customer/reserve_history',active: 'Reserve History' },
-  { route: '/reserve-new',     view: 'customer/reserve_new',    active: 'Reservations' },
-  { route: '/profile',         view: 'customer/profile',        active: 'Profile' },
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 ];
 
 pages.forEach(({ route, view, active }) => {
-  router.get(route, (req, res) => res.render(view, { active, role: 'customer', activeSession: null }));
+  router.get(route, (req, res) => res.render(view, { active, role: 'customer', session: null }));
 });
 
-// 8. SUBMIT RESERVATION (POST)
+// 9. SUBMIT RESERVATION (POST)
 router.post('/reserve', async (req, res) => {
+    console.log('New reservation request received:', req.body);
     try {
-        const userId = (req.session && req.session.userId) ? req.session.userId : 2;
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2);
         const { elementId, date, startTime, endTime } = req.body;
-
-        if (!elementId || !date || !startTime || !endTime) {
-            return res.status(400).json({ success: false, message: 'Missing required fields' });
+        
+        if (!elementId) {
+            console.log('Reservation failed: Missing elementId');
+            return res.status(400).json({ success: false, message: 'Please select a seat.' });
         }
 
-        const startFull = `${date} ${startTime}:00`;
-        const endFull = `${date} ${endTime}:00`;
+        // Convert date and time to DATETIME
+        const start = `${date} ${startTime}:00`;
+        const end = `${date} ${endTime}:00`;
 
-        // 1. Insert into reservations table
+        // Calculate amount (Demo: 50 per hour)
+        const diffMs = new Date(end) - new Date(start);
+        const diffHrs = Math.max(1, diffMs / (1000 * 60 * 60));
+        const amount = diffHrs * 50;
+
         await db.execute(
-            'INSERT INTO reservations (user_id, element_id, start_time, end_time, status) VALUES (?, ?, ?, ?, ?)',
-            [userId, elementId, startFull, endFull, 'confirmed']
+            `INSERT INTO reservations (user_id, element_id, start_time, end_time, amount, status) 
+             VALUES (?, ?, ?, ?, ?, 'pending')`,
+            [userId, elementId, start, end, amount, 'pending']
         );
 
-        // 2. Update floor element status to 'reserved' (Optional, but useful for the map)
-        await db.execute(
-            'UPDATE floor_elements SET status = "reserved" WHERE id = ?',
-            [elementId]
-        );
-
+        console.log('Reservation saved for user:', userId);
         res.json({ success: true });
     } catch (err) {
-        console.error(err);
+        console.error('Error saving reservation:', err);
         res.status(500).json({ success: false, message: err.message });
     }
 });

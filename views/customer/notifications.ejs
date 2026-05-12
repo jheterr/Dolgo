@@ -9,7 +9,6 @@
         min-height: 100vh;
     }
 
-<<<<<<< HEAD
     .page-title {
         font-family: 'Poppins', sans-serif;
         font-size: 2.2rem;
@@ -18,133 +17,6 @@
         margin-bottom: 24px;
         letter-spacing: -0.02em;
     }
-=======
-
-        /* Notifications Page Specific Styles */
-        .content {
-            background-color: #f4f6f9;
-            display: flex;
-            flex-direction: column;
-            height: 100vh; /* Make content full height to support scrolling in container */
-            padding-bottom: 32px;
-        }
-        .page-title {
-            font-family: 'Poppins', sans-serif; font-size: 2.2rem;
-            color: #d65c29; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 24px;
-        }
-        
-        .notifications-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #e2e8f0;
-        }
-        
-        /* Custom Scrollbar for Notifications */
-        .notifications-container::-webkit-scrollbar {
-            width: 16px;
-        }
-        .notifications-container::-webkit-scrollbar-track {
-            background: transparent;
-            margin: 12px 0;
-        }
-        .notifications-container::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 20px;
-            border: 4px solid white;
-        }
-
-        .notification-item {
-            display: flex;
-            padding: 40px 48px;
-            border-bottom: 1px solid #e2e8f0;
-            gap: 24px;
-            align-items: flex-start;
-            position: relative;
-        }
-        .notification-item.unread {
-            background-color: #fffaf7;
-        }
-        .notification-item.unread::before {
-            content: '';
-            position: absolute;
-            left: 20px;
-            top: 60px;
-            width: 10px;
-            height: 10px;
-            background-color: #d65c29;
-            border-radius: 50%;
-        }
-        .notifications-header-controls {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
-        }
-        .notification-tabs {
-            display: flex; gap: 12px;
-        }
-        .tab-btn {
-            background: transparent; border: 1px solid #cbd5e1; padding: 6px 20px;
-            border-radius: 20px; font-size: 0.95rem; font-weight: 700; color: #64748b;
-            cursor: pointer; transition: all 0.2s ease;
-        }
-        .tab-btn.active {
-            background: #d65c29; color: white; border-color: #d65c29;
-        }
-        .tab-btn:hover:not(.active) {
-            background: #f1f5f9;
-        }
-        .btn-mark-read {
-            background: transparent; border: none; color: #d65c29; font-size: 0.95rem;
-            font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;
-        }
-        .btn-mark-read:hover {
-            text-decoration: underline;
-        }
-        .notification-item:last-child {
-            border-bottom: none;
-        }
-        .notification-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            width: 56px;
-            height: 56px;
-            flex-shrink: 0;
-        }
-        .notification-content {
-            flex-grow: 1;
-        }
-        .notification-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 8px;
-        }
-        .notification-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0;
-            letter-spacing: -0.01em;
-        }
-        .notification-time {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #94a3b8;
-        }
-        .notification-desc {
-            font-size: 1rem;
-            color: #64748b;
-            line-height: 1.6;
-            margin: 0;
-            font-weight: 500;
-        }
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
     
     .notifications-header {
         display: flex;
@@ -297,11 +169,7 @@
 </style>
 
 <div class="app">
-<<<<<<< HEAD
     <%- include('../partials/customer_sidebar', { active: 'Notifications' }) %>
-=======
-        <%- include('../partials/customer_sidebar') %>
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
     <main class="content">
         <h1 class="page-title">Notifications</h1>
@@ -391,12 +259,7 @@
                 }
             });
 
-<<<<<<< HEAD
             document.getElementById('emptyState').style.display = visibleCount === 0 ? 'block' : 'none';
         });
     });
 </script>
-=======
-    </script>
-
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906

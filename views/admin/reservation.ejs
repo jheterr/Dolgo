@@ -485,6 +485,7 @@
               <option value="pending">Pending</option>
               <option value="unpaid">Unpaid</option>
               <option value="paid">Paid</option>
+              <option value="confirmed">Confirmed</option>
             </select>
           </div>
         </div>
@@ -608,24 +609,26 @@
 <script>
   const rows = ['A', 'B', 'C', 'D'];
   const seatsPerRow = 7;
-  let occupiedSeats = ["A3", "B2", "C5", "A7", "A2", "D3", "C1", "B4", "D6"];
-  let reservedSeats = ["A3", "B2", "C5", "D3", "D6"];
-  
-  let reservations = [
-    { id: 1, name: "Monkey D. Luffy", email: "luffy@example.com", seat: "A3", hours: 2, date: "2026-04-16", time: "10:00 AM", amount: 200, status: "pending", paymentMethod: "cashier", reference: null, proofImage: null },
-    { id: 2, name: "Roronoa Zoro", email: "zoro@example.com", seat: "B2", hours: 3, date: "2026-04-17", time: "09:00 AM", amount: 300, status: "paid", paymentMethod: "gcash", reference: "GCASH-12345678", proofImage: "screenshot_zoro_payment.png" },
-    { id: 4, name: "Nami Catburglar", email: "nami@example.com", seat: "C5", hours: 2, date: "2026-04-18", time: "02:00 PM", amount: 200, status: "unpaid", paymentMethod: "cashier", reference: null, proofImage: null }
-  ];
+  let reservations = [];
+  let wifiRequests = [];
+  let upgradeRequests = [];
 
-  let wifiRequests = [
-    { id: 1, name: "Sanji Vinsmoke", email: "sanji@example.com", seat: "A1", timeLeft: "00:12:20", requested: 1, fee: 50, status: "pending", paymentMethod: "cashier" },
-    { id: 2, name: "Brook Musician", email: "brook@example.com", seat: "A7", timeLeft: "00:25:30", requested: 2, fee: 100, status: "unpaid", paymentMethod: "cashier" }
-  ];
-
-  let upgradeRequests = [
-    { id: 1, name: "Jinbe Knight", email: "jinbe@example.com", seat: "A2", currentPlan: "Member", requestedPlan: "Premium", fee: 1199, status: "pending", paymentMethod: "cashier" },
-    { id: 2, name: "Robin Nico", email: "robin@example.com", seat: "D3", currentPlan: "Member", requestedPlan: "Premium", fee: 1199, status: "unpaid", paymentMethod: "cashier" }
-  ];
+  async function loadAllData() {
+    try {
+        const [res, wifi, up] = await Promise.all([
+            fetch('/api/reservations').then(r => r.json()).catch(e => ({reservations:[]})),
+            fetch('/api/wifi-extensions').then(r => r.json()).catch(e => ({requests:[]})),
+            fetch('/api/plan-upgrades').then(r => r.json()).catch(e => ({requests:[]}))
+        ]);
+        reservations = (res && res.reservations) || [];
+        wifiRequests = (wifi && wifi.requests) || [];
+        upgradeRequests = (up && up.requests) || [];
+        
+        renderReservations();
+        renderWifi();
+        renderUpgrade();
+    } catch(e) { console.error('Error loading admin data:', e); }
+  }
 
   let selectedSeatForWalkin = null;
   let currentMacCount = 1;
@@ -698,6 +701,7 @@
   function getStatusBadge(status) {
     if (status === 'pending') return '<span class="badge-pending">Pending</span>';
     if (status === 'unpaid') return '<span class="badge-unpaid">Unpaid</span>';
+    if (status === 'confirmed') return '<span class="badge-paid" style="background:#dcfce7; color:#15803d">Confirmed</span>';
     return '<span class="badge-paid">Paid</span>';
   }
   
@@ -705,7 +709,14 @@
     return method === 'gcash' ? '<span class="badge-gcash">GCash</span>' : '<span class="badge-cashier">Cashier</span>';
   }
 
-  function matchesSearch(item, term) { if(!term) return true; const t=term.toLowerCase(); return item.name.toLowerCase().includes(t) || item.email.toLowerCase().includes(t) || (item.seat && item.seat.toLowerCase().includes(t)); }
+  function matchesSearch(item, term) { 
+    if(!term) return true; 
+    const t=term.toLowerCase(); 
+    const name = `${item.first_name || ''} ${item.last_name || ''}`.toLowerCase();
+    const email = (item.email || '').toLowerCase();
+    const seat = (item.seat_label || '').toLowerCase();
+    return name.includes(t) || email.includes(t) || seat.includes(t); 
+  }
 
   // ============ RESERVATIONS ============
   function renderReservations() {
@@ -718,10 +729,10 @@
     tbody.innerHTML = filtered.map(r => {
       let actionButtons = '';
       if (r.status === 'pending') {
-        if (r.paymentMethod === 'cashier') {
+        if (r.payment_method === 'cashier') {
           actionButtons = `<button class="btn-icon btn-success" onclick="openCashierConfirmModal('reservation', ${r.id})" title="Confirm Reservation"><i class="fa-solid fa-check"></i></button>
                            <button class="btn-icon btn-danger" onclick="rejectItem('reservation', ${r.id})" title="Reject"><i class="fa-solid fa-xmark"></i></button>`;
-        } else if (r.paymentMethod === 'gcash') {
+        } else {
           actionButtons = `<button class="btn-icon btn-success" onclick="markGcashPaid('reservation', ${r.id})" title="Mark as Paid"><i class="fa-solid fa-check-circle"></i></button>
                            <button class="btn-icon btn-danger" onclick="rejectItem('reservation', ${r.id})" title="Reject"><i class="fa-solid fa-xmark"></i></button>`;
         }
@@ -730,7 +741,13 @@
       } else {
         actionButtons = '<span style="color:#94a3b8;">—</span>';
       }
-      return `<tr><td class="td-bold">${escapeHtml(r.name)}</td><td>${escapeHtml(r.email)}</td><td>${r.seat}</td><td>${r.hours} Hrs</td><td>${r.date}</td><td>${r.time}</td><td>${formatPHP(r.amount)}</td><td>${getPaymentMethodBadge(r.paymentMethod)}</td><td>${getStatusBadge(r.status)}</td><td class="action-group">${actionButtons}</td></tr>`;
+
+      const name = `${r.first_name || 'User'} ${r.last_name || ''}`;
+      const date = new Date(r.start_time).toLocaleDateString();
+      const time = new Date(r.start_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      const duration = Math.round((new Date(r.end_time) - new Date(r.start_time)) / (1000 * 60 * 60));
+      
+      return `<tr><td class="td-bold">${escapeHtml(name)}</td><td>${escapeHtml(r.email)}</td><td>${r.seat_label || 'N/A'}</td><td>${duration} Hrs</td><td>${date}</td><td>${time}</td><td>${formatPHP(r.amount)}</td><td>${getPaymentMethodBadge(r.payment_method)}</td><td>${getStatusBadge(r.status)}</td><td class="action-group">${actionButtons}</td></tr>`;
     }).join('');
   }
   
@@ -745,10 +762,10 @@
     tbody.innerHTML = filtered.map(w => {
       let actionButtons = '';
       if (w.status === 'pending') {
-        if (w.paymentMethod === 'cashier') {
+        if (w.payment_method === 'cashier') {
           actionButtons = `<button class="btn-icon btn-success" onclick="openCashierConfirmModal('wifi', ${w.id})" title="Confirm Extension"><i class="fa-solid fa-check"></i></button>
                            <button class="btn-icon btn-danger" onclick="rejectItem('wifi', ${w.id})" title="Reject"><i class="fa-solid fa-xmark"></i></button>`;
-        } else if (w.paymentMethod === 'gcash') {
+        } else {
           actionButtons = `<button class="btn-icon btn-success" onclick="markGcashPaid('wifi', ${w.id})" title="Mark as Paid"><i class="fa-solid fa-check-circle"></i></button>
                            <button class="btn-icon btn-danger" onclick="rejectItem('wifi', ${w.id})" title="Reject"><i class="fa-solid fa-xmark"></i></button>`;
         }
@@ -757,7 +774,9 @@
       } else {
         actionButtons = '<span style="color:#94a3b8;">—</span>';
       }
-      return `<tr><td class="td-bold">${escapeHtml(w.name)}</td><td>${escapeHtml(w.email)}</td><td>${w.seat}</td><td>${w.timeLeft || '—'}</td><td>${w.requested} hr(s)</td><td>${formatPHP(w.fee)}</td><td>${getPaymentMethodBadge(w.paymentMethod)}</td><td>${getStatusBadge(w.status)}</td><td class="action-group">${actionButtons}</td></tr>`;
+
+      const name = `${w.first_name || 'User'} ${w.last_name || ''}`;
+      return `<tr><td class="td-bold">${escapeHtml(name)}</td><td>${escapeHtml(w.email)}</td><td>${w.seat_label || '—'}</td><td>${w.timeLeft || '—'}</td><td>${w.requested_hours} hr(s)</td><td>${formatPHP(w.fee)}</td><td>${getPaymentMethodBadge(w.payment_method)}</td><td>${getStatusBadge(w.status)}</td><td class="action-group">${actionButtons}</td></tr>`;
     }).join('');
   }
   
@@ -772,10 +791,10 @@
     tbody.innerHTML = filtered.map(u => {
       let actionButtons = '';
       if (u.status === 'pending') {
-        if (u.paymentMethod === 'cashier') {
+        if (u.payment_method === 'cashier') {
           actionButtons = `<button class="btn-icon btn-success" onclick="openCashierConfirmModal('upgrade', ${u.id})" title="Confirm Upgrade"><i class="fa-solid fa-check"></i></button>
                            <button class="btn-icon btn-danger" onclick="rejectItem('upgrade', ${u.id})" title="Reject"><i class="fa-solid fa-xmark"></i></button>`;
-        } else if (u.paymentMethod === 'gcash') {
+        } else {
           actionButtons = `<button class="btn-icon btn-success" onclick="markGcashPaid('upgrade', ${u.id})" title="Mark as Paid"><i class="fa-solid fa-check-circle"></i></button>
                            <button class="btn-icon btn-danger" onclick="rejectItem('upgrade', ${u.id})" title="Reject"><i class="fa-solid fa-xmark"></i></button>`;
         }
@@ -784,24 +803,25 @@
       } else {
         actionButtons = '<span style="color:#94a3b8;">—</span>';
       }
-      return `<tr><td class="td-bold">${escapeHtml(u.name)}</td><td>${escapeHtml(u.email)}</td><td>${u.seat}</td><td>${u.currentPlan}</td><td>${u.requestedPlan}</td><td>${formatPHP(u.fee)}</td><td>${getPaymentMethodBadge(u.paymentMethod)}</td><td>${getStatusBadge(u.status)}</td><td class="action-group">${actionButtons}</td></tr>`;
+
+      const name = `${u.first_name || 'User'} ${u.last_name || ''}`;
+      return `<tr><td class="td-bold">${escapeHtml(name)}</td><td>${escapeHtml(u.email)}</td><td>${u.seat_label || '—'}</td><td>${u.currentPlan}</td><td>${u.requestedPlan}</td><td>${formatPHP(u.fee)}</td><td>${getPaymentMethodBadge(u.payment_method)}</td><td>${getStatusBadge(u.status)}</td><td class="action-group">${actionButtons}</td></tr>`;
     }).join('');
   }
   
   // ============ PAYMENT HANDLERS ============
-  function markGcashPaid(type, id) {
-    let item;
-    if (type === 'reservation') item = reservations.find(r => r.id === id);
-    else if (type === 'wifi') item = wifiRequests.find(w => w.id === id);
-    else item = upgradeRequests.find(u => u.id === id);
-    
-    if (item && item.status === 'pending' && item.paymentMethod === 'gcash') {
-      item.status = 'paid';
-      renderReservations();
-      renderWifi();
-      renderUpgrade();
-      alert(`✓ Payment confirmed for ${item.name}. Amount: ${formatPHP(item.fee || item.amount)}. Status updated to PAID.`);
-    }
+  async function markGcashPaid(type, id) {
+    if(!confirm("Mark as PAID?")) return;
+    try {
+        const endpoint = type === 'reservation' ? `/api/reservations/${id}/status` : (type === 'wifi' ? `/api/wifi-extensions/${id}/status` : `/api/plan-upgrades/${id}/status`);
+        const body = type === 'reservation' ? { status: 'confirmed', payment_status: 'paid' } : { status: 'paid' };
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if((await res.json()).success) { loadAllData(); }
+    } catch(e) { console.error(e); }
   }
   
   function openCashierConfirmModal(type, id) {
@@ -880,49 +900,50 @@
     openModal('paymentConfirmModal');
   }
   
-  function finalizePaymentConfirmation() {
+  async function finalizePaymentConfirmation() {
     if (!currentPaymentItem) { closeModal('paymentConfirmModal'); return; }
     
-    if (currentModalContext === 'confirm') {
-      if (currentPaymentItem.status === 'pending') {
-        currentPaymentItem.status = 'unpaid';
-        renderReservations();
-        renderWifi();
-        renderUpgrade();
-        closeModal('paymentConfirmModal');
-        alert(`💰 ${currentPaymentType} confirmed for ${currentPaymentItem.name}.\nAmount: ${formatPHP(currentPaymentItem.fee || currentPaymentItem.amount)}\nStatus: UNPAID - Customer will pay at the counter.`);
-      }
-    } else if (currentModalContext === 'payment') {
-      if (currentPaymentItem.status === 'unpaid') {
-        currentPaymentItem.status = 'paid';
-        renderReservations();
-        renderWifi();
-        renderUpgrade();
-        closeModal('paymentConfirmModal');
-        alert(`✓ Payment confirmed for ${currentPaymentItem.name}.\nAmount: ${formatPHP(currentPaymentItem.fee || currentPaymentItem.amount)}\nStatus updated to PAID.`);
-      }
-    }
+    try {
+        const type = currentPaymentType;
+        const id = currentPaymentItem.id;
+        const endpoint = type === 'reservation' ? `/api/reservations/${id}/status` : (type === 'wifi' ? `/api/wifi-extensions/${id}/status` : `/api/plan-upgrades/${id}/status`);
+        
+        let body;
+        if (currentModalContext === 'confirm') {
+            body = type === 'reservation' ? { status: 'confirmed', payment_status: 'unpaid' } : { status: 'unpaid' };
+        } else {
+            body = type === 'reservation' ? { status: 'confirmed', payment_status: 'paid' } : { status: 'paid' };
+        }
+
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if((await res.json()).success) {
+            closeModal('paymentConfirmModal');
+            loadAllData();
+            alert("Success!");
+        }
+    } catch(e) { console.error(e); }
     
     currentPaymentItem = null;
     currentPaymentType = null;
     currentModalContext = null;
   }
   
-  function rejectItem(type, id) {
-    let item, name;
-    if (type === 'reservation') { item = reservations.find(r => r.id === id); name = item?.name; }
-    else if (type === 'wifi') { item = wifiRequests.find(w => w.id === id); name = item?.name; }
-    else { item = upgradeRequests.find(u => u.id === id); name = item?.name; }
-    
-    if (item && confirm(`Reject ${type} for ${name}?`)) {
-      if (type === 'reservation') reservations = reservations.filter(r => r.id !== id);
-      else if (type === 'wifi') wifiRequests = wifiRequests.filter(w => w.id !== id);
-      else upgradeRequests = upgradeRequests.filter(u => u.id !== id);
-      renderReservations();
-      renderWifi();
-      renderUpgrade();
-      alert(`✗ ${type} for ${name} rejected`);
-    }
+  async function rejectItem(type, id) {
+    if (!confirm(`Reject this ${type}?`)) return;
+    try {
+        const endpoint = type === 'reservation' ? `/api/reservations/${id}/status` : (type === 'wifi' ? `/api/wifi-extensions/${id}/status` : `/api/plan-upgrades/${id}/status`);
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'cancelled' })
+        });
+        if((await res.json()).success) { loadAllData(); }
+    } catch(e) { console.error(e); }
   }
   
   function filterReservations() { renderReservations(); }
@@ -981,9 +1002,8 @@
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
   function switchTab(event, tabId) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(tabId).classList.add('active'); event.currentTarget.classList.add('active'); }
 
-  renderReservations();
-  renderWifi();
-  renderUpgrade();
+  loadAllData();
+  setInterval(loadAllData, 10000);
   document.getElementById('addMacBtn').addEventListener('click', addNewMacField);
 </script>
 

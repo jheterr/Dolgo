@@ -1,0 +1,15 @@
+async function test() {
+    try {
+        const res = await fetch('http://localhost:3000/api/reservations');
+        if (!res.ok) {
+            console.log('HTTP Error:', res.status);
+            return;
+        }
+        const data = await res.json();
+        console.log(JSON.stringify(data, null, 2));
+    } catch (e) {
+        console.error('Fetch failed:', e.message);
+    }
+}
+
+test();

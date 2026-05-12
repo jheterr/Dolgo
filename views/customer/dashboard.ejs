@@ -65,7 +65,6 @@
         margin-bottom: 4px;
     }
 
-<<<<<<< HEAD
     .welcome-text {
         font-family: 'Poppins', sans-serif;
         font-size: 2rem;
@@ -108,8 +107,6 @@
         color: #d65c29;
         line-height: 1;
     }
-=======
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
     .stat-label {
         font-size: 1.1rem;
@@ -191,18 +188,12 @@
 </style>
 
 <div class="app">
-<<<<<<< HEAD
     <%- include('../partials/customer_sidebar', { active: 'Dashboard' }) %>
     <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
-=======
-        <!-- Sidebar -->
-        <%- include('../partials/customer_sidebar') %>
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
     <main class="content">
         <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
 
-<<<<<<< HEAD
         <!-- Welcome Section -->
         <div class="welcome-section">
             <h1 class="welcome-text"><span class="light">Welcome,</span> <span class="bold"><%= user.first_name %>!</span></h1>
@@ -233,6 +224,9 @@
             <% } else { %>
                 <h2 style="font-size: 1.8rem; font-weight: 600; color: white;">No Active Session</h2>
                 <p>Please check-in at the counter to start your session.</p>
+                <a href="/customer/reserve-new" style="background: white; color: #d65c29; border: none; border-radius: 24px; padding: 12px 32px; font-size: 16px; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 16px;">
+                    Start New Session
+                </a>
             <% } %>
         </div>
 
@@ -244,39 +238,6 @@
                     <%= availableSeats %>
                 </div>
                 <p class="stat-label">Seats Available Now</p>
-=======
-            <!-- Session Banner -->
-            <div class="session-banner"
-                style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 280px;">
-                
-                <% if (activeSession) { %>
-                    <button onclick="extendTime()"
-                        style="position: absolute; top: 24px; right: 24px; background: white; color: #d65c29; border: none; border-radius: 24px; padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <i class="fa-solid fa-plus" style="color: #d65c29;"></i> Extend Time
-                    </button>
-
-                    <h2 style="font-size: 1.8rem; font-weight: 600; color: white; margin-bottom: 4px;">Remaining Session Time</h2>
-
-                    <div style="position: relative; display: inline-block;">
-                        <div id="timer" class="timer"
-                            style="font-size: 6.5rem; font-weight: 800; line-height: 1.1; letter-spacing: 2px; color: white;">
-                            00:00:00
-                        </div>
-                    </div>
-
-                    <div style="font-size: 18px; font-weight: 600; color: white; margin-top: 16px; line-height: 1.5;">
-                        Your MAC Address: <span class="font-mono"><%= activeSession.mac_address || 'Not Registered' %></span><br>
-                        Your IP Address: <span class="font-mono"><%= activeSession.ip_address || 'Not Registered' %></span><br>
-                        <span style="font-size: 16px; font-weight: 500;">Session ends at <%= new Date(activeSession.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %></span>
-                    </div>
-                <% } else { %>
-                    <h2 style="font-size: 2.2rem; font-weight: 800; color: white; margin-bottom: 12px;">No Active Session</h2>
-                    <p style="font-size: 1.1rem; color: rgba(255,255,255,0.9); margin-bottom: 24px;">Please check in at the counter or reserve a seat to start your session.</p>
-                    <a href="/customer/reserve-new" style="background: white; color: #d65c29; border: none; border-radius: 24px; padding: 12px 32px; font-size: 16px; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                        Start New Session
-                    </a>
-                <% } %>
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
             </div>
 
             <!-- Your Seat -->
@@ -360,12 +321,8 @@
 
 <%- contentFor('script') %>
 <script>
-<<<<<<< HEAD
     function openSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
     function closeSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
-=======
-        let timeLeft = <%= activeSession ? Math.max(0, Math.floor((new Date(activeSession.end_time) - new Date()) / 1000)) : 0 %>;
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
     // Timer State
     let isPaused = <%= (session && session.is_paused) ? 'true' : 'false' %>;
@@ -384,11 +341,11 @@
     const pauseBtn = document.getElementById('pauseBtn');
 
     function updateTimerDisplay() {
+        if (!timerEl) return;
         if (timeRemaining <= 0) {
             timerEl.textContent = "00:00:00";
             return;
         }
-<<<<<<< HEAD
         const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
         const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
@@ -401,47 +358,6 @@
             if (!isPaused && timeRemaining > 0) {
                 timeRemaining -= 1000;
                 updateTimerDisplay();
-=======
-        
-        function closeExtendModal() {
-            document.getElementById('extendModal').classList.remove('active');
-        }
-        
-        function selectTime(element) {
-            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-        }
-        
-        async function confirmExtendTime() {
-            const activeBtn = document.querySelector('.time-btn.active');
-            if (activeBtn) {
-                const text = activeBtn.innerText;
-                let minutesToAdd = 0;
-                if (text.includes('1 hour')) minutesToAdd += 60;
-                if (text.includes('2 hours')) minutesToAdd += 120;
-                if (text.includes('3 hours')) minutesToAdd += 180;
-                if (text.includes('4 hours')) minutesToAdd += 240;
-                if (text.includes('30 mins')) minutesToAdd += 30;
-                
-                try {
-                    const res = await fetch('/api/session/extend', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ minutes: minutesToAdd })
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        timeLeft += minutesToAdd * 60;
-                        updateTimer();
-                        alert('Session extended successfully!');
-                        window.location.reload(); 
-                    } else {
-                        alert('Failed to extend session');
-                    }
-                } catch (e) {
-                    console.error(e);
-                }
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
             }
         }, 1000);
     }
@@ -451,7 +367,6 @@
         const newPauseState = !isPaused;
         const remainingSecs = Math.floor(timeRemaining / 1000);
 
-<<<<<<< HEAD
         try {
             const response = await fetch('/customer/session/pause-toggle', {
                 method: 'POST',
@@ -466,8 +381,6 @@
             }
         } catch (err) { console.error("Error toggling pause", err); }
     }
-=======
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
 
     // Extend Time
     async function confirmExtendTime() {
@@ -487,7 +400,6 @@
         } catch (err) { console.error("Error extending time", err); }
     }
 
-<<<<<<< HEAD
     // Seat Transfer
     async function loadSeatsForTransfer() {
         try {
@@ -495,7 +407,7 @@
             const data = await res.json();
             const select = document.getElementById('seatSelect');
             if (data && data.items) {
-                const chairs = data.items.filter(i => (i.type === 'chair' || i.type === 'chair-sq') && i.statuses[0] === 'open');
+                const chairs = data.items.filter(i => (i.type === 'chair' || i.type === 'chair-sq') && i.statuses && i.statuses[0] === 'open');
                 select.innerHTML = chairs.map(c => `<option value="${c.label}">${c.label}</option>`).join('');
                 if (chairs.length === 0) select.innerHTML = '<option value="">No seats available</option>';
             }
@@ -525,17 +437,11 @@
     if (timeRemaining > 0) {
         updateTimerDisplay();
         if (isPaused) {
-            pauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-            pauseBtn.classList.add('paused');
+            if (pauseBtn) {
+                pauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                pauseBtn.classList.add('paused');
+            }
         }
         startTimerLoop();
     }
 </script>
-=======
-        window.onload = () => {
-            updateTimer();
-            loadDynamicStats();
-        };
-    </script>
-
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906

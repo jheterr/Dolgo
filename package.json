@@ -13,11 +13,8 @@
     "ejs": "~2.6.1",
     "express": "~4.16.1",
     "express-ejs-layouts": "^2.5.1",
-<<<<<<< HEAD
-=======
-    "express-mysql-session": "^3.0.3",
->>>>>>> b71e5ca040dc8e180a5e9bd216de8d45ca4c4906
     "express-session": "^1.19.0",
+    "express-mysql-session": "^3.0.0",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "mysql2": "^3.22.3"
