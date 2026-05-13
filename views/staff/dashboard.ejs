@@ -58,7 +58,90 @@
       .payments-grid{grid-template-columns:1fr;}
       .charts-row{grid-template-columns:1fr;}
     }
-  
+    /* Dynamic Seat Map Styles */
+    .seat-map-container {
+      width: 100%;
+      height: 380px;
+      background: #f8fafc;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--border);
+    }
+
+    #dynamicSeatMap {
+      position: absolute;
+      width: 800px;
+      height: 450px;
+      transform-origin: 0 0;
+      transition: transform 0.3s ease;
+    }
+
+    .fp-item {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .item-visual {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+
+    .chair-icon {
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+    }
+
+    .item-label {
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8px;
+      font-weight: 700;
+      color: #475569;
+      white-space: nowrap;
+    }
+
+    .item-label.center {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 9px;
+    }
+
+    .map-legend {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .legend-dot {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot span {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    
 </style>
 
 <div class="app">
@@ -81,7 +164,7 @@
         <div class="stat-card sc-gold"><div class="stat-icon"><i class="fa-solid fa-users"></i></div><div class="stat-lbl">TOTAL ACTIVE USERS</div><div class="stat-val">3</div></div>
         <div class="stat-card sc-orange"><div class="stat-icon"><i class="fa-solid fa-user"></i></div><div class="stat-lbl">TOTAL CUSTOMERS</div><div class="stat-val">100</div></div>
         <div class="stat-card sc-teal"><div class="stat-icon"><i class="fa-solid fa-wifi"></i></div><div class="stat-lbl">ACTIVE WI-FI SESSION</div><div class="stat-val">100</div></div>
-        <div class="stat-card sc-green"><div class="stat-icon"><i class="fa-solid fa-couch"></i></div><div class="stat-lbl">SEAT AVAILABLE</div><div class="stat-val">20/35</div></div>
+        <div class="stat-card sc-green"><div class="stat-icon"><i class="fa-solid fa-couch"></i></div><div class="stat-lbl">SEAT AVAILABLE</div><div class="stat-val" id="statAvailable">0/0</div></div>
       </div>
 
       <!-- Charts -->
@@ -99,51 +182,20 @@
       <!-- Seat Map + Activity -->
       <div class="dash-bottom">
         <div class="card">
-          <div class="section-title">Live Seat Status</div>
-          <div class="map-legend">
-            <div class="legend-dot"><span style="background:var(--green)"></span>Active</div>
-            <div class="legend-dot"><span style="background:var(--orange)"></span>Idle</div>
-            <div class="legend-dot"><span style="background:#e53e3e"></span>Inactive</div>
-            <div class="legend-dot"><span style="background:var(--olive)"></span>Reserved</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div class="section-title" style="margin-bottom:0">Live Seat Status</div>
+            <button class="btn btn-ghost" style="padding: 4px 12px; font-size: 11px;" onclick="renderLiveSeatMap()" title="Sync with Seat Management">
+              <i class="fa-solid fa-rotate"></i> Sync
+            </button>
           </div>
-          <div class="seat-map">
-            <div class="map-entrance">Entrance</div>
-            <div class="map-zone zone-counter">Counter</div>
-            <div class="map-zone zone-meeting">Meeting<br>Room</div>
-            <div class="map-zone zone-table3">Table 3</div>
-            <div class="seat seat-active" style="bottom:106px;left:44%" data-seat="T3-S1" data-name="Monkey D. Luffy">T3</div>
-            <div class="seat seat-inactive" style="bottom:82px;left:44%">T3</div>
-            <div class="seat seat-reserved" style="bottom:58px;left:44%">T3</div>
-            <div class="seat seat-idle" style="bottom:34px;left:44%">T3</div>
-            <div class="seat seat-active" style="bottom:120px;left:55%" data-seat="T3-S5" data-name="Nami Catburglar">T3</div>
-            <div class="seat seat-active" style="bottom:96px;left:55%" data-seat="T3-S6" data-name="Sanji Vinsmoke">T3</div>
-            <div class="seat seat-inactive" style="bottom:72px;left:55%">T3</div>
-            <div class="seat seat-idle" style="bottom:48px;left:55%">T3</div>
-            <div class="rt-base" style="bottom:50px;left:78px"></div>
-            <div class="seat seat-idle" style="bottom:74px;left:72px">RT1</div>
-            <div class="seat seat-active" style="bottom:50px;left:60px" data-seat="RT1-S2" data-name="Zoro Roronoa">RT1</div>
-            <div class="seat seat-inactive" style="bottom:26px;left:72px">RT1</div>
-            <div class="seat seat-active" style="bottom:50px;left:96px" data-seat="RT1-S4" data-name="Usopp">RT1</div>
-            <div class="rt-label" style="bottom:10px;left:62px">Rounded<br>Table 1</div>
-            <div class="rt-base" style="bottom:50px;left:194px"></div>
-            <div class="seat seat-active" style="bottom:74px;left:188px" data-seat="RT2-S1" data-name="Jinbe">RT2</div>
-            <div class="seat seat-reserved" style="bottom:50px;left:176px">RT2</div>
-            <div class="seat seat-idle" style="bottom:26px;left:188px">RT2</div>
-            <div class="seat seat-inactive" style="bottom:50px;left:212px">RT2</div>
-            <div class="rt-label" style="bottom:10px;left:178px">Rounded<br>Table 2</div>
-            <div class="rt-base" style="bottom:50px;right:158px"></div>
-            <div class="seat seat-active" style="bottom:74px;right:164px" data-seat="RT3-S1" data-name="Franky">RT3</div>
-            <div class="seat seat-idle" style="bottom:50px;right:176px">RT3</div>
-            <div class="seat seat-inactive" style="bottom:26px;right:164px">RT3</div>
-            <div class="seat seat-active" style="bottom:50px;right:140px" data-seat="RT3-S4" data-name="Robin">RT3</div>
-            <div class="rt-label" style="bottom:10px;right:146px">Rounded<br>Table 3</div>
-            <div class="cubicle-block">
-              <div class="cubicle-row"><div class="c-seat seat-inactive">C1-S1</div><div class="c-seat seat-active" data-seat="C1-S2" data-name="Brook">C1-S2</div><span class="c-label">Cubicle 1</span></div>
-              <div class="cubicle-row"><div class="c-seat seat-active">C2-S1</div><div class="c-seat seat-active">C2-S2</div><span class="c-label">Cubicle 2</span></div>
-              <div class="cubicle-row"><div class="c-seat seat-inactive">C3-S1</div><div class="c-seat seat-inactive">C3-S2</div><span class="c-label">Cubicle 3</span></div>
-              <div class="cubicle-row"><div class="c-seat seat-active">C4-S1</div><div class="c-seat seat-idle">C4-S2</div><span class="c-label">Cubicle 4</span></div>
-              <div class="cubicle-row"><div class="c-seat seat-active">C5-S1</div><div class="c-seat seat-active">C5-S2</div><span class="c-label">Cubicle 5</span></div>
-            </div>
+          <div class="map-legend">
+            <div class="legend-dot"><span style="background:#10b981"></span>Available</div>
+            <div class="legend-dot"><span style="background:#d65c29"></span>Taken</div>
+            <div class="legend-dot"><span style="background:#1e293b"></span>Reserved</div>
+            <div class="legend-dot"><span style="background:#facc15"></span>Idle</div>
+          </div>
+          <div class="seat-map-container" id="seatMapViewport">
+            <div id="dynamicSeatMap"></div>
           </div>
         </div>
         <div class="card">
@@ -257,6 +309,111 @@ function renderSeatChart() {
   });
 }
 
+// Dynamic Seat Map Rendering
+async function renderLiveSeatMap() {
+  const container = document.getElementById('dynamicSeatMap');
+  const viewport = document.getElementById('seatMapViewport');
+  if (!container) return;
+
+  try {
+    const res = await fetch('/api/layout');
+    const data = await res.json();
+    let items = data.items || [];
+    
+    container.innerHTML = '';
+
+    if (items.length === 0) {
+      container.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-weight:600;">No layout found.</div>';
+      return;
+    }
+
+    // Update stat counter
+    const chairs = items.filter(i => (i.type === 'chair' || i.type === 'chair-sq'));
+    const openChairs = chairs.filter(i => !i.statuses || i.statuses[0] === 'open');
+    const statEl = document.getElementById('statAvailable');
+    if (statEl) statEl.textContent = `${openChairs.length}/${chairs.length}`;
+
+    items.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'fp-item';
+      el.style.left = item.x + 'px';
+      el.style.top = item.y + 'px';
+      el.style.width = item.w + 'px';
+      el.style.height = item.h + 'px';
+      el.style.zIndex = (item.type === 'chair' || item.type === 'chair-sq') ? 5 : item.type.startsWith('block') ? 2 : 3;
+
+      const visual = document.createElement('div');
+      visual.className = 'item-visual';
+      visual.style.transform = 'rotate(' + (item.rot || 0) + 'deg)';
+
+      if (item.type === 'chair') {
+        visual.classList.add('chair-icon');
+        visual.style.webkitMaskImage = 'url(/images/chair.png)';
+        visual.style.maskImage = 'url(/images/chair.png)';
+        const status = (item.statuses && item.statuses[0]) || 'open';
+        
+        if (status === 'taken') {
+          visual.style.backgroundColor = '#d65c29'; // Orange
+        } else if (status === 'reserved') {
+          visual.style.backgroundColor = '#1e293b'; // Dark
+        } else if (status === 'idle') {
+          visual.style.backgroundColor = '#facc15'; // Yellow
+        } else {
+          visual.style.backgroundColor = '#10b981'; // Green
+        }
+      } else if (item.type === 'chair-sq') {
+        const status = (item.statuses && item.statuses[0]) || 'open';
+        const sqColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981';
+        visual.style.background = sqColor;
+        visual.style.borderRadius = '4px';
+      } else if (item.type === 'round-table' || item.type === 'rect-table') {
+        visual.style.background = item.color || '#fdba74';
+        visual.style.border = '1.5px solid #f97316';
+        visual.style.borderRadius = item.type === 'round-table' ? '50%' : '6px';
+      } else if (item.type === 'room') {
+        const status = (item.statuses && item.statuses[0]) || 'open';
+        const roomColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : item.color;
+        visual.style.background = roomColor;
+        visual.style.border = '2px solid #16a34a';
+        visual.style.borderRadius = '8px';
+      } else {
+        visual.style.background = item.color || '#cbd5e1';
+        visual.style.borderRadius = '4px';
+      }
+      el.appendChild(visual);
+
+      if (item.label || item.type === 'room') {
+        const lbl = document.createElement('span');
+        lbl.className = 'item-label';
+        if (item.type !== 'chair' && item.type !== 'chair-sq') {
+          lbl.classList.add('center');
+          const status = (item.statuses && item.statuses[0]) || 'open';
+          const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
+          lbl.style.color = isDark ? '#fff' : '#1e293b';
+        }
+        lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
+        el.appendChild(lbl);
+      }
+      container.appendChild(el);
+    });
+
+    const rect = viewport.getBoundingClientRect();
+    const vWidth = rect.width || viewport.clientWidth || 600;
+    const vHeight = rect.height || viewport.clientHeight || 380;
+    const scale = Math.min(vWidth / 800, vHeight / 450) * 0.95;
+    container.style.transform = `scale(${scale})`;
+    container.style.left = `${(vWidth - (800 * scale)) / 2}px`;
+    container.style.top = `${(vHeight - (450 * scale)) / 2}px`;
+  } catch (e) {
+    console.error(e);
+    container.innerHTML = '<div style="color:red; padding:20px;">Error loading live status.</div>';
+  }
+}
+
+// Polling interval for live status
+setInterval(renderLiveSeatMap, 10000);
+window.addEventListener('resize', renderLiveSeatMap);
+
 // Initialize All
 function renderAll() {
   renderReservationPayments();
@@ -265,6 +422,7 @@ function renderAll() {
   renderActivityFeed();
   renderTrafficChart();
   renderSeatChart();
+  renderLiveSeatMap();
 }
 
 window.onload = renderAll;

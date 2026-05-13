@@ -120,67 +120,85 @@
     background: #3d6a4a;
   }
 
-  /* Seat Layout inside Modal */
+  /* Seat Layout inside Modal (Visual) */
   .modal-seat-layout {
     background: #f8fafc;
-    border-radius: 20px;
-    padding: 16px;
+    border-radius: 12px;
+    padding: 10px;
     margin: 12px 0;
+    height: 300px;
+    overflow: hidden;
+    position: relative;
+    border: 1.5px solid #e2e8f0;
   }
-  .modal-seat-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  #modalSeatMap {
+    position: absolute;
+    width: 800px;
+    height: 450px;
+    transform-origin: 0 0;
+    cursor: crosshair;
   }
-  .modal-seat-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .modal-row-label {
-    width: 32px;
-    font-weight: 800;
-    background: #e2e8f0;
-    border-radius: 20px;
-    text-align: center;
-    padding: 4px 0;
-    font-size: 0.8rem;
-  }
-  .modal-seats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .modal-seat {
-    width: 50px;
-    height: 50px;
+  .modal-seat-layout .fp-item {
+    position: absolute;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    font-size: 0.65rem;
-    font-weight: 600;
     cursor: pointer;
-    transition: 0.1s;
-    border: 2px solid;
+  }
+  .modal-seat-layout .item-visual {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .modal-seat-layout .chair-icon {
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+  }
+  .modal-seat-layout .item-label {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    font-weight: 700;
+    color: #475569;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .modal-seat-layout .item-label.center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 9px;
+  }
+  .modal-seat-layout .fp-item.selected .item-visual {
+    box-shadow: 0 0 0 3px #4f46e5;
+    border-radius: 4px;
+    transform: scale(1.1);
+  }
+  .modal-seat-layout .fp-item.selected .item-visual.chair-icon {
+    box-shadow: none;
+    filter: drop-shadow(0 0 3px #4f46e5);
   }
   
-  .modal-seat span:first-child { font-size: 0.7rem; font-weight: 800; }
-  .modal-seat.available { background: #dcfce7; border-color: #86efac; color: #166534; }
-  .modal-seat.occupied { background: #fee2e2; border-color: #fecaca; color: #991b1b; cursor: not-allowed; opacity: 0.7; }
-  .modal-seat.reserved { background: #fef9c3; border-color: #fde047; color: #854d0e; cursor: not-allowed; opacity: 0.7; }
-  .modal-seat.idle { background: #fed7aa; border-color: #fdba74; color: #9a3412; cursor: not-allowed; opacity: 0.7; }
-  .modal-seat.selected { background: #4f46e5; border-color: #4f46e5; color: white; }
   .legend {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
     margin-top: 12px;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
+    font-weight: 600;
   }
-  .legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .legend-item { display: inline-flex; align-items: center; gap: 4px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
   @media (max-width: 768px) {
     .page-header-actions {
@@ -197,7 +215,7 @@
     .filter-group {
       justify-content: space-between;
     }
-    .modal-seat { width: 40px; height: 40px; font-size: 0.55rem; }
+    .modal-seat-layout { height: 200px; }
     .rfid-input-group { flex-direction: column; }
     .btn-scan { width: 100%; }
   }
@@ -215,7 +233,8 @@
       <div class="page-header">
         <h1 class="page-title">Customers List</h1>
         <div class="page-header-actions">
-          <button class="btn-add-walkin" onclick="openAddWalkinModal()"><i class="fa-solid fa-person-walking-arrow-right"></i> Add Walk-in</button>
+          <button class="btn-add-walkin" style="background: #1e293b;" onclick="openAddUserModal('member')"><i class="fa-solid fa-user-plus"></i> Add Member</button>
+          <button class="btn-add-walkin" onclick="openAddUserModal('walkin')"><i class="fa-solid fa-person-walking-arrow-right"></i> Add Walk-in</button>
           <div class="search-bar">
             <i class="fa-solid fa-magnifying-glass"></i>
             <input class="form-control" id="custSearch" type="text" placeholder="Search name or email…" oninput="searchCustomers()">
@@ -387,11 +406,19 @@
               <button type="button" id="addMacBtn" class="add-mac-btn"><i class="fa-solid fa-plus"></i> Add another MAC address</button>
             </div>
             <div class="form-group"><label class="form-label">Status</label><select class="form-control" id="wi-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-            <div class="form-group"><label class="form-label">Assign Seat * (Click on seat below)</label>
-              <div class="modal-seat-layout" id="modalSeatLayout"></div>
+            <div class="form-group"><label class="form-label" style="display: flex; justify-content: space-between;">Assign Seat * <span>(Select on map)</span></label>
+              <div class="modal-seat-layout" id="modalSeatLayout">
+                <div id="modalSeatMap"></div>
+              </div>
               <input type="hidden" id="selectedSeat" value="">
-              <div style="font-size:0.7rem; color:#4f46e5; margin-top:4px;" id="selectedSeatDisplay">No seat selected</div>
-              <div class="legend"><span><span style="background:#dcfce7;"> Available</span><span style="background:#fee2e2;"> Occupied</span><span style="background:#fef9c3;"> Reserved</span></span></div>
+              <input type="hidden" id="selectedSeatId" value="">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size:0.75rem; color:#4f46e5; font-weight: 700;" id="selectedSeatDisplay">No seat selected</div>
+                <div class="legend">
+                  <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span>Available</div>
+                  <div class="legend-item"><span class="legend-dot" style="background:#d65c29"></span>Taken</div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -677,43 +704,148 @@
       const email = document.getElementById('wi-email').value.trim();
       const firstName = document.getElementById('wi-firstname').value.trim();
       const lastName = document.getElementById('wi-lastname').value.trim();
-      if (!firstName || !lastName || !email) { alert("Required fields missing."); return; }
+      const phone = document.getElementById('wi-phone').value.trim();
+      const rfid = document.getElementById('wi-rfid').value.trim();
+      const hours = parseFloat(document.getElementById('wi-hours').value);
+      const elementId = document.getElementById('selectedSeatId').value;
+      const status = document.getElementById('wi-status').value;
+      const isWalkin = document.getElementById('addWalkinModal').dataset.type === 'walkin';
+
+      if (!firstName || !lastName || !email || !elementId) { 
+        alert("Required fields missing (Name, Email, and Seat Selection are mandatory)."); 
+        return; 
+      }
+
       try {
         const res = await fetch('/api/users/add', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ firstName, lastName, email, role: 'customer', type: 'walkin' })
+          body: JSON.stringify({ 
+            firstName, lastName, email, 
+            role: 'customer', 
+            type: isWalkin ? 'walkin' : 'member',
+            phone,
+            status
+          })
         });
-        if((await res.json()).success) {
-          toast("Customer added!", "success");
-          closeModal('addWalkinModal');
-          loadRealUsers();
+        const data = await res.json();
+        
+        if(data.success) {
+          const userId = data.userId;
+          
+          // Now start the session
+          const sessionRes = await fetch('/api/session/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, elementId, hours })
+          });
+          
+          if ((await sessionRes.json()).success) {
+            toast(`${isWalkin ? 'Walk-in' : 'Member'} added and seat assigned!`, "success");
+            closeModal('addWalkinModal');
+            loadRealUsers();
+          } else {
+            toast("User created but failed to assign seat.", "warning");
+          }
+        } else {
+          alert("Error adding customer: " + (data.error || "Unknown error"));
         }
       } catch (err) { console.error(err); }
     }
 
-    function renderModalSeatLayout() {
-      const container = document.getElementById('modalSeatLayout');
-      if(!container) return;
-      let html = '<div class="modal-seat-grid">';
-      for (let r of rows) {
-        html += `<div class="modal-seat-row"><div class="modal-row-label">${r}</div><div class="modal-seats">`;
-        for (let i = 1; i <= seatsPerRow; i++) {
-          const seatId = `${r}${i}`;
-          html += `<div class="modal-seat available" data-seat="${seatId}"><span>${seatId}</span><span>Free</span></div>`;
+    async function renderModalSeatLayout() {
+      const container = document.getElementById('modalSeatMap');
+      const viewport = document.getElementById('modalSeatLayout');
+      if (!container) return;
+
+      container.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:12px;">Loading map...</div>';
+
+      try {
+        const res = await fetch('/api/layout');
+        const data = await res.json();
+        let items = data.items || [];
+        
+        container.innerHTML = '';
+
+        if (items.length === 0) {
+          container.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:12px;">No layout found.</div>';
+          return;
         }
-        html += `</div></div>`;
+
+        items.forEach(item => {
+          const el = document.createElement('div');
+          el.className = 'fp-item';
+          el.style.left = item.x + 'px';
+          el.style.top = item.y + 'px';
+          el.style.width = item.w + 'px';
+          el.style.height = item.h + 'px';
+          el.style.zIndex = (item.type === 'chair' || item.type === 'chair-sq') ? 5 : item.type.startsWith('block') ? 2 : 3;
+
+          const visual = document.createElement('div');
+          visual.className = 'item-visual';
+          visual.style.transform = 'rotate(' + (item.rot || 0) + 'deg)';
+
+          const isSeat = (item.type === 'chair' || item.type === 'chair-sq');
+          const status = (item.statuses && item.statuses[0]) || 'open';
+
+          if (item.type === 'chair') {
+            visual.classList.add('chair-icon');
+            visual.style.webkitMaskImage = 'url(/images/chair.png)';
+            visual.style.maskImage = 'url(/images/chair.png)';
+            visual.style.backgroundColor = (status === 'taken') ? '#d65c29' : '#10b981';
+          } else if (item.type === 'chair-sq') {
+            visual.style.background = (status === 'taken') ? '#d65c29' : '#10b981';
+            visual.style.borderRadius = '4px';
+          } else if (item.type === 'round-table' || item.type === 'rect-table') {
+            visual.style.background = item.color || '#fdba74';
+            visual.style.border = '1.5px solid #f97316';
+            visual.style.borderRadius = item.type === 'round-table' ? '50%' : '6px';
+          } else {
+            visual.style.background = item.color || '#cbd5e1';
+            visual.style.borderRadius = '4px';
+          }
+          el.appendChild(visual);
+
+          if (item.label || item.type === 'room') {
+            const lbl = document.createElement('span');
+            lbl.className = 'item-label';
+            if (item.type !== 'chair' && item.type !== 'chair-sq') {
+              lbl.classList.add('center');
+              lbl.style.color = '#1e293b';
+            }
+            lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
+            el.appendChild(lbl);
+          }
+
+          if (isSeat && status === 'open') {
+            el.onclick = () => {
+              document.querySelectorAll('#modalSeatMap .fp-item').forEach(s => s.classList.remove('selected'));
+              el.classList.add('selected');
+              selectedSeatForWalkin = item.label;
+              document.getElementById('selectedSeat').value = item.label;
+              document.getElementById('selectedSeatId').value = item.id;
+              document.getElementById('selectedSeatDisplay').innerHTML = `Selected: <strong>${item.label}</strong>`;
+            };
+          } else if (isSeat && status !== 'open') {
+            el.style.cursor = 'not-allowed';
+            el.title = 'Seat already taken';
+          }
+
+          container.appendChild(el);
+        });
+
+        // Scale to fit modal
+        const vWidth = viewport.clientWidth || 450;
+        const vHeight = viewport.clientHeight || 300;
+        const scale = Math.min(vWidth / 800, vHeight / 450) * 0.95;
+        container.style.transform = `scale(${scale})`;
+        container.style.left = `${(vWidth - (800 * scale)) / 2}px`;
+        container.style.top = `${(vHeight - (450 * scale)) / 2}px`;
+
+      } catch (e) {
+        console.error(e);
+        container.innerHTML = '<div style="color:red; font-size:11px;">Error loading map.</div>';
       }
-      html += '</div>';
-      container.innerHTML = html;
-      document.querySelectorAll('.modal-seat.available').forEach(el => {
-        el.onclick = () => {
-          document.querySelectorAll('.modal-seat').forEach(s => s.classList.remove('selected'));
-          el.classList.add('selected');
-          selectedSeatForWalkin = el.dataset.seat;
-          document.getElementById('selectedSeatDisplay').innerHTML = `Selected: <strong>${selectedSeatForWalkin}</strong>`;
-        };
-      });
     }
 
     function addNewMacField() {
@@ -735,7 +867,31 @@
 
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-    function openAddWalkinModal() { renderModalSeatLayout(); openModal('addWalkinModal'); }
+    function openAddUserModal(type) { 
+      const modal = document.getElementById('addWalkinModal');
+      const title = modal.querySelector('.modal-title');
+      const submitBtn = modal.querySelector('.btn-primary');
+      
+      modal.dataset.type = type;
+      if (type === 'member') {
+        title.innerHTML = '<i class="fa-solid fa-user-plus"></i> Add New Member';
+        submitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Member';
+      } else {
+        title.innerHTML = '<i class="fa-solid fa-person-walking-arrow-right"></i> Add New Walk-in Customer';
+        submitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Walk-in';
+      }
+      
+      // Reset form
+      document.getElementById('wi-email').value = '';
+      document.getElementById('wi-firstname').value = '';
+      document.getElementById('wi-lastname').value = '';
+      document.getElementById('selectedSeat').value = '';
+      document.getElementById('selectedSeatId').value = '';
+      document.getElementById('selectedSeatDisplay').innerHTML = 'No seat selected';
+      
+      renderModalSeatLayout(); 
+      openModal('addWalkinModal'); 
+    }
     function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
     function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
     function escapeHtml(s) { return s ? String(s).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])) : ''; }

@@ -486,7 +486,8 @@ function applyFilters() {
     filteredLogs = filteredLogs.filter(log => 
       (log.first_name && log.first_name.toLowerCase().includes(term)) ||
       (log.last_name && log.last_name.toLowerCase().includes(term)) ||
-      (log.door_name && log.door_name.toLowerCase().includes(term))
+      (log.door_name && log.door_name.toLowerCase().includes(term)) ||
+      (log.method && log.method.toLowerCase().includes(term))
     );
   }
   

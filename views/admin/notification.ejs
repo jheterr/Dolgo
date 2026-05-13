@@ -1,316 +1,476 @@
 <!-- Title passed to layout -->
-<% locals.title = 'The Last Muster | Notification' %>
+<% locals.title = 'The Last Muster | Notifications & Logs' %>
 
 <%- contentFor('style') %>
 <style>
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .45);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 16px;
+    /* Layout Overrides */
+    .content {
+        gap: 24px;
     }
 
-    .modal-overlay.open {
-      display: flex;
+    /* Tabs Styling */
+    .notif-tabs {
+        display: flex;
+        gap: 8px;
+        background: #f1f5f9;
+        padding: 6px;
+        border-radius: 12px;
+        width: fit-content;
+        margin-bottom: 8px;
+    }
+    .notif-tab {
+        padding: 8px 24px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .notif-tab.active {
+        background: white;
+        color: var(--orange);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    .modal {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 28px;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      max-height: 90vh;
-      overflow-y: auto;
+    /* Filter Bar */
+    .filter-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        background: white;
+        padding: 16px 24px;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 12px;
+    }
+    .search-input-group {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+    }
+    .search-input-group i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 14px;
+    }
+    .search-input {
+        padding-left: 40px !important;
+        border-radius: 10px !important;
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+    }
+    .filter-group {
+        display: flex;
+        gap: 10px;
     }
 
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    /* Notification Item */
+    .notif-feed {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
     }
+    .notif-card {
+        background: white;
+        border-radius: 16px;
+        padding: 18px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #e2e8f0;
+        box-shadow: var(--shadow);
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+    .notif-card:hover {
+        border-color: var(--orange);
+        transform: translateY(-2px);
+    }
+    .notif-card.unread::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--orange);
+    }
+    .notif-card.unread {
+        background: #fffaf7;
+    }
+    .notif-icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        font-size: 16px;
+    }
+    .icon-security { background: #fee2e2; color: #ef4444; }
+    .icon-system { background: #eff6ff; color: #3b82f6; }
+    .icon-activity { background: #f0fdf4; color: #22c55e; }
+    
+    .notif-info { flex: 1; }
+    .notif-title { font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 2px; }
+    .notif-msg { font-size: 12px; color: #475569; line-height: 1.5; }
+    .notif-meta { font-size: 11px; color: #94a3b8; margin-top: 6px; display: flex; gap: 12px; }
 
-    .modal-title {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
+    /* Audit Log Table */
+    .log-table-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid #e2e8f0;
     }
+    .log-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .log-table th {
+        background: #f8fafc;
+        padding: 14px 20px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .log-table td {
+        padding: 14px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 12px;
+        color: #1e293b;
+    }
+    .category-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 800;
+    }
+    .cat-security { background: #fee2e2; color: #991b1b; }
+    .cat-system { background: #e0f2fe; color: #075985; }
+    .cat-activity { background: #dcfce7; color: #166534; }
 
-    .modal-close {
-      background: none;
-      border: none;
-      font-size: 1.3rem;
-      color: var(--text-sm);
-      cursor: pointer;
+    .status-pill {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 700;
     }
+    .status-granted { background: #dcfce7; color: #16a34a; }
+    .status-denied { background: #fee2e2; color: #ef4444; }
+    .status-unlocked { background: #fef9c3; color: #854d0e; }
 
-    .modal-body {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px;
+        color: #94a3b8;
     }
+    .empty-state i { font-size: 40px; margin-bottom: 16px; opacity: 0.5; }
 
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
+    @media (max-width: 768px) {
+        .filter-bar { flex-direction: column; align-items: stretch; }
+        .search-input-group { max-width: none; }
+        .notif-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+        .notif-actions { width: 100%; display: flex; justify-content: flex-end; }
     }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .notif-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .notif-item {
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin-bottom: 10px;
-      border-left: 4px solid var(--orange);
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 14px;
-    }
-
-    .notif-orange {
-      background: #fff7f3;
-      border-left-color: var(--orange);
-    }
-
-    .notif-green {
-      background: #f0fdf4;
-      border-left-color: var(--green);
-    }
-
-    .notif-blue {
-      background: #eff6ff;
-      border-left-color: #3498db;
-    }
-
-    .notif-read {
-      background: #f8fafc;
-      border-left-color: var(--border);
-      opacity: .7;
-    }
-
-    .notif-title {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 700;
-      font-size: .88rem;
-      margin-bottom: 4px;
-    }
-
-    .notif-body {
-      font-size: 11.5px;
-      color: var(--text-md);
-      line-height: 1.5;
-      margin-bottom: 8px;
-    }
-
-    .notif-time {
-      font-size: 10.5px;
-      color: var(--text-sm);
-    }
-
-    .notif-actions {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .mark-btn {
-      background: none;
-      border: none;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'Montserrat', sans-serif;
-      white-space: nowrap;
-    }
-
-    .mark-btn:hover {
-      text-decoration: underline;
-    }
-  
 </style>
 
 <div class="app">
     <%- include('../partials/admin_sidebar', { active: 'Notification' }) %>
     <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+    
     <main class="content">
-      <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
 
-      <div class="page-header">
-        <h1 class="page-title">Notification</h1>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-primary" onclick="openModal('announcementModal')"><i class="fa-solid fa-bullhorn"></i>
-            Add Announcement</button>
-          <button class="btn btn-ghost" onclick="markAllRead()"><i class="fa-solid fa-check-double"></i> Mark all
-            read</button>
+        <div class="page-header">
+            <h1 class="page-title">Notifications & System Logs</h1>
+            <div style="display:flex;gap:10px">
+                <button class="btn btn-primary" onclick="openModal('announcementModal')"><i class="fa-solid fa-bullhorn"></i> Post Announcement</button>
+                <button class="btn btn-ghost" id="markAllReadBtn" onclick="markAllRead()"><i class="fa-solid fa-check-double"></i> Mark All Read</button>
+            </div>
         </div>
-      </div>
-      <div class="card" id="notifList">
-        <div class="notif-item notif-orange" id="n1">
-          <div>
-            <div class="notif-title">Reservation Confirmed</div>
-            <div class="notif-body">Staff Zoro confirmed reservation for customer Sanji.</div>
-            <div class="notif-time"><i class="fa-solid fa-clock"></i> Apr 14, 06:15 PM</div>
-          </div>
-          <div class="notif-actions"><button class="mark-btn" style="color:var(--orange)" onclick="markRead('n1')">Mark
-              as read</button></div>
+
+        <div class="notif-tabs">
+            <div class="notif-tab active" onclick="switchTab('notifications')">Notifications</div>
+            <div class="notif-tab" onclick="switchTab('logs')">Audit Logs</div>
         </div>
-        <div class="notif-item notif-green" id="n2">
-          <div>
-            <div class="notif-title">New Walk-in Customer</div>
-            <div class="notif-body">Walk-in customer checked in at Seat RT2-S1.</div>
-            <div class="notif-time"><i class="fa-solid fa-clock"></i> Apr 14, 04:00 PM</div>
-          </div>
-          <div class="notif-actions"><button class="mark-btn" style="color:var(--green)" onclick="markRead('n2')">Mark
-              as read</button></div>
+
+        <div class="filter-bar">
+            <div class="search-input-group">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" class="form-control search-input" id="logSearch" placeholder="Search logs or notifications..." oninput="handleFilter()">
+            </div>
+            <div class="filter-group">
+                <select class="form-control" id="categoryFilter" style="width: auto;" onchange="handleFilter()">
+                    <option value="all">All Categories</option>
+                    <option value="Security">Security</option>
+                    <option value="System">System</option>
+                    <option value="Activity">User Activity</option>
+                </select>
+                <select class="form-control" id="statusFilter" style="width: auto;" onchange="handleFilter()">
+                    <option value="all">All Status</option>
+                    <option value="unread">Unread Only</option>
+                    <option value="read">Read Only</option>
+                </select>
+            </div>
         </div>
-        <div class="notif-item notif-blue" id="n3">
-          <div>
-            <div class="notif-title">WiFi Extension Requested</div>
-            <div class="notif-body">Customer Monkey D. Luffy requested a 2-hour WiFi extension.</div>
-            <div class="notif-time"><i class="fa-solid fa-clock"></i> Apr 14, 02:30 PM</div>
-          </div>
-          <div class="notif-actions"><button class="mark-btn" style="color:#3498db" onclick="markRead('n3')">Mark as
-              read</button></div>
+
+        <!-- Notifications View -->
+        <div id="notificationsView" class="notif-feed">
+            <div class="empty-state">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Loading notifications...</p>
+            </div>
         </div>
-        <div class="notif-item notif-read" id="n4">
-          <div>
-            <div class="notif-title">Plan Upgrade Approved</div>
-            <div class="notif-body">Nami Catburglar's plan upgrade to Premium was approved.</div>
-            <div class="notif-time"><i class="fa-solid fa-clock"></i> Apr 13, 10:00 AM</div>
-          </div>
-          <div class="notif-actions"><button class="mark-btn" style="color:var(--text-sm)">Read</button></div>
+
+        <!-- Audit Logs View -->
+        <div id="logsView" style="display: none;">
+            <div class="log-table-card">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody">
+                        <!-- Logs will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </div>
-      <div class="modal-overlay" id="announcementModal">
-        <div class="modal">
-          <div class="modal-header">
-            <div class="modal-title"><i class="fa-solid fa-bullhorn"></i> Add Announcement</div><button
-              class="modal-close" onclick="closeModal('announcementModal')">&times;</button>
-          </div>
-          <div class="modal-body">
-            <div class="form-group"><label class="form-label">Title</label><input class="form-control" id="ann-title"
-                type="text" placeholder="Announcement title"></div>
-            <div class="form-group"><label class="form-label">Message</label><textarea class="form-control"
-                id="ann-body" placeholder="Announcement message…"></textarea></div>
-            <div class="form-group"><label class="form-label">Type</label><select class="form-control" id="ann-type">
-                <option value="notif-orange">General</option>
-                <option value="notif-green">Good News</option>
-                <option value="notif-blue">Info</option>
-              </select></div>
-          </div>
-          <div class="modal-footer"><button class="btn btn-ghost"
-              onclick="closeModal('announcementModal')">Cancel</button><button class="btn btn-primary"
-              onclick="addAnnouncement()"><i class="fa-solid fa-paper-plane"></i> Post</button></div>
+
+        <!-- Announcement Modal -->
+        <div class="modal-overlay" id="announcementModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title"><i class="fa-solid fa-bullhorn"></i> Create Announcement</div>
+                    <button class="modal-close" onclick="closeModal('announcementModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input class="form-control" id="ann-title" type="text" placeholder="e.g. System Maintenance">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control" id="ann-message" placeholder="Type your announcement here..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-ghost" onclick="closeModal('announcementModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitAnnouncement()">Post Announcement</button>
+                </div>
+            </div>
         </div>
-      </div>
     </main>
-  </div>
+</div>
 
 <%- contentFor('script') %>
 <script>
+    let allNotifications = [];
+    let allLogs = [];
+    let activeTab = 'notifications';
 
-    function openSidebar() {
-      document.getElementById('sidebar').classList.add('mobile-open');
-      document.getElementById('mobileOverlay').classList.add('show');
+    async function loadData() {
+        try {
+            const [notifRes, logRes] = await Promise.all([
+                fetch('/api/notifications').then(res => res.json()),
+                fetch('/api/audit-logs').then(res => res.json())
+            ]);
+
+            allNotifications = notifRes.notifications || [];
+            allLogs = logRes.logs || [];
+
+            renderView();
+        } catch (e) {
+            console.error('Error loading data:', e);
+            toast("Error loading notifications", "error");
+        }
     }
-    function closeSidebar() {
-      document.getElementById('sidebar').classList.remove('mobile-open');
-      document.getElementById('mobileOverlay').classList.remove('show');
+
+    function switchTab(tab) {
+        activeTab = tab;
+        document.querySelectorAll('.notif-tab').forEach(t => {
+            t.classList.toggle('active', t.textContent.toLowerCase().includes(tab));
+        });
+        
+        document.getElementById('notificationsView').style.display = tab === 'notifications' ? 'flex' : 'none';
+        document.getElementById('logsView').style.display = tab === 'logs' ? 'block' : 'none';
+        
+        // Update status filter visibility
+        document.getElementById('statusFilter').style.display = tab === 'notifications' ? 'block' : 'none';
+        
+        renderView();
+    }
+
+    function handleFilter() {
+        renderView();
+    }
+
+    function renderView() {
+        if (activeTab === 'notifications') {
+            renderNotifications();
+        } else {
+            renderLogs();
+        }
+    }
+
+    function renderNotifications() {
+        const container = document.getElementById('notificationsView');
+        const searchTerm = document.getElementById('logSearch').value.toLowerCase();
+        const catFilter = document.getElementById('categoryFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+
+        const filtered = allNotifications.filter(n => {
+            const matchesSearch = n.title.toLowerCase().includes(searchTerm) || n.message.toLowerCase().includes(searchTerm);
+            const matchesStatus = statusFilter === 'all' ? true : (statusFilter === 'unread' ? !n.is_read : n.is_read);
+            return matchesSearch && matchesStatus;
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-bell-slash"></i><p>No notifications found.</p></div>`;
+            return;
+        }
+
+        container.innerHTML = filtered.map(n => {
+            const time = new Date(n.created_at).toLocaleString();
+            return `
+                <div class="notif-card ${!n.is_read ? 'unread' : ''}">
+                    <div style="display:flex; align-items:center;">
+                        <div class="notif-icon-box icon-system">
+                            <i class="fa-solid fa-info-circle"></i>
+                        </div>
+                        <div class="notif-info">
+                            <div class="notif-title">${escapeHtml(n.title)}</div>
+                            <div class="notif-msg">${escapeHtml(n.message)}</div>
+                            <div class="notif-meta">
+                                <span><i class="fa-solid fa-clock"></i> ${time}</span>
+                                ${n.first_name ? `<span><i class="fa-solid fa-user"></i> ${n.first_name}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notif-actions">
+                        ${!n.is_read ? `<button class="btn btn-ghost btn-sm" onclick="markRead(${n.id})">Mark Read</button>` : '<span style="font-size:11px; color:#94a3b8;">Read</span>'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderLogs() {
+        const container = document.getElementById('logsTableBody');
+        const searchTerm = document.getElementById('logSearch').value.toLowerCase();
+        const catFilter = document.getElementById('categoryFilter').value;
+
+        const filtered = allLogs.filter(l => {
+            const matchesSearch = (l.action || '').toLowerCase().includes(searchTerm) || 
+                                (l.user_name || '').toLowerCase().includes(searchTerm) ||
+                                (l.detail || '').toLowerCase().includes(searchTerm);
+            const matchesCat = catFilter === 'all' ? true : l.category === catFilter;
+            return matchesSearch && matchesCat;
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<tr><td colspan="6" class="empty-state">No logs found.</td></tr>`;
+            return;
+        }
+
+        container.innerHTML = filtered.map(l => {
+            const time = new Date(l.timestamp).toLocaleString();
+            const catCls = `cat-${(l.category || '').toLowerCase()}`;
+            const statusCls = `status-${(l.status || '').toLowerCase()}`;
+            
+            return `
+                <tr>
+                    <td style="white-space:nowrap; color:#64748b; font-size:11px;">${time}</td>
+                    <td style="font-weight:700;">${escapeHtml(l.user_name || 'System')}</td>
+                    <td style="font-weight:600;">${escapeHtml(l.action)}</td>
+                    <td><span class="category-badge ${catCls}">${l.category}</span></td>
+                    <td><span class="status-pill ${statusCls}">${l.status}</span></td>
+                    <td style="color:#64748b;">${escapeHtml(l.detail || '')}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function markRead(id) {
+        try {
+            const res = await fetch('/api/notifications/mark-read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            if ((await res.json()).success) {
+                loadData();
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function markAllRead() {
+        try {
+            const res = await fetch('/api/notifications/mark-read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ all: true })
+            });
+            if ((await res.json()).success) {
+                loadData();
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function submitAnnouncement() {
+        const title = document.getElementById('ann-title').value.trim();
+        const message = document.getElementById('ann-message').value.trim();
+        
+        if (!title || !message) { alert("Please fill in both fields"); return; }
+        
+        try {
+            const res = await fetch('/api/notifications/announcement', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, message })
+            });
+            if ((await res.json()).success) {
+                toast("Announcement posted!", "success");
+                closeModal('announcementModal');
+                loadData();
+                
+                document.getElementById('ann-title').value = '';
+                document.getElementById('ann-message').value = '';
+            }
+        } catch (e) { console.error(e); }
     }
 
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-    let yr = 2026, mo = 3;
-    const evMap = { 19: 'Hub 2nd Anni' };
-    const MN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-    function renderCal() {
-      document.getElementById('calTitle').textContent = MN[mo] + ' ' + yr;
-      const g = document.getElementById('calGrid');
-      g.innerHTML = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => `<div class="cal-head">${d}</div>`).join('');
-      const first = new Date(yr, mo, 1).getDay(), days = new Date(yr, mo + 1, 0).getDate();
-      for (let i = 0; i < first; i++) g.innerHTML += '<div class="cal-day empty"></div>';
-      for (let d = 1; d <= days; d++) {
-        const today = yr === 2026 && mo === 3 && d === 20;
-        const ev = evMap[d] ? `<div class="cal-event-tag">${evMap[d]}</div>` : '';
-        g.innerHTML += `<div class="cal-day${today ? ' today' : ''}">${d}${ev}</div>`;
-      }
-    }
-    function changeMonth(dir) {
-      mo += dir;
-      if (mo > 11) { mo = 0; yr++; }
-      if (mo < 0) { mo = 11; yr--; }
-      renderCal();
+    function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+    function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+    function escapeHtml(s) { return s ? String(s).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])) : ''; }
+    
+    function toast(msg, type="info") {
+        alert(msg); // Placeholder for a real toast if available
     }
 
-    function createEvent() {
-      const name = document.getElementById('ev-name').value.trim(),
-        date = document.getElementById('ev-date').value,
-        loc = document.getElementById('ev-loc').value;
-
-      if (!name || !date) {
-        alert('Name and date are required');
-        return;
-      }
-
-      const time = document.getElementById('ev-time').value || '';
-      const div = document.createElement('div');
-      div.className = 'event-item';
-
-      div.innerHTML = `
-    <div class="event-name">${name}</div>
-    <div class="event-meta">
-      <i class="fa-solid fa-clock"></i> ${date}${time ? ' ' + time : ''} · ${loc}
-    </div>
-    <div class="event-actions">
-      <button class="btn btn-ghost btn-sm" onclick="editEvent(this)"><i class="fa-solid fa-pen"></i></button>
-      <button class="btn btn-danger btn-sm" onclick="deleteEvent(this)"><i class="fa-solid fa-trash"></i></button>
-    </div>
-  `;
-
-      document.getElementById('upcomingList').prepend(div);
-
-      alert(`Event "${name}" created`);
-      closeModal('createEventModal');
-
-      ['ev-name', 'ev-date', 'ev-time', 'ev-desc']
-        .forEach(id => document.getElementById(id).value = '');
-    }
-
-    function deleteEvent(btn) {
-      if (confirm('Delete this event?')) {
-        btn.closest('.event-item').remove();
-        alert('Event deleted');
-      }
-    }
-    function editEvent() { alert('Edit feature coming soon'); }
-
-    renderCal();
-  </script>
-
+    loadData();
+    setInterval(loadData, 30000); // Auto refresh every 30s
+</script>

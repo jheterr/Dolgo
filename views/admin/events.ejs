@@ -3,6 +3,10 @@
 
 <%- contentFor('style') %>
 <style>
+  * { font-family: 'Montserrat', sans-serif; }
+  h1, h2, h3, h4, h5, h6, .modal-title, .cal-title, .page-title, .card-title, .cal-head {
+    font-family: 'Poppins', sans-serif !important;
+  }
 
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;}
 .modal-overlay.open{display:flex;}
@@ -30,6 +34,61 @@
 .cal-tag-reservation{background:#8A8636;color:#fff;}
 .legend{display:flex;gap:12px;justify-content:center;margin-top:12px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;}
 .legend-dot{width:10px;height:10px;display:inline-block;border-radius:2px;margin-right:4px;}
+
+/* Calendar View Styles */
+.cal-grid.yearly-view {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+.year-month-box {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+}
+.year-month-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 6px;
+  color: var(--orange);
+}
+.year-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.year-day {
+  font-size: 8px;
+  text-align: center;
+  padding: 2px 0;
+  border-radius: 2px;
+}
+.year-day.has-event { background: var(--orange); color: white; }
+.year-day.has-reservation { background: #8A8636; color: white; }
+.year-day.today { border: 1px solid var(--orange); }
+
+.cal-grid.weekly-view {
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+.weekly-view .cal-day {
+  min-height: 120px;
+}
+.weekly-view .cal-tag {
+  font-size: 9px;
+  padding: 4px 6px;
+}
+
+@media (max-width: 1100px) {
+  .cal-grid.yearly-view { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 800px) {
+  .cal-grid.yearly-view { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 500px) {
+  .cal-grid.yearly-view { grid-template-columns: 1fr; }
+}
 
 /* Filter Controls */
 .filter-controls {
@@ -235,10 +294,17 @@
       
       <div class="card">
         <div class="cal-header">
-          <div class="cal-title" id="calTitle">April 2026</div>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="cal-title" id="calTitle">April 2026</div>
+            <select id="calViewFilter" class="filter-select" style="padding: 4px 12px; font-size: 11px;" onchange="changeView(this.value)">
+              <option value="monthly">Monthly</option>
+              <option value="weekly">Weekly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
           <div class="cal-nav">
-            <button class="cal-nav-btn" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-            <button class="cal-nav-btn" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+            <button class="cal-nav-btn" onclick="navigateCal(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="cal-nav-btn" onclick="navigateCal(1)"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
         </div>
         <div class="cal-grid" id="calGrid"></div>
@@ -370,7 +436,41 @@ function closeModal(id){
   document.getElementById(id).classList.remove('open');
 }
 
-let yr=2026,mo=3;
+let yr=new Date().getFullYear(), mo=new Date().getMonth();
+let currentCalView = 'monthly';
+let currentWeekStart = getStartOfWeek(new Date());
+
+function getStartOfWeek(d) {
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = date.getDate() - day;
+  const start = new Date(date.setDate(diff));
+  start.setHours(0,0,0,0);
+  return start;
+}
+
+function changeView(view) {
+  currentCalView = view;
+  if (view === 'weekly') {
+    currentWeekStart = getStartOfWeek(new Date(yr, mo, 15));
+  }
+  renderCal();
+}
+
+function navigateCal(dir) {
+  if (currentCalView === 'monthly') {
+    mo += dir;
+    if (mo > 11) { mo = 0; yr++; }
+    if (mo < 0) { mo = 11; yr--; }
+  } else if (currentCalView === 'yearly') {
+    yr += dir;
+  } else if (currentCalView === 'weekly') {
+    currentWeekStart.setDate(currentWeekStart.getDate() + (dir * 7));
+    yr = currentWeekStart.getFullYear();
+    mo = currentWeekStart.getMonth();
+  }
+  renderCal();
+}
 const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 // Default seat colors
@@ -709,27 +809,27 @@ function showEventDetail(event){
   openModal('eventDetailModal');
 }
 
-function renderCal(){
-  document.getElementById('calTitle').textContent=MN[mo]+' '+yr;
-  const g=document.getElementById('calGrid');
-  g.innerHTML=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-head">${d}</div>`).join('');
-  const first=new Date(yr,mo,1).getDay(), days=new Date(yr,mo+1,0).getDate();
-  for(let i=0;i<first;i++) g.innerHTML+='<div class="cal-day empty"></div>';
-  for(let d=1;d<=days;d++){
-    const dateStr = `${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const isTodayFlag = isToday(dateStr);
-    const dayEvents = getEventsByDate(dateStr);
-    const dayReservations = getReservationsByDate(dateStr);
-    let tagsHtml = '';
-    dayEvents.slice(0,1).forEach(e => { tagsHtml += `<div class="cal-tag cal-tag-event" title="${e.title}">📅 ${e.title.length>12?e.title.substring(0,10)+'…':e.title}</div>`; });
-    if(dayEvents.length > 1) tagsHtml += `<div class="cal-tag cal-tag-event">+${dayEvents.length-1} more</div>`;
-    dayReservations.slice(0,1).forEach(r => { 
-      const name = `${r.first_name} ${r.last_name}`;
-      tagsHtml += `<div class="cal-tag cal-tag-reservation" title="${name} - Seat ${r.seat_label}">📖 ${name.length>12?name.substring(0,10)+'…':name}</div>`; 
-    });
-    if(dayReservations.length > 1) tagsHtml += `<div class="cal-tag cal-tag-reservation">+${dayReservations.length-1} more</div>`;
-    g.innerHTML+=`<div class="cal-day${isTodayFlag?' today':''}" data-date="${dateStr}"><strong>${d}</strong>${tagsHtml}</div>`;
+function renderCal() {
+  const g = document.getElementById('calGrid');
+  const title = document.getElementById('calTitle');
+  if (!g || !title) return;
+  
+  g.className = 'cal-grid ' + currentCalView + '-view';
+  
+  if (currentCalView === 'monthly') {
+    title.textContent = MN[mo] + ' ' + yr;
+    renderMonthlyView(g);
+  } else if (currentCalView === 'yearly') {
+    title.textContent = 'Year ' + yr;
+    renderYearlyView(g);
+  } else if (currentCalView === 'weekly') {
+    const end = new Date(currentWeekStart);
+    end.setDate(end.getDate() + 6);
+    title.textContent = `${MN[currentWeekStart.getMonth()]} ${currentWeekStart.getDate()} - ${MN[end.getMonth()]} ${end.getDate()}, ${yr}`;
+    renderWeeklyView(g);
   }
+  
+  // Re-attach listeners for monthly/weekly
   document.querySelectorAll('.cal-day:not(.empty)').forEach(day => {
     day.addEventListener('click', () => {
       const date = day.getAttribute('data-date');
@@ -738,11 +838,96 @@ function renderCal(){
   });
 }
 
-function changeMonth(dir){
-  mo+=dir;
-  if(mo>11){mo=0;yr++;}
-  if(mo<0){mo=11;yr--;}
+function renderMonthlyView(g) {
+  g.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-head">${d}</div>`).join('');
+  const first = new Date(yr, mo, 1).getDay();
+  const days = new Date(yr, mo + 1, 0).getDate();
+  
+  for(let i=0; i<first; i++) g.innerHTML += '<div class="cal-day empty"></div>';
+  for(let d=1; d<=days; d++) {
+    const dateStr = `${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isTodayFlag = isToday(dateStr);
+    const dayEvents = getEventsByDate(dateStr);
+    const dayReservations = getReservationsByDate(dateStr);
+    let tagsHtml = '';
+    dayEvents.slice(0,2).forEach(e => { tagsHtml += `<div class="cal-tag cal-tag-event" title="${e.title}">📅 ${e.title.length>12?e.title.substring(0,10)+'…':e.title}</div>`; });
+    if(dayEvents.length > 2) tagsHtml += `<div class="cal-tag cal-tag-event">+${dayEvents.length-2} more</div>`;
+    dayReservations.slice(0,1).forEach(r => { 
+      const name = `${r.first_name} ${r.last_name}`;
+      tagsHtml += `<div class="cal-tag cal-tag-reservation" title="${name} - Seat ${r.seat_label}">📖 ${name.length>12?name.substring(0,10)+'…':name}</div>`; 
+    });
+    if(dayReservations.length > 1) tagsHtml += `<div class="cal-tag cal-tag-reservation">+${dayReservations.length-1} more</div>`;
+    g.innerHTML += `<div class="cal-day${isTodayFlag?' today':''}" data-date="${dateStr}"><strong>${d}</strong>${tagsHtml}</div>`;
+  }
+}
+
+function renderWeeklyView(g) {
+  g.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-head">${d}</div>`).join('');
+  let d = new Date(currentWeekStart);
+  for (let i = 0; i < 7; i++) {
+    const dateStr = d.toISOString().split('T')[0];
+    const isTodayFlag = isToday(dateStr);
+    const dayEvents = getEventsByDate(dateStr);
+    const dayReservations = getReservationsByDate(dateStr);
+    let tagsHtml = '';
+    dayEvents.forEach(e => { tagsHtml += `<div class="cal-tag cal-tag-event" title="${e.title}">📅 ${e.title}</div>`; });
+    dayReservations.forEach(r => { 
+      const name = `${r.first_name} ${r.last_name}`;
+      tagsHtml += `<div class="cal-tag cal-tag-reservation" title="${name} - Seat ${r.seat_label}">📖 ${name} - Seat ${r.seat_label}</div>`; 
+    });
+    
+    g.innerHTML += `
+      <div class="cal-day${isTodayFlag?' today':''}" data-date="${dateStr}">
+        <div style="font-size: 14px; margin-bottom: 5px;"><strong>${d.getDate()}</strong> <span style="font-size: 10px; color: #64748b;">${MN[d.getMonth()]}</span></div>
+        ${tagsHtml}
+      </div>`;
+    d.setDate(d.getDate() + 1);
+  }
+}
+
+function renderYearlyView(g) {
+  g.innerHTML = '';
+  for (let m = 0; m < 12; m++) {
+    const first = new Date(yr, m, 1).getDay();
+    const days = new Date(yr, m + 1, 0).getDate();
+    let monthHtml = `
+      <div class="year-month-box">
+        <div class="year-month-title">${MN[m]}</div>
+        <div class="year-month-grid">
+          ${['S','M','T','W','T','F','S'].map(d=>`<div style="font-size:7px; font-weight:700; text-align:center; opacity:0.5;">${d}</div>`).join('')}
+    `;
+    
+    for(let i=0; i<first; i++) monthHtml += '<div></div>';
+    for(let d=1; d<=days; d++) {
+      const dateStr = `${yr}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const hasEvent = getEventsByDate(dateStr).length > 0;
+      const hasRes = getReservationsByDate(dateStr).length > 0;
+      const isTodayFlag = isToday(dateStr);
+      
+      let cls = 'year-day';
+      if (hasEvent) cls += ' has-event';
+      else if (hasRes) cls += ' has-reservation';
+      if (isTodayFlag) cls += ' today';
+      
+      monthHtml += `<div class="${cls}" title="${dateStr}" onclick="showDayDetails('${dateStr}')">${d}</div>`;
+    }
+    monthHtml += '</div></div>';
+    g.innerHTML += monthHtml;
+  }
+}
+
+function showDayDetails(date) {
+  currentCalView = 'monthly';
+  const d = new Date(date);
+  yr = d.getFullYear();
+  mo = d.getMonth();
+  document.getElementById('calViewFilter').value = 'monthly';
   renderCal();
+  showScheduleModal(date);
+}
+
+function changeMonth(dir){
+  navigateCal(dir);
 }
 
 async function createEvent(){

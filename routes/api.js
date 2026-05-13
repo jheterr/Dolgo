@@ -131,11 +131,11 @@ router.post('/users/add', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password || '123456', salt); // Default pass if none provided
 
-        await db.query(
+        const [result] = await db.query(
             'INSERT INTO users (username, email, password_hash, role, type, status, first_name, last_name, phone, location, schedule) VALUES (?, ?, ?, ?, ?, "active", ?, ?, ?, ?, ?)',
             [email, email, hashedPassword, role || 'customer', type || 'member', firstName, lastName, phone || null, location || null, schedule || null]
         );
-        res.json({ success: true });
+        res.json({ success: true, userId: result.insertId });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, error: 'Database error' });
@@ -500,6 +500,133 @@ router.post('/door-logs', async (req, res) => {
         res.json({ success: true });
     } catch (error) {
         console.error('Error submitting door log:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// --- NOTIFICATIONS & AUDIT LOGS ---
+
+// Get all notifications
+router.get('/notifications', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT n.*, u.first_name, u.last_name 
+            FROM notifications n
+            LEFT JOIN users u ON n.user_id = u.id
+            ORDER BY n.created_at DESC
+        `);
+        res.json({ notifications: rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Mark notification as read
+router.post('/notifications/mark-read', async (req, res) => {
+    const { id, all } = req.body;
+    try {
+        if (all) {
+            await db.query('UPDATE notifications SET is_read = 1');
+        } else {
+            await db.query('UPDATE notifications SET is_read = 1 WHERE id = ?', [id]);
+        }
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Add Announcement (broadcast to all users or just system)
+router.post('/notifications/announcement', async (req, res) => {
+    const { title, message, type } = req.body;
+    try {
+        // For now, let's just create a general notification for the admin/system
+        // In a real app, you might want to insert for each user or have a global_notifications table
+        // For Dolgo, we'll just insert one for the admin (ID 1) as a record
+        await db.query('INSERT INTO notifications (user_id, title, message) VALUES (1, ?, ?)', [title, message]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Unified Audit Logs (Combines Door logs, Reservation updates, User activity)
+router.get('/audit-logs', async (req, res) => {
+    try {
+        // Fetch Door logs
+        const [doorLogs] = await db.query(`
+            SELECT 'Security' as category, door_name as action, status, access_time as timestamp, 
+                   CONCAT(u.first_name, ' ', u.last_name) as user_name, method as detail
+            FROM door_access_logs d
+            LEFT JOIN users u ON d.user_id = u.id
+        `);
+
+        // Fetch Reservation logs (confirmed/cancelled)
+        const [resLogs] = await db.query(`
+            SELECT 'Activity' as category, CONCAT('Reservation ', status) as action, 'info' as status, created_at as timestamp,
+                   CONCAT(u.first_name, ' ', u.last_name) as user_name, CONCAT('Seat: ', fe.label) as detail
+            FROM reservations r
+            JOIN users u ON r.user_id = u.id
+            JOIN floor_elements fe ON r.element_id = fe.id
+        `);
+
+        // Fetch WiFi extensions
+        const [wifiLogs] = await db.query(`
+            SELECT 'System' as category, 'WiFi Extension' as action, status, created_at as timestamp,
+                   CONCAT(u.first_name, ' ', u.last_name) as user_name, CONCAT(requested_hours, ' hours') as detail
+            FROM wifi_extension_requests w
+            JOIN users u ON w.user_id = u.id
+        `);
+
+        // Combine and sort
+        const allLogs = [...doorLogs, ...resLogs, ...wifiLogs].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        res.json({ logs: allLogs });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Update profile picture
+router.post('/users/profile-picture', async (req, res) => {
+    const { image } = req.body;
+    const userId = req.session.user ? req.session.user.id : null;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    try {
+        await db.query('UPDATE users SET profile_picture = ? WHERE id = ?', [image, userId]);
+        // Update session
+        req.session.user.profile_picture = image;
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Update profile info
+router.put('/users/profile', async (req, res) => {
+    const { firstName, lastName, phone, location } = req.body;
+    const userId = req.session.user ? req.session.user.id : null;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    try {
+        await db.query(
+            'UPDATE users SET first_name = ?, last_name = ?, phone = ?, location = ? WHERE id = ?',
+            [firstName, lastName, phone, location, userId]
+        );
+        // Update session
+        req.session.user.first_name = firstName;
+        req.session.user.last_name = lastName;
+        req.session.user.phone = phone;
+        req.session.user.location = location;
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Database error' });
     }
 });
