@@ -7,6 +7,7 @@
         padding: 40px;
         background-color: #f4f6f9;
         min-height: 100vh;
+        font-family: 'Montserrat', sans-serif;
     }
 
     .page-title {
@@ -43,6 +44,7 @@
         color: #64748b;
         cursor: pointer;
         transition: 0.2s;
+        font-family: 'Montserrat', sans-serif;
     }
 
     .tab-btn.active {
@@ -61,6 +63,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        font-family: 'Montserrat', sans-serif;
     }
 
     .btn-mark-all:hover {
@@ -83,6 +86,7 @@
         border: 1px solid #e2e8f0;
         transition: all 0.2s;
         position: relative;
+        cursor: pointer;
     }
 
     .notification-item:hover {
@@ -131,12 +135,14 @@
     }
 
     .notif-time {
+        font-family: 'Montserrat', sans-serif;
         font-size: 0.8rem;
         font-weight: 700;
         color: #94a3b8;
     }
 
     .notif-desc {
+        font-family: 'Montserrat', sans-serif;
         font-size: 0.95rem;
         color: #64748b;
         line-height: 1.5;
@@ -165,6 +171,7 @@
         background: white;
         border-radius: 20px;
         border: 1px solid #e2e8f0;
+        font-family: 'Montserrat', sans-serif;
     }
 </style>
 
@@ -185,44 +192,38 @@
         </div>
 
         <div class="notifications-list" id="notifList">
-            <!-- Notification 1 -->
-            <div class="notification-item unread">
-                <div class="notif-icon"><i class="fa-solid fa-cake-candles"></i></div>
-                <div class="notif-content">
-                    <div class="notif-header">
-                        <h3 class="notif-title">2nd Anniversary Celebration!</h3>
-                        <span class="notif-time">2 hours ago</span>
+            <% if (locals.userNotifications && locals.userNotifications.length > 0) { %>
+                <% locals.userNotifications.forEach(notif => { %>
+                    <div class="notification-item <%= notif.is_read ? '' : 'unread' %>" 
+                         onclick="markAsRead('<%= notif.id %>', this)"
+                         data-id="<%= notif.id %>">
+                        <div class="notif-icon">
+                            <% if (notif.title.toLowerCase().includes('celebration')) { %>
+                                <i class="fa-solid fa-cake-candles"></i>
+                            <% } else if (notif.title.toLowerCase().includes('confirmed')) { %>
+                                <i class="fa-solid fa-calendar-check"></i>
+                            <% } else { %>
+                                <i class="fa-solid fa-bell"></i>
+                            <% } %>
+                        </div>
+                        <div class="notif-content">
+                            <div class="notif-header">
+                                <h3 class="notif-title"><%= notif.title %></h3>
+                                <span class="notif-time">
+                                    <%= new Date(notif.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                                </span>
+                            </div>
+                            <p class="notif-desc"><%= notif.message %></p>
+                        </div>
+                        <div class="unread-dot"></div>
                     </div>
-                    <p class="notif-desc">Join us on April 19, 2026, for our 2nd Anniversary! Exclusive discounts and freebies await all members. See you there!</p>
+                <% }) %>
+            <% } else { %>
+                <div class="empty-state">
+                    <i class="fa-regular fa-bell-slash" style="font-size: 3rem; margin-bottom: 16px; display: block;"></i>
+                    <p>You're all caught up! No new notifications.</p>
                 </div>
-                <div class="unread-dot"></div>
-            </div>
-
-            <!-- Notification 2 -->
-            <div class="notification-item unread">
-                <div class="notif-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                <div class="notif-content">
-                    <div class="notif-header">
-                        <h3 class="notif-title">Seat Reservation Confirmed</h3>
-                        <span class="notif-time">Yesterday</span>
-                    </div>
-                    <p class="notif-desc">Your reservation for Seat #5 on April 18, 2026 (10:00 AM - 1:00 PM) has been confirmed. Don't forget your QR code!</p>
-                </div>
-                <div class="unread-dot"></div>
-            </div>
-
-            <!-- Notification 3 -->
-            <div class="notification-item">
-                <div class="notif-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
-                <div class="notif-content">
-                    <div class="notif-header">
-                        <h3 class="notif-title">Scheduled System Maintenance</h3>
-                        <span class="notif-time">3 days ago</span>
-                    </div>
-                    <p class="notif-desc">The Last Muster portal will undergo scheduled maintenance on April 15 from 2:00 AM to 4:00 AM. Access may be intermittent.</p>
-                </div>
-                <div class="unread-dot"></div>
-            </div>
+            <% } %>
         </div>
 
         <div id="emptyState" class="empty-state" style="display: none;">
@@ -234,11 +235,39 @@
 
 <%- contentFor('script') %>
 <script>
-    function markAllAsRead() {
-        document.querySelectorAll('.notification-item.unread').forEach(item => {
-            item.classList.remove('unread');
-        });
-        alert('All notifications marked as read.');
+    async function markAsRead(id, element) {
+        if (!element.classList.contains('unread')) return;
+
+        try {
+            const response = await fetch(`/customer/notifications/read/${id}`, {
+                method: 'POST'
+            });
+            const result = await response.json();
+            if (result.success) {
+                element.classList.remove('unread');
+            }
+        } catch (err) {
+            console.error('Error marking as read:', err);
+        }
+    }
+
+    async function markAllAsRead() {
+        const unreadItems = document.querySelectorAll('.notification-item.unread');
+        if (unreadItems.length === 0) return;
+
+        try {
+            const response = await fetch('/customer/notifications/read-all', {
+                method: 'POST'
+            });
+            const result = await response.json();
+            if (result.success) {
+                unreadItems.forEach(item => {
+                    item.classList.remove('unread');
+                });
+            }
+        } catch (err) {
+            console.error('Error marking all as read:', err);
+        }
     }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -259,7 +288,7 @@
                 }
             });
 
-            document.getElementById('emptyState').style.display = visibleCount === 0 ? 'block' : 'none';
+            document.getElementById('emptyState').style.display = (items.length > 0 && visibleCount === 0) ? 'block' : 'none';
         });
     });
 </script>

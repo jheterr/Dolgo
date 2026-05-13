@@ -8,13 +8,14 @@
         .page-title {
             font-family: 'Poppins', sans-serif;
             font-size: 2.5rem;
-            color: #d65c29;
+            color: var(--orange, #d65c29);
             font-weight: 800;
             letter-spacing: -0.02em;
             margin-bottom: 8px;
         }
 
         .page-subtitle {
+            font-family: 'Montserrat', sans-serif;
             font-size: 1.3rem;
             color: #64748b;
             margin-bottom: 32px;
@@ -45,6 +46,7 @@
             flex-direction: column;
             border: 1px solid #e2e8f0;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .plan-card:hover {
@@ -53,11 +55,12 @@
         }
 
         .plan-card.premium {
-            border: 2px solid #d65c29;
+            border: 2px solid var(--orange, #d65c29);
             background: #fff;
         }
 
         .plan-title {
+            font-family: 'Poppins', sans-serif;
             font-size: 1.25rem;
             font-weight: 700;
             margin-bottom: 12px;
@@ -80,13 +83,13 @@
         }
 
         .plan-title.premium {
-            color: #d65c29;
+            color: var(--orange, #d65c29);
         }
 
         .plan-price {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            color: #d65c29;
+            color: var(--orange, #d65c29);
             font-family: 'Poppins', sans-serif;
             display: flex;
             align-items: baseline;
@@ -97,11 +100,13 @@
         .plan-price .period {
             font-size: 1rem;
             font-weight: 600;
-            color: #d65c29;
+            color: var(--orange, #d65c29);
             margin-left: 2px;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .plan-desc {
+            font-family: 'Montserrat', sans-serif;
             font-size: 0.85rem;
             color: #64748b;
             margin-bottom: 24px;
@@ -117,6 +122,7 @@
         }
 
         .plan-features li {
+            font-family: 'Montserrat', sans-serif;
             font-size: 0.85rem;
             color: #475569;
             margin-bottom: 12px;
@@ -133,7 +139,8 @@
         }
 
         .btn-subscribe {
-            background: #d65c29;
+            font-family: 'Montserrat', sans-serif;
+            background: var(--orange, #d65c29);
             color: white;
             border: none;
             border-radius: 8px;
@@ -146,7 +153,7 @@
         }
 
         .btn-subscribe:hover {
-            background: #bf4d1f;
+            background: var(--orange-dk, #bf4d1f);
         }
     
 </style>

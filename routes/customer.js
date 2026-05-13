@@ -189,16 +189,68 @@ router.get('/reservations', async (req, res) => {
     }
 });
 
-// 8. GENERIC PAGES
-const pages = [
+// 8. NOTIFICATIONS ROUTE (Detailed)
+router.get('/notifications', async (req, res) => {
+    try {
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 3);
+        console.log('Fetching notifications for userId:', userId);
+        
+        const [rows] = await db.execute(
+            'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC',
+            [userId]
+        );
+        console.log(`Found ${rows.length} notifications for user ${userId}`);
+        
+        res.render('customer/notifications', { 
+            active: 'Notifications', 
+            role: 'customer', 
+            userNotifications: rows || [],
+            session: null 
+        });
+    } catch (err) {
+        console.error('Notifications Route Error:', err);
+        res.status(500).send("Notifications Error: " + err.message);
+    }
+});
+
+// 9. MARK NOTIFICATION AS READ
+router.post('/notifications/read/:id', async (req, res) => {
+    try {
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2);
+        const notifId = req.params.id;
+        await db.execute(
+            'UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?',
+            [notifId, userId]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false });
+    }
+});
+
+// 10. MARK ALL NOTIFICATIONS AS READ
+router.post('/notifications/read-all', async (req, res) => {
+    try {
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2);
+        await db.execute(
+            'UPDATE notifications SET is_read = 1 WHERE user_id = ?',
+            [userId]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false });
+    }
+});
+
+// 11. GENERIC PAGES
+const genericPages = [
   { route: '/dashboard_static', view: 'customer/dashboard',      active: 'Dashboard' },
   { route: '/membership',       view: 'customer/membership',     active: 'Membership' },
-  { route: '/notifications',    view: 'customer/notifications',  active: 'Notifications' },
   { route: '/reserve-history',  view: 'customer/reserve_history',active: 'Reserve History' },
   { route: '/reserve-new',      view: 'customer/reserve_new',    active: 'Reserve New' },
 ];
 
-pages.forEach(({ route, view, active }) => {
+genericPages.forEach(({ route, view, active }) => {
   router.get(route, (req, res) => res.render(view, { active, role: 'customer', session: null }));
 });
 
@@ -206,7 +258,7 @@ pages.forEach(({ route, view, active }) => {
 router.post('/reserve', async (req, res) => {
     console.log('New reservation request received:', req.body);
     try {
-        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2);
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 3);
         const { elementId, date, startTime, endTime } = req.body;
         
         if (!elementId) {
@@ -226,7 +278,7 @@ router.post('/reserve', async (req, res) => {
         await db.execute(
             `INSERT INTO reservations (user_id, element_id, start_time, end_time, amount, status) 
              VALUES (?, ?, ?, ?, ?, 'pending')`,
-            [userId, elementId, start, end, amount, 'pending']
+            [userId, elementId, start, end, amount]
         );
 
         console.log('Reservation saved for user:', userId);
