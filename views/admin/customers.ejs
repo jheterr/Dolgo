@@ -243,23 +243,23 @@
       </div>
       
       <div class="tabs-nav">
-        <button class="tab-btn active" onclick="switchTab(event,'tab-members')">Members</button>
-        <button class="tab-btn" onclick="switchTab(event,'tab-walkins')">Walk-in</button>
+        <button class="tab-btn active" onclick="switchTab(event,'tab-customers')">Customers</button>
         <button class="tab-btn" onclick="switchTab(event,'tab-pending')">Pending Approvals <span id="pendingBadge" style="background:#dc2626; color:white; border-radius:50%; padding:2px 6px; font-size:10px; margin-left:4px; display:none;">0</span></button>
       </div>
       
-      <!-- TAB: MEMBERS -->
-      <div id="tab-members" class="tab-panel active">
+      <!-- TAB: CUSTOMERS (Members + Walk-ins merged) -->
+      <div id="tab-customers" class="tab-panel active">
         <div class="card">
           <div class="card-header-with-filter">
-            <div class="section-title"><i class="fa-solid fa-crown"></i> Members List</div>
+            <div class="section-title"><i class="fa-solid fa-users"></i> All Customers</div>
             <div class="filter-group">
-              <select id="memberTypeFilter" class="filter-dropdown" onchange="filterMembers()">
+              <select id="custTypeFilter" class="filter-dropdown" onchange="filterCustomers()">
                 <option value="all">All Types</option>
                 <option value="Member">Member</option>
                 <option value="Premium">Premium</option>
+                <option value="Walk-in">Walk-in</option>
               </select>
-              <select id="memberStatusFilter" class="filter-dropdown" onchange="filterMembers()">
+              <select id="custStatusFilter" class="filter-dropdown" onchange="filterCustomers()">
                 <option value="all">All Status</option>
                 <option value="Active">Active</option>
                 <option value="Idle">Idle</option>
@@ -273,87 +273,7 @@
                 <tr><th>Seat</th><th>Name</th><th>Email</th><th>Type</th><th>RFID</th><th>WiFi</th><th>MAC Address</th><th>Status</th><th>Action</th></tr>
               </thead>
               <tbody id="custBody">
-                <!-- Member 1 -->
-                <tr data-status="Active" data-type="Member">
-                  <td>A3</td><td class="td-bold">Monkey D. Luffy</td><td>luffy@strawhat.com</td><td>Member</td><td>RFID_A1B2C3</td>
-                  <td class="wifi-cell" data-customer-id="1" data-current-hours="5">5 hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Monkey D. Luffy', 5)"><i class="fa-solid fa-pen"></i></button></td>
-                  <td>AA:BB:CC:11:22:33</td><td><span class="badge badge-green">Active</span></td>
-                  <td><div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)"><i class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm" onclick="openEditCustomerModal(this)"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm" onclick="removeCustomer(this)"><i class="fa-solid fa-trash"></i></button></div></td>
-                </tr>
-                <tr data-status="Active" data-type="Member">
-                  <td>B2</td><td class="td-bold">Roronoa Zoro</td><td>zoro@strawhat.com</td><td>Member</td><td>RFID_9Z8X7Y</td>
-                  <td class="wifi-cell" data-customer-id="2" data-current-hours="3">3 hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Roronoa Zoro', 3)"><i class="fa-solid fa-pen"></i></button></td>
-                  <td>AA:BB:CC:44:55:66</td><td><span class="badge badge-green">Active</span></td>
-                  <td><div><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)"><i class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm" onclick="openEditCustomerModal(this)"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm" onclick="removeCustomer(this)"><i class="fa-solid fa-trash"></i></button></div></td>
-                </tr>
-                <tr data-status="Idle" data-type="Member">
-                  <td>C5</td><td class="td-bold">Nami Catburglar</td><td>nami@weather.com</td><td>Member</td><td>RFID_NA789</td>
-                  <td class="wifi-cell" data-customer-id="3" data-current-hours="2">2 hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Nami Catburglar', 2)"><i class="fa-solid fa-pen"></i></button></td>
-                  <td>AA:BB:CC:77:88:99<br>AA:BB:CC:77:88:AA</td><td><span class="badge badge-orange">Idle</span></td>
-                  <td><div><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)"><i class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm" onclick="openEditCustomerModal(this)"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm" onclick="removeCustomer(this)"><i class="fa-solid fa-trash"></i></button></div></td>
-                </tr>
-                <tr data-status="Inactive" data-type="Member">
-                  <td>B4</td><td class="td-bold">Sanji Vinsmoke</td><td>sanji@allblue.com</td><td>Member</td><td>RFID_SJ42</td>
-                  <td class="wifi-cell" data-customer-id="4" data-current-hours="2">2 hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Sanji Vinsmoke', 2)"><i class="fa-solid fa-pen"></i></button></td>
-                  <td>AA:BB:CC:AA:BB:CC</td><td><span class="badge badge-red">Inactive</span></td>
-                  <td><div><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)"><i class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm" onclick="openEditCustomerModal(this)"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm" onclick="removeCustomer(this)"><i class="fa-solid fa-trash"></i></button></div></td>
-                </tr>
-                <tr data-status="Active" data-type="Member">
-                  <td>C1</td><td class="td-bold">Tony Chopper</td><td>chopper@dr.com</td><td>Member</td><td>RFID_CHOP</td>
-                  <td class="wifi-cell" data-customer-id="5" data-current-hours="2">2 hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Tony Chopper', 2)"><i class="fa-solid fa-pen"></i></button></td>
-                  <td>AA:BB:CC:DD:EE:01</td><td><span class="badge badge-green">Active</span></td>
-                  <td><div><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)"><i class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm" onclick="openEditCustomerModal(this)"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm" onclick="removeCustomer(this)"><i class="fa-solid fa-trash"></i></button></div></td>
-                </tr>
-                <tr data-status="Active" data-type="Premium">
-                  <td>D3</td><td class="td-bold">Vivi Nefertari</td><td>vivi@alabasta.com</td><td>Premium</td><td>RFID_VIVI</td>
-                  <td class="wifi-cell" data-customer-id="6" data-current-hours="8">8 hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Vivi Nefertari', 8)"><i class="fa-solid fa-pen"></i></button></td>
-                  <td>AA:BB:CC:DD:EE:04</td><td><span class="badge badge-green">Active</span></td>
-                  <td><div><button class="btn btn-ghost btn-sm" onclick="viewCustomer(this)"><i class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm" onclick="openEditCustomerModal(this)"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm" onclick="removeCustomer(this)"><i class="fa-solid fa-trash"></i></button></div></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      
-      <!-- TAB: WALK-IN -->
-      <div id="tab-walkins" class="tab-panel">
-        <div class="card">
-          <div class="card-header-with-filter">
-            <div class="section-title"><i class="fa-solid fa-person-walking"></i> Walk-in Customers</div>
-            <div class="filter-group">
-              <select id="walkinStatusFilter" class="filter-dropdown" onchange="filterWalkins()">
-                <option value="all">All Status</option>
-                <option value="Active">Active</option>
-                <option value="Idle">Idle</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr><th>Seat</th><th>Name</th><th>Email</th><th>Type</th><th>RFID</th><th>WiFi</th><th>MAC Address</th><th>Status</th><th>Action</th></tr>
-              </thead>
-              <tbody id="walkinsBody">
-                <tr data-status="Active">
-                  <td>C1</td><td class="td-bold">Tony Chopper</td><td>chopper@dr.com</td><td>Walk-in</td><td>-</td>
-                  <td class="wifi-cell" data-customer-id="w1" data-current-hours="5">5 hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Tony Chopper', 5)"><i class="fa-solid fa-pen"></i></button></td>
-                  <td>AA:BB:CC:D0:EE:01</td><td><span class="badge badge-green">Active</span></td>
-                  <td><div><button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)"><i class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm" onclick="openEditWalkinModal(this)"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm" onclick="removeWalkin(this)"><i class="fa-solid fa-trash"></i></button></div></td>
-                </tr>
-                <tr data-status="Inactive">
-                  <td>D3</td><td class="td-bold">Vivi Nefertari</td><td>vivi@alabasta.com</td><td>Walk-in</td><td>-</td>
-                  <td class="wifi-cell" data-customer-id="w2" data-current-hours="2">2 hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Vivi Nefertari', 2)"><i class="fa-solid fa-pen"></i></button></td>
-                  <td>AA:BB:CC:D0:EE:04</td><td><span class="badge badge-red">Inactive</span></td>
-                  <td><div><button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)"><i class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm" onclick="openEditWalkinModal(this)"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm" onclick="removeWalkin(this)"><i class="fa-solid fa-trash"></i></button></div></td>
-                </tr>
-                <tr data-status="Active">
-                  <td>A7</td><td class="td-bold">Brook</td><td>brook@walkin.com</td><td>Walk-in</td><td>-</td>
-                  <td class="wifi-cell" data-customer-id="w3" data-current-hours="3">3 hr(s) <button class="wifi-edit-btn" onclick="openWifiEditModal(this, 'Brook', 3)"><i class="fa-solid fa-pen"></i></button></td>
-                  <td>AA:BB:CC:DD:EE:02</td><td><span class="badge badge-green">Active</span></td>
-                  <td><div><button class="btn btn-ghost btn-sm" onclick="viewWalkinCustomer(this)"><i class="fa-solid fa-eye"></i></button><button class="btn btn-ghost btn-sm" onclick="openEditWalkinModal(this)"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger btn-sm" onclick="removeWalkin(this)"><i class="fa-solid fa-trash"></i></button></div></td>
-                </tr>
+                <!-- Populated by JS loadRealUsers() -->
               </tbody>
             </table>
           </div>
@@ -510,41 +430,47 @@
 
     async function loadRealUsers() {
       try {
-        // Load All Customers (role=customer)
-        const resMem = await fetch('/api/users?role=customer');
-        const dataMem = await resMem.json();
-        const allCustomers = dataMem.users || [];
-        
-        // Load Active Sessions (for time info)
-        const resAct = await fetch('/api/active-customers');
-        const dataAct = await resAct.json();
-        const activeSessions = dataAct.customers || [];
-        
+        // Fetch members and walk-ins separately at DB level (no guessing)
+        const [resMem, resWalk, resAct] = await Promise.all([
+          fetch('/api/users?role=customer&typeGroup=member'),
+          fetch('/api/users?role=customer&typeGroup=walkin'),
+          fetch('/api/active-customers')
+        ]);
+        const members   = (await resMem.json()).users  || [];
+        const walkins   = (await resWalk.json()).users || [];
+        const activeSessions = (await resAct.json()).customers || [];
+
         const memberBody = document.getElementById('custBody');
         const walkinBody = document.getElementById('walkinsBody');
         memberBody.innerHTML = '';
         walkinBody.innerHTML = '';
-        
-        allCustomers.forEach(user => {
+
+        function buildRow(user, typeLabel) {
           const session = activeSessions.find(s => s.id === user.id);
           const endTime = session ? new Date(session.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'No active session';
-          
+          const dbStatus = user.status || '';
+          const statusNorm = dbStatus.charAt(0).toUpperCase() + dbStatus.slice(1).toLowerCase();
+          const rowStatus = ['Active','Idle','Inactive'].includes(statusNorm) ? statusNorm : (session ? 'Active' : 'Inactive');
+          const badgeClass = rowStatus === 'Active' ? 'green' : (rowStatus === 'Idle' ? 'orange' : 'red');
+
           const tr = document.createElement('tr');
-          tr.setAttribute('data-type', user.type === 'member' ? 'Member' : 'Walk-in');
-          tr.setAttribute('data-status', session ? 'Active' : 'Inactive');
-          
+          tr.setAttribute('data-type', typeLabel);
+          tr.setAttribute('data-status', rowStatus);
+          tr.setAttribute('data-name', (user.first_name + ' ' + user.last_name).toLowerCase());
+          tr.setAttribute('data-email', (user.email || '').toLowerCase());
+
           tr.innerHTML = `
             <td>${session?.seat_label || '—'}</td>
             <td class="td-bold">${escapeHtml(user.first_name)} ${escapeHtml(user.last_name)}</td>
             <td>${escapeHtml(user.email)}</td>
-            <td>${user.type === 'member' ? 'Member' : 'Walk-in'}</td>
+            <td>${typeLabel}</td>
             <td>—</td>
             <td class="wifi-cell">
-                ${endTime} 
-                ${session ? `<button class="wifi-edit-btn" onclick="openWifiEditModal(this, '${user.first_name} ${user.last_name}', '${endTime}', ${user.id})"><i class="fa-solid fa-pen"></i></button>` : ''}
+                ${endTime}
+                ${session ? `<button class=\"wifi-edit-btn\" onclick=\"openWifiEditModal(this, '${user.first_name} ${user.last_name}', '${endTime}', ${user.id})\"><i class=\"fa-solid fa-pen\"></i></button>` : ''}
             </td>
             <td>${session?.mac_address || '—'}</td>
-            <td><span class="badge badge-${session ? 'green' : 'red'}">${session ? 'Active' : 'Inactive'}</span></td>
+            <td><span class="badge badge-${badgeClass}">${rowStatus}</span></td>
             <td>
               <div style="display:flex;gap:5px">
                 <button class="btn btn-ghost btn-sm" onclick='viewCustomer(${JSON.stringify(user)})' title="View"><i class="fa-solid fa-eye"></i></button>
@@ -553,12 +479,18 @@
               </div>
             </td>
           `;
-          
-          if (user.type === 'walkin') {
-            walkinBody.appendChild(tr);
-          } else {
-            memberBody.appendChild(tr);
-          }
+          return tr;
+        }
+
+        // Populate Members tab — includes member, premium, and self-registered (NULL type)
+        members.forEach(user => {
+          const label = (user.type || '').toLowerCase().includes('prem') ? 'Premium' : 'Member';
+          memberBody.appendChild(buildRow(user, label));
+        });
+
+        // Populate Walk-in tab — only users with type LIKE '%walk%'
+        walkins.forEach(user => {
+          walkinBody.appendChild(buildRow(user, 'Walk-in'));
         });
 
       } catch (err) { console.error(err); }
@@ -856,6 +788,45 @@
       div.innerHTML = `<input type="text" class="mac-input" placeholder="AA:BB:CC:DD:EE:FF"><button type="button" class="remove-mac-btn" onclick="this.parentElement.remove(); currentMacCount--;"><i class="fa-solid fa-minus"></i></button>`;
       container.appendChild(div);
       currentMacCount++;
+    }
+
+    function filterMembers() {
+      const typeVal = document.getElementById('memberTypeFilter').value;
+      const statusVal = document.getElementById('memberStatusFilter').value;
+      const searchVal = document.getElementById('custSearch').value.toLowerCase().trim();
+      document.querySelectorAll('#custBody tr').forEach(tr => {
+        const type   = tr.getAttribute('data-type') || '';
+        const status = tr.getAttribute('data-status') || '';
+        const name   = tr.getAttribute('data-name') || '';
+        const email  = tr.getAttribute('data-email') || '';
+        const typeOk   = typeVal === 'all' || type === typeVal;
+        const statusOk = statusVal === 'all' || status === statusVal;
+        const searchOk = !searchVal || name.includes(searchVal) || email.includes(searchVal);
+        tr.style.display = (typeOk && statusOk && searchOk) ? '' : 'none';
+      });
+    }
+
+    function filterWalkins() {
+      const statusVal = document.getElementById('walkinStatusFilter').value;
+      const searchVal = document.getElementById('custSearch').value.toLowerCase().trim();
+      document.querySelectorAll('#walkinsBody tr').forEach(tr => {
+        const status = tr.getAttribute('data-status') || '';
+        const name   = tr.getAttribute('data-name') || '';
+        const email  = tr.getAttribute('data-email') || '';
+        const statusOk = statusVal === 'all' || status === statusVal;
+        const searchOk = !searchVal || name.includes(searchVal) || email.includes(searchVal);
+        tr.style.display = (statusOk && searchOk) ? '' : 'none';
+      });
+    }
+
+    function searchCustomers() {
+      // Apply search across whichever tab is active
+      const activePanel = document.querySelector('.tab-panel.active');
+      if (activePanel && activePanel.id === 'tab-members') {
+        filterMembers();
+      } else if (activePanel && activePanel.id === 'tab-walkins') {
+        filterWalkins();
+      }
     }
 
     function switchTab(event, id) { 

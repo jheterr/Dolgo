@@ -1,9 +1,14 @@
 <!-- Title passed to layout -->
-<% locals.title = 'The Last Muster • Events & Reservations' %>
+<% locals.title = 'The Last Muster | Events & Reservations' %>
 
 <%- contentFor('style') %>
 <style>
-/* Use the exact design variables from the Staff Panel */
+
+  * { font-family: 'Montserrat', sans-serif; }
+  h1, h2, h3, h4, h5, h6, .modal-title, .cal-title, .page-title, .card-title, .cal-head {
+    font-family: 'Poppins', sans-serif !important;
+  }
+
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;backdrop-filter: blur(4px);}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--white);border-radius:var(--radius);padding:28px;width:100%;max-width:550px;box-shadow:0 20px 60px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:16px;max-height:90vh;overflow-y:auto;}
@@ -13,23 +18,78 @@
 .modal-close:hover{color:var(--orange);}
 .modal-body{display:flex;flex-direction:column;gap:14px;}
 .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:8px;}
-
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .cal-title{font-family:'Poppins',sans-serif;font-size:1rem;font-weight:700;}
 .cal-nav{display:flex;gap:6px;}
-.cal-nav-btn{width:30px;height:30px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--white);cursor:pointer;color:var(--text-sm);font-size:12px;transition:.2s;display:flex;align-items:center;justify-content:center;}
+.cal-nav-btn{width:30px;height:30px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--white);cursor:pointer;color:var(--text-sm);font-size:12px;transition:.2s;display: flex; align-items: center; justify-content: center;}
 .cal-nav-btn:hover{border-color:var(--orange);color:var(--orange);}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
 .cal-head{text-align:center;font-size:10px;font-weight:700;color:var(--text-sm);padding:6px 0;letter-spacing:.04em;text-transform: uppercase;}
-.cal-day{min-height:75px;border:1.5px solid var(--border);border-radius:8px;padding:5px 6px;background:var(--white);font-size:12px;font-weight:700;cursor:pointer;transition:.15s;overflow:hidden;}
+.cal-day{min-height:65px;border:1.5px solid var(--border);border-radius:8px;padding:5px 6px;background:var(--white);font-size:12px;font-weight:700;cursor:pointer;transition:.15s;overflow:hidden;}
 .cal-day:hover{border-color:var(--orange);background:var(--cream-lt);}
 .cal-day.empty{background:var(--cream-lt);opacity:.5;pointer-events:none;}
 .cal-day.today{border-color:var(--orange);color:var(--orange);}
-.cal-tag{font-size:8px;font-weight:700;border-radius:3px;padding:2px 4px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-tag{font-size:7.5px;font-weight:700;border-radius:3px;padding:2px 4px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cal-tag-event{background:var(--orange);color:#fff;}
 .cal-tag-reservation{background:#8A8636;color:#fff;}
 .legend{display:flex;gap:12px;justify-content:center;margin-top:12px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;}
 .legend-dot{width:10px;height:10px;display:inline-block;border-radius:2px;margin-right:4px;}
+
+/* Calendar View Styles */
+.cal-grid.yearly-view {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+.year-month-box {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+}
+.year-month-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 6px;
+  color: var(--orange);
+}
+.year-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.year-day {
+  font-size: 8px;
+  text-align: center;
+  padding: 2px 0;
+  border-radius: 2px;
+}
+.year-day.has-event { background: var(--orange); color: white; }
+.year-day.has-reservation { background: #8A8636; color: white; }
+.year-day.today { border: 1px solid var(--orange); }
+
+.cal-grid.weekly-view {
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+.weekly-view .cal-day {
+  min-height: 120px;
+}
+.weekly-view .cal-tag {
+  font-size: 9px;
+  padding: 4px 6px;
+}
+
+@media (max-width: 1100px) {
+  .cal-grid.yearly-view { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 800px) {
+  .cal-grid.yearly-view { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 500px) {
+  .cal-grid.yearly-view { grid-template-columns: 1fr; }
+}
 
 /* Filter Controls */
 .filter-controls {
@@ -48,18 +108,68 @@
 .filter-select {
   padding: 10px 20px;
   border-radius: 40px;
-  border: 1px solid var(--border);
+  border: 1px solid #e2e8f0;
   background: white;
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-md);
+  color: #1e293b;
   cursor: pointer;
   outline: none;
   transition: all 0.2s;
 }
-.filter-select:hover { border-color: var(--orange); }
+.filter-select:hover {
+  border-color: #CF6322;
+}
+.filter-select:focus {
+  border-color: #CF6322;
+  box-shadow: 0 0 0 2px rgba(207,99,34,0.1);
+}
 
-/* Cards Grid */
+/* Schedule Modal Styles */
+.schedule-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+.schedule-hour {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 8px 0;
+}
+.schedule-time {
+  width: 80px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #CF6322;
+}
+.schedule-customers {
+  flex: 1;
+  font-size: 12px;
+  color: #475569;
+}
+.schedule-customers span {
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 15px;
+  margin-right: 6px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+.schedule-empty {
+  color: #94a3b8;
+  font-style: italic;
+}
+.date-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e293b;
+  text-align: center;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 12px;
+}
+
+/* Cards Grid - 3 columns per row */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -73,19 +183,18 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
-  border: 1px solid var(--border);
+  border: 1px solid #e2e8f0;
 }
 .event-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0,0,0,0.1);
 }
 .card-banner {
-  height: 150px;
+  height: 170px;
   background-size: cover;
   background-position: center;
   position: relative;
   background-repeat: no-repeat;
-  background-color: var(--orange);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,11 +205,11 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  background: var(--orange);
+  background: #CF6322;
   color: white;
   padding: 4px 12px;
   border-radius: 20px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 .card-content {
@@ -110,11 +219,11 @@
   font-size: 16px;
   font-weight: 800;
   margin-bottom: 8px;
-  color: var(--text-md);
+  color: #1e293b;
 }
 .card-meta {
   font-size: 11px;
-  color: var(--text-sm);
+  color: #64748b;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -134,6 +243,9 @@
   color: #475569;
   line-height: 1.4;
   margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .empty-state {
   text-align: center;
@@ -141,7 +253,6 @@
   color: #94a3b8;
   grid-column: 1 / -1;
 }
-
 .reservation-detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
 .reservation-detail-row:last-child{border-bottom:none;}
 .reservation-label{font-weight:600;color:var(--text-md);}
@@ -149,65 +260,44 @@
 .event-detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
 .event-detail-row:last-child{border-bottom:none;}
 
-.schedule-hour {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 10px 0;
-}
-.schedule-time {
-  width: 90px;
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--orange);
-}
-.schedule-item {
-  flex: 1;
-  font-size: 12px;
-  color: var(--text-md);
-  font-weight: 600;
-}
-.schedule-tag {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 15px;
-  font-size: 10px;
-  font-weight: 700;
-}
-
 @media(max-width:1024px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:700px){.cards-grid{grid-template-columns:1fr;}.filter-controls{flex-direction:column;align-items:stretch;}}
+  
 </style>
 
 <div class="app">
-    <%- include('../partials/customer_sidebar', { active: 'Event' }) %>
-    <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
-
+  <%- include('../partials/customer_sidebar', { active: 'Event' }) %>
+  <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
     <main class="content">
       <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
 
       <div class="page-header">
         <h1 class="page-title">Events & Reservations</h1>
       </div>
-
-      <!-- Calendar Card -->
+      
       <div class="card" style="margin-bottom: 24px;">
         <div class="cal-header">
-          <div class="cal-title" id="calTitle">Loading...</div>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="cal-title" id="calTitle">Loading...</div>
+            <select id="calViewFilter" class="filter-select" style="padding: 4px 12px; font-size: 11px;" onchange="changeView(this.value)">
+              <option value="monthly">Monthly</option>
+              <option value="weekly">Weekly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
           <div class="cal-nav">
-            <button class="cal-nav-btn" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-            <button class="cal-nav-btn" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+            <button class="cal-nav-btn" onclick="navigateCal(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="cal-nav-btn" onclick="navigateCal(1)"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
         </div>
         <div class="cal-grid" id="calGrid"></div>
         <div class="legend">
           <span><span class="legend-dot" style="background:var(--orange);"></span> Event</span>
           <span><span class="legend-dot" style="background:#8A8636;"></span> My Reservation</span>
-          <span><span class="legend-dot" style="background:var(--orange); border:1px solid var(--orange);"></span> Today</span>
+          <span><span class="legend-dot" style="background:var(--orange);border:1px solid var(--orange);"></span> Today</span>
         </div>
       </div>
-
-      <!-- Filters -->
+      
       <div class="filter-controls">
         <div class="filter-dropdown">
           <select id="viewSelect" class="filter-select" onchange="switchView()">
@@ -223,9 +313,9 @@
           </select>
         </div>
       </div>
-
+      
       <div id="cardsContainer" class="cards-grid"></div>
-
+      
       <!-- Schedule Modal -->
       <div class="modal-overlay" id="scheduleModal">
         <div class="modal">
@@ -239,239 +329,328 @@
           </div>
         </div>
       </div>
-
+      
       <!-- Reservation Detail Modal -->
       <div class="modal-overlay" id="reservationDetailModal">
-        <div class="modal">
-          <div class="modal-header">
-            <div class="modal-title"><i class="fa-solid fa-calendar-check"></i> Reservation Details</div>
-            <button class="modal-close" onclick="closeModal('reservationDetailModal')">&times;</button>
-          </div>
+        <div class="modal"><div class="modal-header"><div class="modal-title"><i class="fa-solid fa-calendar-check"></i> Reservation Details</div><button class="modal-close" onclick="closeModal('reservationDetailModal')">&times;</button></div>
           <div class="modal-body" id="reservationDetailBody"></div>
-          <div class="modal-footer">
-            <button class="btn btn-ghost" onclick="closeModal('reservationDetailModal')">Close</button>
-          </div>
+          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('reservationDetailModal')">Close</button></div>
         </div>
       </div>
-
+      
       <!-- Event Detail Modal -->
       <div class="modal-overlay" id="eventDetailModal">
-        <div class="modal">
-          <div class="modal-header">
-            <div class="modal-title"><i class="fa-solid fa-calendar-star"></i> Event Details</div>
-            <button class="modal-close" onclick="closeModal('eventDetailModal')">&times;</button>
-          </div>
+        <div class="modal"><div class="modal-header"><div class="modal-title"><i class="fa-solid fa-calendar-star"></i> Event Details</div><button class="modal-close" onclick="closeModal('eventDetailModal')">&times;</button></div>
           <div class="modal-body" id="eventDetailBody"></div>
-          <div class="modal-footer">
-            <button class="btn btn-ghost" onclick="closeModal('eventDetailModal')">Close</button>
-          </div>
+          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('eventDetailModal')">Close</button></div>
         </div>
       </div>
+      
     </main>
-</div>
+  </div>
 
 <%- contentFor('script') %>
 <script>
-    function openSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
-    function closeSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
-    function openModal(id){ document.getElementById(id).classList.add('open'); }
-    function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function openSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
-    // Data Stores
-    let events = [];
-    let myReservations = [];
+let yr=new Date().getFullYear(), mo=new Date().getMonth();
+let currentCalView = 'monthly';
+let currentWeekStart = getStartOfWeek(new Date());
 
-    async function loadData() {
-        try {
-            const [evRes, revRes] = await Promise.all([
-                fetch('/api/events').then(res => res.json()),
-                fetch('/api/reservations').then(res => res.json())
-            ]);
-            
-            // Note: /api/reservations returns ALL reservations for admin, 
-            // but here we filter or use the ones passed by the server if we want privacy.
-            // However, to keep it simple and real-time, we'll fetch.
-            // In a real app, /api/my-reservations would be better.
-            
-            events = (evRes.events || []).map(e => ({
-                id: e.id,
-                name: e.title,
-                date: e.event_date ? e.event_date.split('T')[0] : '',
-                time: e.event_date ? new Date(e.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'All day',
-                location: e.location,
-                description: e.description,
-                image: e.image,
-                price: e.price
-            }));
+function getStartOfWeek(d) {
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = date.getDate() - day;
+  const start = new Date(date.setDate(diff));
+  start.setHours(0,0,0,0);
+  return start;
+}
 
-            // Filter for my reservations if we have a way to know our ID on client side
-            // For now, let's assume the server-passed reservations are the "initial" state
-            // and we refresh them.
-            myReservations = (revRes.reservations || []).map(r => ({
-                id: r.id,
-                customerName: `${r.first_name} ${r.last_name}`,
-                date: r.start_time ? r.start_time.split('T')[0] : '',
-                time: r.start_time ? new Date(r.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
-                seat: r.seat_label,
-                status: r.status || 'confirmed'
-            }));
+function changeView(view) {
+  currentCalView = view;
+  if (view === 'weekly') {
+    currentWeekStart = getStartOfWeek(new Date(yr, mo, 15));
+  }
+  renderCal();
+}
 
-            renderCal();
-            switchView();
-        } catch (e) { console.error('Load Error:', e); }
+function navigateCal(dir) {
+  if (currentCalView === 'monthly') {
+    mo += dir;
+    if (mo > 11) { mo = 0; yr++; }
+    if (mo < 0) { mo = 11; yr--; }
+  } else if (currentCalView === 'yearly') {
+    yr += dir;
+  } else if (currentCalView === 'weekly') {
+    currentWeekStart.setDate(currentWeekStart.getDate() + (dir * 7));
+    yr = currentWeekStart.getFullYear();
+    mo = currentWeekStart.getMonth();
+  }
+  renderCal();
+}
+
+const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+const timeSlots = [
+  "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
+  "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM",
+  "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM"
+];
+
+function getTimeHour(timeStr) {
+  if (!timeStr) return 0;
+  if (timeStr.includes('AM') || timeStr.includes('PM')) {
+      const hourMap = {
+        "08:00 AM": 8, "09:00 AM": 9, "10:00 AM": 10, "11:00 AM": 11,
+        "12:00 PM": 12, "01:00 PM": 13, "02:00 PM": 14, "03:00 PM": 15,
+        "04:00 PM": 16, "05:00 PM": 17, "06:00 PM": 18, "07:00 PM": 19,
+        "08:00 PM": 20, "09:00 PM": 21, "10:00 PM": 22, "11:00 PM": 23
+      };
+      return hourMap[timeStr] || 0;
+  }
+  return parseInt(timeStr.split(':')[0]);
+}
+
+function getMyReservationsForTimeSlot(date, timeSlot) {
+  const resOnDate = myReservations.filter(r => {
+      const d = new Date(r.start_time).toISOString().split('T')[0];
+      return d === date && r.status === 'confirmed';
+  });
+  const slotHour = getTimeHour(timeSlot);
+  return resOnDate.filter(r => {
+      const h = new Date(r.start_time).getHours();
+      return h === slotHour;
+  });
+}
+
+function showScheduleModal(dateStr) {
+  const formattedDate = new Date(dateStr).toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+  const dayEvents = events.filter(e => new Date(e.event_date).toISOString().split('T')[0] === dateStr);
+  
+  let scheduleHtml = `<div class="date-title">Schedule - ${formattedDate}</div>`;
+  
+  if (dayEvents.length > 0) {
+    scheduleHtml += `<div style="background:#fff8f0; padding:12px; border-radius:12px; margin-bottom:16px; border-left:4px solid var(--orange);">
+      <div style="font-weight:700; margin-bottom:8px; color:var(--orange);"><i class="fa-solid fa-calendar-star"></i> Events</div>`;
+    dayEvents.forEach(e => {
+      scheduleHtml += `
+        <div style="padding:6px 0; border-bottom:1px solid #e2e8f0; cursor:pointer;" onclick="showEventDetail(${JSON.stringify(e).replace(/"/g, '&quot;')})">
+          <span style="font-weight:700;">${escapeHtml(e.title)}</span>
+          <span style="font-size:11px; color:#64748b; margin-left:8px;">${new Date(e.event_date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+          <span style="font-size:10px; color:#94a3b8; margin-left:8px;">📍 ${e.location}</span>
+        </div>
+      `;
+    });
+    scheduleHtml += `</div>`;
+  }
+  
+  scheduleHtml += `<div class="schedule-list">`;
+  for (const timeSlot of timeSlots) {
+    const res = getMyReservationsForTimeSlot(dateStr, timeSlot);
+    let resHtml = '';
+    if (res.length > 0) {
+      resHtml = res.map(r => `<span onclick="showReservationDetail(${JSON.stringify(r).replace(/"/g, '&quot;')})" style="cursor:pointer; background:#fdf9f0; color:#8A8636; border:1px solid #8A8636;">My Booking (Seat ${r.seat_label})</span>`).join('');
+    } else {
+      resHtml = '<span class="schedule-empty">No personal bookings</span>';
     }
+    scheduleHtml += `
+      <div class="schedule-hour">
+        <div class="schedule-time">${timeSlot}</div>
+        <div class="schedule-customers">${resHtml}</div>
+      </div>
+    `;
+  }
+  scheduleHtml += `</div>`;
+  document.getElementById('scheduleModalBody').innerHTML = scheduleHtml;
+  openModal('scheduleModal');
+}
 
-    // Initial load and polling
-    loadData();
-    setInterval(loadData, 15000);
+let events = [];
+let myReservations = [];
 
-    let yr = new Date().getFullYear(), mo = new Date().getMonth();
-    const MN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-    function isToday(dateStr){
-        const todayStr = new Date().toISOString().split('T')[0];
-        return dateStr === todayStr;
-    }
-
-    function switchView(){
-        const viewType = document.getElementById('viewSelect').value;
-        const sortType = document.getElementById('sortSelect').value;
-        const container = document.getElementById('cardsContainer');
-        let items = [], isEvent = false;
-
-        const todayStr = new Date().toISOString().split('T')[0];
-
-        if(viewType === 'myReservations'){
-            items = [...myReservations];
-        } else if(viewType === 'upcomingEvents'){
-            items = events.filter(e => e.date >= todayStr);
-            isEvent = true;
-        } else {
-            items = events.filter(e => e.date < todayStr);
-            isEvent = true;
-        }
-
-        // Sorting
-        items.sort((a,b) => {
-            const valA = isEvent ? a.name : a.seat;
-            const valB = isEvent ? b.name : b.seat;
-            if(sortType === 'date_asc') return a.date.localeCompare(b.date);
-            if(sortType === 'date_desc') return b.date.localeCompare(a.date);
-            if(sortType === 'name_asc') return (valA || '').localeCompare(valB || '');
-            if(sortType === 'name_desc') return (valB || '').localeCompare(valA || '');
-            return 0;
-        });
-
-        if(items.length === 0){
-            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i><p>No records found</p></div>`;
-            return;
-        }
-
-        container.innerHTML = items.map(item => {
-            if(isEvent){
-                return `
-                <div class="event-card" onclick="showEventDetail(${JSON.stringify(item).replace(/"/g, '&quot;')})">
-                    <div class="card-banner" style="${item.image ? `background-image:url(${item.image}); background-size:cover;` : ''}">
-                        ${!item.image ? '<i class="fa-solid fa-calendar-star"></i>' : ''}
-                        <div class="card-badge">${viewType === 'upcomingEvents' ? 'Upcoming' : 'Past'}</div>
-                    </div>
-                    <div class="card-content">
-                        <div class="card-title">${escapeHtml(item.name)}</div>
-                        <div class="card-meta"><span><i class="fa-regular fa-calendar"></i> ${item.date}</span><span class="card-location"><i class="fa-solid fa-location-dot"></i> ${item.location}</span></div>
-                        <div class="card-description">${escapeHtml((item.description || '').substring(0,80))}...</div>
-                    </div>
-                </div>`;
-            } else {
-                return `
-                <div class="event-card" onclick="showReservationDetail(${JSON.stringify(item).replace(/"/g, '&quot;')})">
-                    <div class="card-banner" style="background:#8A8636;"><i class="fa-solid fa-chair"></i><div class="card-badge" style="background:#6d6a2b;">${item.status}</div></div>
-                    <div class="card-content">
-                        <div class="card-title">Seat ${item.seat || 'N/A'}</div>
-                        <div class="card-meta"><span><i class="fa-regular fa-calendar"></i> ${item.date}</span><span><i class="fa-regular fa-clock"></i> ${item.time}</span></div>
-                        <div class="card-description">My personal reservation at The Last Muster.</div>
-                    </div>
-                </div>`;
-            }
-        }).join('');
-    }
-
-    function showReservationDetail(res){
-        const body = document.getElementById('reservationDetailBody');
-        body.innerHTML = `
-            <div class="reservation-detail-row"><span class="reservation-label">Reservation ID:</span><span class="reservation-value">#RES-${res.id}</span></div>
-            <div class="reservation-detail-row"><span class="reservation-label">Seat Label:</span><span class="reservation-value">${res.seat || 'N/A'}</span></div>
-            <div class="reservation-detail-row"><span class="reservation-label">Date:</span><span class="reservation-value">${res.date}</span></div>
-            <div class="reservation-detail-row"><span class="reservation-label">Start Time:</span><span class="reservation-value">${res.time}</span></div>
-            <div class="reservation-detail-row"><span class="reservation-label">Status:</span><span class="reservation-value" style="color: ${res.status === 'confirmed' ? '#4A7C59' : '#CF6322'};">${res.status}</span></div>
-        `;
-        openModal('reservationDetailModal');
-    }
-
-    function showEventDetail(ev){
-        const body = document.getElementById('eventDetailBody');
-        body.innerHTML = `
-            ${ev.image ? `<img src="${ev.image}" style="width:100%; border-radius:12px; margin-bottom:15px; max-height:200px; object-fit:cover;">` : ''}
-            <div class="event-detail-row"><span class="reservation-label">Event Name:</span><span class="reservation-value">${escapeHtml(ev.name)}</span></div>
-            <div class="event-detail-row"><span class="reservation-label">Date:</span><span class="reservation-value">${ev.date}</span></div>
-            <div class="event-detail-row"><span class="reservation-label">Time:</span><span class="reservation-value">${ev.time}</span></div>
-            <div class="event-detail-row"><span class="reservation-label">Location:</span><span class="reservation-value">${ev.location}</span></div>
-            <div class="event-detail-row"><span class="reservation-label">Price:</span><span class="reservation-value">₱${ev.price || '0.00'}</span></div>
-            <div style="margin-top: 12px; font-size: 13px; line-height: 1.6; color: #475569;">${escapeHtml(ev.description)}</div>
-        `;
-        openModal('eventDetailModal');
-    }
-
-    function showScheduleModal(dateStr){
-        const dayEvents = events.filter(e => e.date === dateStr);
-        const dayRes = myReservations.filter(r => r.date === dateStr);
-        const formatted = new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+async function loadAllData() {
+    try {
+        const [evRes, revRes] = await Promise.all([
+            fetch('/api/events').then(res => res.json()),
+            fetch('/api/reservations').then(res => res.json())
+        ]);
+        events = evRes.events || [];
+        // Note: The client currently sees ALL reservations from /api/reservations.
+        // We'll filter for "My Reservations" if we want to follow typical customer behavior,
+        // but if the goal is "same as staff", we'll show them.
+        // For now, let's filter to keep it relevant to the customer.
+        // We can get the user ID from the session or just use what the server passed initially.
+        const currentUserId = <%= user ? user.id : 'null' %>;
+        myReservations = (revRes.reservations || []).filter(r => r.user_id === currentUserId);
         
-        let html = `<div style="text-align:center; font-weight:800; border-bottom:2px solid #e2e8f0; padding-bottom:12px; margin-bottom:12px;">Schedule for ${formatted}</div>`;
-        
-        if(dayEvents.length === 0 && dayRes.length === 0){
-            html += `<div style="text-align:center; padding:20px; color:#94a3b8;">Nothing scheduled for this day</div>`;
-        } else {
-            dayEvents.forEach(e => {
-                html += `
-                <div class="schedule-hour" onclick="showEventDetail(${JSON.stringify(e).replace(/"/g, '&quot;')})">
-                    <div class="schedule-time">${e.time}</div>
-                    <div class="schedule-item"><span class="schedule-tag" style="background:var(--orange); color:white; margin-right:8px;">EVENT</span> ${escapeHtml(e.name)}</div>
-                </div>`;
-            });
-            dayRes.forEach(r => {
-                html += `
-                <div class="schedule-hour" onclick="showReservationDetail(${JSON.stringify(r).replace(/"/g, '&quot;')})">
-                    <div class="schedule-time">${r.time}</div>
-                    <div class="schedule-item"><span class="schedule-tag" style="background:#8A8636; color:white; margin-right:8px;">MY BOOKING</span> Seat ${r.seat}</div>
-                </div>`;
-            });
-        }
-        
-        document.getElementById('scheduleModalBody').innerHTML = html;
-        openModal('scheduleModal');
+        renderCal();
+        switchView();
+    } catch (e) { console.error('Error loading data:', e); }
+}
+
+setInterval(loadAllData, 15000);
+loadAllData();
+
+function isToday(dateStr){
+  return dateStr === new Date().toISOString().split('T')[0];
+}
+
+function getUpcomingEvents(){
+  const todayStr = new Date().toISOString().split('T')[0];
+  return events.filter(e => new Date(e.event_date).toISOString().split('T')[0] >= todayStr);
+}
+function getPastEvents(){
+  const todayStr = new Date().toISOString().split('T')[0];
+  return events.filter(e => new Date(e.event_date).toISOString().split('T')[0] < todayStr);
+}
+
+function sortItems(items, isEvent){
+  const sortType = document.getElementById('sortSelect').value;
+  const key = isEvent ? 'event_date' : 'start_time';
+  if(sortType === 'date_asc') return [...items].sort((a,b)=>a[key].localeCompare(b[key]));
+  if(sortType === 'date_desc') return [...items].sort((a,b)=>b[key].localeCompare(a[key]));
+  if(sortType === 'name_asc') return [...items].sort((a,b)=>(a.title||`Seat ${a.seat_label}`).localeCompare(b.title||`Seat ${b.seat_label}`));
+  if(sortType === 'name_desc') return [...items].sort((a,b)=>(b.title||`Seat ${b.seat_label}`).localeCompare(a.title||`Seat ${a.seat_label}`));
+  return items;
+}
+
+function switchView(){
+  const viewType = document.getElementById('viewSelect').value;
+  const container = document.getElementById('cardsContainer');
+  let items = [], isEvent = false;
+  switch(viewType){
+    case 'myReservations': items = sortItems(myReservations, false); break;
+    case 'upcomingEvents': items = sortItems(getUpcomingEvents(), true); isEvent = true; break;
+    case 'pastEvents': items = sortItems(getPastEvents(), true); isEvent = true; break;
+    default: items = sortItems(myReservations, false);
+  }
+  if(items.length === 0){ container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i><p>No records found</p></div>`; return; }
+  
+  if(isEvent){
+    container.innerHTML = items.map(ev => {
+      const d = new Date(ev.event_date);
+      return `
+        <div class="event-card" onclick="showEventDetail(${JSON.stringify(ev).replace(/"/g, '&quot;')})">
+          <div class="card-banner" style="${ev.image ? `background-image:url(${ev.image});` : ''} background-color: var(--orange);">
+            ${!ev.image ? '<i class="fa-solid fa-calendar-star"></i>' : ''}
+            <div class="card-badge">${viewType === 'upcomingEvents' ? 'Upcoming' : 'Past'}</div>
+          </div>
+          <div class="card-content">
+            <div class="card-title">${escapeHtml(ev.title)}</div>
+            <div class="card-meta"><span><i class="fa-regular fa-calendar"></i> ${d.toLocaleDateString()}</span><span><i class="fa-regular fa-clock"></i> ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span><span class="card-location"><i class="fa-solid fa-location-dot"></i> ${ev.location}</span></div>
+            <div class="card-description">${escapeHtml((ev.description || '').substring(0,80))}...</div>
+          </div>
+        </div>`;
+    }).join('');
+  } else {
+    container.innerHTML = items.map(r => {
+      const d = new Date(r.start_time);
+      return `
+        <div class="event-card" onclick="showReservationDetail(${JSON.stringify(r).replace(/"/g, '&quot;')})">
+          <div class="card-banner" style="background-color: #8A8636;">
+            <i class="fa-solid fa-chair"></i>
+            <div class="card-badge" style="background:#8A8636;">${r.status}</div>
+          </div>
+          <div class="card-content">
+            <div class="card-title">Seat ${r.seat_label}</div>
+            <div class="card-meta"><span><i class="fa-regular fa-calendar"></i> ${d.toLocaleDateString()}</span><span><i class="fa-regular fa-clock"></i> ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div>
+            <div class="card-description">Confirmed personal reservation for Seat ${r.seat_label}.</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+}
+
+function showReservationDetail(reservation){
+  const modalBody = document.getElementById('reservationDetailBody');
+  const d = new Date(reservation.start_time);
+  modalBody.innerHTML = `
+    <div class="reservation-detail-row"><span class="reservation-label">Reservation ID:</span><span class="reservation-value">#RES-${reservation.id}</span></div>
+    <div class="reservation-detail-row"><span class="reservation-label">Seat:</span><span class="reservation-value">${reservation.seat_label}</span></div>
+    <div class="reservation-detail-row"><span class="reservation-label">Date:</span><span class="reservation-value">${d.toLocaleDateString()}</span></div>
+    <div class="reservation-detail-row"><span class="reservation-label">Time:</span><span class="reservation-value">${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div>
+    <div class="reservation-detail-row"><span class="reservation-label">Status:</span><span class="reservation-value"><span class="badge" style="background:#4A7C59; color:white; padding:4px 10px; border-radius:15px;">${reservation.status}</span></span></div>`;
+  openModal('reservationDetailModal');
+}
+
+function showEventDetail(event){
+  const modalBody = document.getElementById('eventDetailBody');
+  const d = new Date(event.event_date);
+  modalBody.innerHTML = `
+    ${event.image ? `<img src="${event.image}" style="width:100%; border-radius:12px; margin-bottom:15px; max-height:200px; object-fit:cover;">` : ''}
+    <div class="event-detail-row"><span class="reservation-label">Event:</span><span class="reservation-value">${escapeHtml(event.title)}</span></div>
+    <div class="event-detail-row"><span class="reservation-label">Date:</span><span class="reservation-value">${d.toLocaleDateString()}</span></div>
+    <div class="event-detail-row"><span class="reservation-label">Time:</span><span class="reservation-value">${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div>
+    <div class="event-detail-row"><span class="reservation-label">Location:</span><span class="reservation-value">${event.location}</span></div>
+    <div class="event-detail-row"><span class="reservation-label">Price:</span><span class="reservation-value">₱${event.price || '0.00'}</span></div>
+    <div style="margin-top:12px; font-size:13px; color:#475569; line-height:1.6;">${escapeHtml(event.description)}</div>`;
+  openModal('eventDetailModal');
+}
+
+function renderCal() {
+  const g = document.getElementById('calGrid');
+  const title = document.getElementById('calTitle');
+  g.className = 'cal-grid ' + (currentCalView + '-view');
+  
+  if (currentCalView === 'monthly') {
+    title.textContent = MN[mo] + ' ' + yr;
+    g.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-head">${d}</div>`).join('');
+    const first = new Date(yr, mo, 1).getDay(), days = new Date(yr, mo + 1, 0).getDate();
+    for(let i=0; i<first; i++) g.innerHTML += '<div class="cal-day empty"></div>';
+    for(let d=1; d<=days; d++) {
+      const dateStr = `${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dayEvents = events.filter(e => new Date(e.event_date).toISOString().split('T')[0] === dateStr);
+      const dayRes = myReservations.filter(r => new Date(r.start_time).toISOString().split('T')[0] === dateStr && r.status === 'confirmed');
+      let tags = '';
+      if(dayEvents.length) tags += `<div class="cal-tag cal-tag-event">📅 ${dayEvents[0].title.substring(0,8)}...</div>`;
+      if(dayRes.length) tags += `<div class="cal-tag cal-tag-reservation">📖 ${dayRes.length} Booking</div>`;
+      g.innerHTML += `<div class="cal-day${isToday(dateStr)?' today':''}" onclick="showScheduleModal('${dateStr}')"><strong>${d}</strong>${tags}</div>`;
     }
-
-    function renderCal(){
-        document.getElementById('calTitle').textContent = MN[mo] + ' ' + yr;
-        const grid = document.getElementById('calGrid');
-        grid.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div class="cal-head">${d}</div>`).join('');
-        const first = new Date(yr, mo, 1).getDay(), days = new Date(yr, mo+1, 0).getDate();
-        for(let i=0; i<first; i++) grid.innerHTML += '<div class="cal-day empty"></div>';
-        for(let d=1; d<=days; d++){
-            const dateStr = `${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-            const today = isToday(dateStr);
-            const dayEv = events.filter(e => e.date === dateStr);
-            const dayR = myReservations.filter(r => r.date === dateStr);
-            let tags = '';
-            dayEv.slice(0,1).forEach(e => tags += `<div class="cal-tag cal-tag-event">📅 ${e.name.substring(0,8)}...</div>`);
-            dayR.slice(0,1).forEach(r => tags += `<div class="cal-tag cal-tag-reservation">📖 Seat ${r.seat || ''}</div>`);
-            if(dayEv.length + dayR.length > 2) tags += `<div class="cal-tag" style="background:#f1f5f9; color:#64748b; font-size:7px;">+${(dayEv.length+dayR.length)-2} more</div>`;
-            grid.innerHTML += `<div class="cal-day ${today?'today':''}" onclick="showScheduleModal('${dateStr}')"><strong>${d}</strong>${tags}</div>`;
-        }
+  } else if (currentCalView === 'weekly') {
+    const end = new Date(currentWeekStart); end.setDate(end.getDate()+6);
+    title.textContent = `${currentWeekStart.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - ${end.toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'})}`;
+    g.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-head">${d}</div>`).join('');
+    for(let i=0; i<7; i++) {
+      const d = new Date(currentWeekStart); d.setDate(d.getDate()+i);
+      const ds = d.toISOString().split('T')[0];
+      const dayEvents = events.filter(e => new Date(e.event_date).toISOString().split('T')[0] === ds);
+      const dayRes = myReservations.filter(r => new Date(r.start_time).toISOString().split('T')[0] === ds && r.status === 'confirmed');
+      let tags = '';
+      dayEvents.forEach(e => tags += `<div class="cal-tag cal-tag-event">📅 ${e.title}</div>`);
+      dayRes.forEach(r => tags += `<div class="cal-tag cal-tag-reservation">📖 Seat ${r.seat_label}</div>`);
+      g.innerHTML += `<div class="cal-day${isToday(ds)?' today':''}" onclick="showScheduleModal('${ds}')"><strong>${d.getDate()} ${MN[d.getMonth()].substring(0,3)}</strong>${tags}</div>`;
     }
+  } else if (currentCalView === 'yearly') {
+    title.textContent = yr;
+    g.innerHTML = '';
+    for(let m=0; m<12; m++) {
+      let mHtml = `<div class="year-month-box"><div class="year-month-title">${MN[m]}</div><div class="year-month-grid">`;
+      const first = new Date(yr, m, 1).getDay(), days = new Date(yr, m + 1, 0).getDate();
+      for(let i=0; i<first; i++) mHtml += '<div></div>';
+      for(let d=1; d<=days; d++) {
+        const ds = `${yr}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const hasEv = events.some(e => new Date(e.event_date).toISOString().split('T')[0] === ds);
+        const hasRes = myReservations.some(r => new Date(r.start_time).toISOString().split('T')[0] === ds && r.status === 'confirmed');
+        let cls = 'year-day';
+        if(isToday(ds)) cls += ' today';
+        if(hasEv) cls += ' has-event';
+        if(hasRes) cls += ' has-reservation';
+        mHtml += `<div class="${cls}" onclick="showScheduleModal('${ds}')">${d}</div>`;
+      }
+      mHtml += '</div></div>';
+      g.innerHTML += mHtml;
+    }
+  }
+}
 
-    function changeMonth(dir){ mo+=dir; if(mo>11){mo=0;yr++;} if(mo<0){mo=11;yr--;} renderCal(); }
-    function escapeHtml(s){ if(!s)return ''; return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+function escapeHtml(str){ if(!str)return ''; return String(str).replace(/[&<>]/g,function(m){if(m==='&')return '&amp;';if(m==='<')return '&lt;';if(m==='>')return '&gt;';return m;}); }
 
-    renderCal(); switchView();
+renderCal();
 </script>
