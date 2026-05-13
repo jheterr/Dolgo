@@ -160,8 +160,9 @@ CREATE TABLE IF NOT EXISTS door_access_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     door_name VARCHAR(50) NOT NULL,
+    method VARCHAR(50) DEFAULT 'RFID',
     access_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('granted', 'denied') NOT NULL,
+    status ENUM('granted', 'denied', 'unlocked', 'locked') NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

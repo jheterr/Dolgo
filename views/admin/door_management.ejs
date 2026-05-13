@@ -414,9 +414,15 @@
       <div class="table-header">
         <h3 class="section-title" style="margin-bottom:0">Access & Activity Logs</h3>
         <div class="filter-group" id="desktopFilterGroup">
+          <div class="search-container" style="position:relative; margin-right:10px;">
+            <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:12px;"></i>
+            <input type="text" id="logSearchInput" placeholder="Search name or door..." 
+                   style="padding:6px 14px 6px 34px; border:1.5px solid #e2e8f0; border-radius:20px; font-size:0.7rem; outline:none;"
+                   oninput="handleSearch()">
+          </div>
           <button class="filter-btn active" data-filter="all" onclick="filterLogs('all', this)">All Activity</button>
-          <button class="filter-btn" data-filter="Unlock" onclick="filterLogs('Unlock', this)">Unlocks</button>
-          <button class="filter-btn" data-filter="Lock" onclick="filterLogs('Lock', this)">Locks</button>
+          <button class="filter-btn" data-filter="granted" onclick="filterLogs('granted', this)">Granted</button>
+          <button class="filter-btn" data-filter="denied" onclick="filterLogs('denied', this)">Denied</button>
         </div>
       </div>
       
@@ -448,17 +454,50 @@
 
 <%- contentFor('script') %>
 <script>
-// Activity Logs Data
-let activityLogs = [
-  { id: 1, name: "Juan Dela Cruz", role: "Customer", roleType: "customer", time: "11:05 AM", timestamp: "2026-04-25 11:05", method: "RFID: 44:E2:01", methodType: "rfid", activity: "Unlock" },
-  { id: 2, name: "Daniel Padilla", role: "Staff", roleType: "staff", time: "09:45 AM", timestamp: "2026-04-25 09:45", method: "System Console", methodType: "system", activity: "Unlock" },
-  { id: 3, name: "Joshua Garcia", role: "Staff", roleType: "staff", time: "10:11 AM", timestamp: "2026-04-25 10:11", method: "System Console", methodType: "system", activity: "Lock" },
-  { id: 4, name: "Maria Santos", role: "Customer", roleType: "customer", time: "08:30 AM", timestamp: "2026-04-25 08:30", method: "RFID: A3:F2:7B", methodType: "rfid", activity: "Unlock" },
-  { id: 5, name: "Admin Zoro", role: "Admin", roleType: "staff", time: "07:55 AM", timestamp: "2026-04-25 07:55", method: "System Console", methodType: "system", activity: "Unlock" },
-  { id: 6, name: "Auto-lock", role: "System", roleType: "system", time: "08:00 AM", timestamp: "2026-04-25 08:00", method: "Auto Timer", methodType: "system", activity: "Lock" }
-];
+// Current User Data
+const currentUser = <%- JSON.stringify(locals.user || {}) %>;
 
+// Activity Logs Data
+let activityLogs = [];
+let filteredLogs = [];
 let currentFilter = "all";
+let searchTerm = "";
+
+async function fetchLogs() {
+  try {
+    const res = await fetch('/api/door-logs');
+    const data = await res.json();
+    activityLogs = data.logs || [];
+    applyFilters();
+  } catch (err) {
+    console.error('Error fetching logs:', err);
+  }
+}
+
+function applyFilters() {
+  filteredLogs = [...activityLogs];
+  
+  if (currentFilter !== "all") {
+    filteredLogs = filteredLogs.filter(log => log.status === currentFilter);
+  }
+  
+  if (searchTerm) {
+    const term = searchTerm.toLowerCase();
+    filteredLogs = filteredLogs.filter(log => 
+      (log.first_name && log.first_name.toLowerCase().includes(term)) ||
+      (log.last_name && log.last_name.toLowerCase().includes(term)) ||
+      (log.door_name && log.door_name.toLowerCase().includes(term))
+    );
+  }
+  
+  renderDesktopLogs();
+  renderMobileLogs();
+}
+
+function handleSearch() {
+  searchTerm = document.getElementById('logSearchInput').value;
+  applyFilters();
+}
 
 // Helper: Escape HTML
 function escapeHtml(str) {
@@ -476,63 +515,50 @@ function renderDesktopLogs() {
   const tbody = document.getElementById('desktopLogBody');
   if (!tbody) return;
   
-  let filteredLogs = [...activityLogs];
-  if (currentFilter !== "all") {
-    filteredLogs = activityLogs.filter(log => log.activity === currentFilter);
-  }
-  
   tbody.innerHTML = filteredLogs.map(log => {
-    const badgeClass = log.activity === 'Unlock' ? 'badge-green' : 'badge-red';
-    const icon = log.activity === 'Unlock' ? 'fa-lock-open' : 'fa-lock';
-    const methodDisplay = log.methodType === 'rfid' 
-      ? `<span class="rfid-tag">${escapeHtml(log.method)}</span>`
-      : `<span class="method-system">${escapeHtml(log.method)}</span>`;
+    const status = log.status || 'denied';
+    const badgeClass = status === 'granted' ? 'badge-green' : 'badge-red';
+    const icon = status === 'granted' ? 'fa-lock-open' : 'fa-lock';
+    const name = log.first_name ? `${log.first_name} ${log.last_name}` : 'Unknown';
+    const time = new Date(log.access_time).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' });
     
     return `
-      <tr data-activity="${log.activity}">
-        <td>${escapeHtml(log.name)}</td>
-        <td>${escapeHtml(log.role)}</td>
-        <td>${escapeHtml(log.time)}</td>
-        <td>${methodDisplay}</td>
-        <td><span class="badge ${badgeClass}"><i class="fa-solid ${icon}"></i> ${log.activity}</span></td>
+      <tr>
+        <td>${escapeHtml(name)}</td>
+        <td><span class="role-badge ${log.role === 'customer' ? 'customer' : 'staff'}">${escapeHtml(log.role || 'N/A')}</span></td>
+        <td>${escapeHtml(time)}</td>
+        <td><span class="method-tag"><i class="fa-solid fa-door-open"></i> ${escapeHtml(log.method || log.door_name)}</span></td>
+        <td><span class="badge ${badgeClass}"><i class="fa-solid ${icon}"></i> ${status.toUpperCase()}</span></td>
       </tr>
     `;
   }).join('');
 }
 
-// ========== MOBILE CARD VIEW RENDER (No large icons) ==========
+// ========== MOBILE CARD VIEW RENDER ==========
 function getMobileCardHTML(log) {
-  const badgeClass = log.activity === 'Unlock' ? 'success' : 'danger';
-  const badgeIcon = log.activity === 'Unlock' ? 'fa-lock-open' : 'fa-lock';
+  const status = log.status || 'denied';
+  const badgeClass = status === 'granted' ? 'success' : 'danger';
+  const badgeIcon = status === 'granted' ? 'fa-lock-open' : 'fa-lock';
+  const name = log.first_name ? `${log.first_name} ${log.last_name}` : 'Unknown';
+  const time = new Date(log.access_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   
-  let roleBadgeClass = "staff";
-  if (log.roleType === "customer") roleBadgeClass = "customer";
-  if (log.roleType === "system") roleBadgeClass = "staff";
+  let roleBadgeClass = log.role === "customer" ? "customer" : "staff";
   
-  let methodDisplay = escapeHtml(log.method);
-  if (log.methodType === "rfid") {
-    methodDisplay = `<span class="method-tag"><i class="fa-solid fa-id-card"></i> ${escapeHtml(log.method)}</span>`;
-  } else if (log.methodType === "system") {
-    methodDisplay = `<span class="method-tag"><i class="fa-solid fa-desktop"></i> ${escapeHtml(log.method)}</span>`;
-  } else {
-    methodDisplay = `<span class="method-tag">${escapeHtml(log.method)}</span>`;
-  }
-
   return `
-    <div class="activity-card" data-activity="${log.activity}">
+    <div class="activity-card">
       <div class="activity-header">
         <div class="activity-user">
-          <span>${escapeHtml(log.name)}</span>
-          <span class="role-badge ${roleBadgeClass}">${escapeHtml(log.role)}</span>
+          <span>${escapeHtml(name)}</span>
+          <span class="role-badge ${roleBadgeClass}">${escapeHtml(log.role || 'N/A')}</span>
         </div>
         <div class="activity-time">
-          <i class="fa-regular fa-clock"></i> ${escapeHtml(log.time)}
+          <i class="fa-regular fa-clock"></i> ${escapeHtml(time)}
         </div>
       </div>
       <div class="activity-detail">
-        ${methodDisplay}
+        <span class="method-tag"><i class="fa-solid fa-door-open"></i> ${escapeHtml(log.method || log.door_name)}</span>
         <span class="activity-badge ${badgeClass}">
-          <i class="fa-solid ${badgeIcon}"></i> ${log.activity}
+          <i class="fa-solid ${badgeIcon}"></i> ${status.toUpperCase()}
         </span>
       </div>
     </div>
@@ -543,13 +569,6 @@ function renderMobileLogs() {
   const container = document.getElementById('mobileActivityTimeline');
   if (!container) return;
   
-  let filteredLogs = [...activityLogs];
-  if (currentFilter !== "all") {
-    filteredLogs = activityLogs.filter(log => log.activity === currentFilter);
-  }
-  
-  filteredLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  
   if (filteredLogs.length === 0) {
     container.innerHTML = `<div class="empty-logs"><i class="fa-regular fa-folder-open"></i><p>No activity logs found</p></div>`;
   } else {
@@ -557,85 +576,49 @@ function renderMobileLogs() {
   }
 }
 
-// ========== FILTER FUNCTION (Unified for both views) ==========
+// ========== FILTER FUNCTION ==========
 function filterLogs(filterType, btn) {
   currentFilter = filterType;
   
-  // Update active button UI in desktop filter group
   const desktopGroup = document.getElementById('desktopFilterGroup');
   if (desktopGroup) {
     desktopGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   }
   btn.classList.add('active');
   
-  // Re-render both views
-  renderDesktopLogs();
-  renderMobileLogs();
+  applyFilters();
 }
 
 // ========== DOOR TRIGGER FUNCTION ==========
-function triggerDoor(status, role, method) {
+async function triggerDoor(status, role, method) {
+  // UI Feedback
   const el = document.getElementById('doorVal');
   el.textContent = status;
   el.className = 'door-status-value ' + (status === 'UNLOCKED' ? 'unlocked' : 'locked');
   
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const timestamp = now.toISOString().slice(0, 16).replace('T', ' ');
-  
-  const activity = status === 'UNLOCKED' ? 'Unlock' : 'Lock';
-  const roleType = (role === 'Customer' || role === 'Admin' || role === 'Staff') ? 
-    (role === 'Customer' ? 'customer' : 'staff') : 'system';
-  
-  let methodType = "system";
-  let methodDisplay = method;
-  if (method === 'Manual Console') {
-    methodDisplay = 'System Console';
-    methodType = "system";
+  // Submit log to backend
+  try {
+    await fetch('/api/door-logs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: currentUser.id || 1, // Fallback to admin if not found
+        door_name: 'Main Door',
+        status: status.toLowerCase(), // 'unlocked' or 'locked'
+        method: method
+      })
+    });
+    
+    // Refresh the logs
+    fetchLogs();
+  } catch (err) {
+    console.error('Error logging door action:', err);
   }
-  
-  const newLog = {
-    id: Date.now(),
-    name: 'Current User',
-    role: role,
-    roleType: roleType,
-    time: timeStr,
-    timestamp: timestamp,
-    method: methodDisplay,
-    methodType: methodType,
-    activity: activity
-  };
-  
-  activityLogs.unshift(newLog);
-  
-  // Re-render both views
-  renderDesktopLogs();
-  renderMobileLogs();
-  
-  // Visual feedback
-  const btn = status === 'UNLOCKED' ? document.querySelector('.door-btn-open') : document.querySelector('.door-btn-close');
-  if (btn) {
-    btn.style.transform = 'scale(0.95)';
-    setTimeout(() => { if (btn) btn.style.transform = ''; }, 200);
-  }
-}
-
-// ========== UTILITY FUNCTIONS ==========
-
-function openSidebar() {
-  document.getElementById('sidebar').classList.add('mobile-open');
-  document.getElementById('mobileOverlay').classList.add('show');
-}
-
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('mobile-open');
-  document.getElementById('mobileOverlay').classList.remove('show');
 }
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-  renderDesktopLogs();
-  renderMobileLogs();
+  fetchLogs();
   
   const doorVal = document.getElementById('doorVal');
   if (doorVal && doorVal.textContent === 'LOCKED') {

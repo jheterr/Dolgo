@@ -473,4 +473,36 @@ router.delete('/events/:id', async (req, res) => {
 
 
 
+// Get door access logs
+router.get('/door-logs', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT d.*, u.first_name, u.last_name, u.role
+            FROM door_access_logs d
+            LEFT JOIN users u ON d.user_id = u.id
+            ORDER BY d.access_time DESC
+        `);
+        res.json({ logs: rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Submit door access log
+router.post('/door-logs', async (req, res) => {
+    const { user_id, door_name, status, method } = req.body;
+    try {
+        await db.query(
+            'INSERT INTO door_access_logs (user_id, door_name, status, method) VALUES (?, ?, ?, ?)',
+            [user_id, door_name, status, method || 'Manual Console']
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error submitting door log:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 module.exports = router;
+
