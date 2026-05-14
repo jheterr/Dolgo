@@ -117,7 +117,7 @@
             <div class="char-counter" id="char-count">0 / 165</div>
           </div>
           <button class="btn btn-primary" onclick="prepareAndSend()">
-            <i class="fa-solid fa-paper-plane"></i> Send via Gmail
+            <i class="fa-solid fa-bell"></i> Send to Accounts
           </button>
         </div>
       </div>
@@ -163,34 +163,34 @@
 
 <%- contentFor('script') %>
 <script>
-// Same functional script as before
-const users = [
-  {id:1, name:"Sanji Vinsmoke", email:"sanji@gmail.com", type:"member"},
-  {id:2, name:"Zoro Roronoa", email:"zoro@gmail.com", type:"member"},
-  {id:3, name:"Nami Catburglar", email:"nami@gmail.com", type:"member"},
-  {id:4, name:"Usopp", email:"usopp@gmail.com", type:"member"},
-  {id:5, name:"Monkey D. Luffy", email:"luffy@gmail.com", type:"member"},
-  {id:6, name:"Tony Chopper", email:"chopper@gmail.com", type:"walkin"},
-  {id:7, name:"Brook", email:"brook@gmail.com", type:"walkin"},
-  {id:8, name:"Franky", email:"franky@gmail.com", type:"walkin"},
-  {id:9, name:"Daniel Padilla", email:"daniel@gmail.com", type:"staff"},
-  {id:10, name:"Joshua Garcia", email:"joshua@gmail.com", type:"staff"}
-];
-
-let messageHistory = [
-  {id:1, audience:"All Users", subject:"Welcome to The Last Muster!", date:"Apr 10, 2026, 11:11pm"},
-  {id:2, audience:"Walk-ins", subject:"Free WiFi Reminder", date:"Apr 11, 2026, 2:30pm"}
-];
-
+let dbUsers = [];
+let messageHistory = [];
 let selectedRecipients = [];
 let pendingSubject = ''; let pendingBody = '';
+
+async function loadInitialData() {
+    try {
+        const [uRes, mRes] = await Promise.all([
+            fetch('/api/users').then(res => res.json()),
+            fetch('/api/messages').then(res => res.json())
+        ]);
+        dbUsers = uRes.users || [];
+        messageHistory = (mRes.messages || []).map(m => ({
+            id: m.id,
+            audience: m.audience,
+            subject: m.subject,
+            date: new Date(m.created_at).toLocaleString()
+        }));
+        renderMessageHistory();
+    } catch (e) { console.error('Error loading data:', e); }
+}
 
 function renderMessageHistory() {
   const tbody = document.getElementById('msgHistory');
   tbody.innerHTML = messageHistory.map(msg => `
     <tr>
-      <td>${msg.audience}</td>
-      <td><strong>${msg.subject}</strong></td>
+      <td>${escapeHtml(msg.audience)}</td>
+      <td><strong>${escapeHtml(msg.subject)}</strong></td>
       <td style="font-size:11px;color:var(--text-sm)">${msg.date}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="viewMessage(${msg.id})">View</button></td>
     </tr>
@@ -206,8 +206,8 @@ function updateCharCount() {
   else counter.classList.remove('limit');
 }
 
-function prepareAndSend() {
-  const recipients = document.getElementById('msg-recipients').value.trim();
+async function prepareAndSend() {
+  const recipientsStr = document.getElementById('msg-recipients').value.trim();
   const subject = document.getElementById('msg-subject').value.trim();
   const body = document.getElementById('msg-body').value.trim();
   const audience = document.getElementById('msg-audience').value;
@@ -221,28 +221,28 @@ function prepareAndSend() {
     renderRecipientList();
     document.getElementById('recipientModal').classList.add('show');
   } else {
-    // Auto-populate recipients based on audience if empty
-    let targetEmails = recipients;
+    let targetEmails = recipientsStr;
     if (!targetEmails) {
-      if (audience === 'all') targetEmails = users.map(u => u.email).join(', ');
-      else if (audience === 'members') targetEmails = users.filter(u => u.type === 'member').map(u => u.email).join(', ');
-      else if (audience === 'walkins') targetEmails = users.filter(u => u.type === 'walkin').map(u => u.email).join(', ');
-      else if (audience === 'staff') targetEmails = users.filter(u => u.type === 'staff').map(u => u.email).join(', ');
+      if (audience === 'all') targetEmails = dbUsers.map(u => u.email).join(', ');
+      else if (audience === 'members') targetEmails = dbUsers.filter(u => u.status === 'approved' && u.role === 'customer').map(u => u.email).join(', ');
+      else if (audience === 'walkins') targetEmails = dbUsers.filter(u => u.status === 'pending' && u.role === 'customer').map(u => u.email).join(', ');
+      else if (audience === 'staff') targetEmails = dbUsers.filter(u => u.role === 'staff').map(u => u.email).join(', ');
     }
-    sendMessage(subject, body, audience, targetEmails);
+    
+    await sendMessage(subject, body, audience, targetEmails);
   }
 }
 
 function renderRecipientList() {
   const container = document.getElementById('recipientList');
   const search = (document.getElementById('recipientSearch').value || '').toLowerCase();
-  const filtered = users.filter(u => u.name.toLowerCase().includes(search));
+  const filtered = dbUsers.filter(u => `${u.first_name} ${u.last_name}`.toLowerCase().includes(search));
 
   container.innerHTML = filtered.map(u => `
-    <div class="user-row-modal" onclick="toggleRecipient(${u.id}, '${u.name}', '${u.type}')">
+    <div class="user-row-modal" onclick="toggleRecipient(${u.id}, '${u.first_name} ${u.last_name}', '${u.role}')">
       <input type="checkbox" ${selectedRecipients.some(r => r.id === u.id) ? 'checked' : ''}>
-      <span class="user-name">${u.name}</span>
-      <span class="user-type ${u.type}">${u.type}</span>
+      <span class="user-name">${escapeHtml(u.first_name)} ${escapeHtml(u.last_name)}</span>
+      <span class="user-type ${u.role}">${u.role}</span>
     </div>
   `).join('');
 }
@@ -254,37 +254,42 @@ function toggleRecipient(id, name, type) {
   renderRecipientList();
 }
 
-function sendToSpecificRecipients() {
+async function sendToSpecificRecipients() {
   if (selectedRecipients.length === 0) return alert("Please select at least one recipient");
   const emails = selectedRecipients.map(r => {
-    const u = users.find(user => user.id === r.id);
+    const u = dbUsers.find(user => user.id === r.id);
     return u ? u.email : '';
   }).filter(e => e !== '').join(', ');
   
-  sendMessage(pendingSubject, pendingBody, "Specific Customers", emails);
+  const audienceLabel = "Specific: " + selectedRecipients.map(r => r.name).join(", ");
+  await sendMessage(pendingSubject, pendingBody, audienceLabel, emails);
   closeRecipientModal();
 }
 
-function sendMessage(subject, body, audience, recipients) {
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + 
-                  ', ' + now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
-  
-  // Gmail mailto link
-  const mailtoLink = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoLink;
+async function sendMessage(subject, body, audience, recipients) {
+  try {
+      // 1. Save to DB history and send internal notifications
+      const res = await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ audience, recipients, subject, body })
+      });
+      const data = await res.json();
 
-  messageHistory.unshift({
-    id: Date.now(),
-    audience: audience === "Specific Customers" ? selectedRecipients.map(r => r.name).join(", ") : audience,
-    subject: subject,
-    date: dateStr
-  });
-  renderMessageHistory();
-  document.getElementById('msg-subject').value = '';
-  document.getElementById('msg-body').value = '';
-  document.getElementById('msg-recipients').value = '';
-  updateCharCount();
+      if (data.success) {
+          alert('Message sent successfully to user accounts!');
+          // 2. Update local state
+          loadInitialData();
+
+          // Clear inputs
+          document.getElementById('msg-subject').value = '';
+          document.getElementById('msg-body').value = '';
+          document.getElementById('msg-recipients').value = '';
+          updateCharCount();
+      } else {
+          alert('Error sending message: ' + data.error);
+      }
+  } catch (e) { console.error('Error sending message:', e); alert('Failed to connect to server'); }
 }
 
 function closeRecipientModal() {
@@ -292,9 +297,9 @@ function closeRecipientModal() {
 }
 
 function viewMessage(id) {
-  alert("Message details would open here (ID: " + id + ")");
+  const msg = messageHistory.find(m => m.id === id);
+  if (msg) alert(`Subject: ${msg.subject}\nAudience: ${msg.audience}\nDate: ${msg.date}`);
 }
-
 
 function openSidebar() {
   document.getElementById('sidebar').classList.add('mobile-open');
@@ -306,6 +311,8 @@ function closeSidebar() {
   document.getElementById('mobileOverlay').classList.remove('show');
 }
 
-renderMessageHistory();
+function escapeHtml(str){ if(!str)return ''; return String(str).replace(/[&<>]/g,function(m){if(m==='&')return '&amp;';if(m==='<')return '&lt;';if(m==='>')return '&gt;';return m;}); }
+
+loadInitialData();
 </script>
 

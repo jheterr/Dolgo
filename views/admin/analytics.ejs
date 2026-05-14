@@ -1,575 +1,998 @@
 <!-- Title passed to layout -->
-<% locals.title = 'The Last Muster | Analytics & Reports' %>
+<% locals.title='The Last Muster | Analytics & Reports' %>
 
-<%- contentFor('style') %>
-<style>
+  <%- contentFor('style') %>
+    <style>
+      .analytics-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 4px;
+      }
 
-    .analytics-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px;}
-    .stat-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
-    .stat-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
-    .an-card{border-radius:var(--radius);padding:20px;background:var(--white);box-shadow:var(--shadow);text-align:center;}
-    .an-icon{font-size:1.4rem;margin-bottom:6px;}
-    .an-val{font-family:'Poppins',sans-serif;font-size:2.1rem;font-weight:800;}
-    .an-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-sm);margin-top:3px;}
-    .chart-card{background:var(--white);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:24px;}
-    .chart-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
-    .chart-title{font-family:'Poppins',sans-serif;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px;}
-    .chart-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-    .chart-controls select{padding:6px 12px;border-radius:6px;border:1px solid var(--border);font-size:12px;}
-    .chart-box{height:260px;}
-    .two-col-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;}
-    .three-col-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px;}
-    .top-customer-list{max-height:280px;overflow-y:auto;}
-    .top-customer-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
-    .top-customer-name{font-weight:700;font-size:13px;}
-    .top-customer-hours{font-weight:800;color:var(--orange);font-size:13px;}
-    .badge-type{background:var(--cream-lt);padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;}
-    .summary-card{background:var(--white);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
-    .summary-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
-    .summary-row:last-child{border-bottom:none;}
-    .summary-label{font-weight:600;color:var(--text-md);}
-    .summary-value{font-weight:800;font-size:1.1rem;}
-    .total-revenue{background:var(--green);color:white;padding:8px 12px;border-radius:8px;margin-top:10px;}
-    .loss-amount{background:#dc2626;color:white;padding:8px 12px;border-radius:8px;margin-top:10px;}
-    .pending-badge{background:#fef3c7;color:#92400e;padding:4px 8px;border-radius:20px;font-size:11px;display:inline-block;}
-    .income-overview-card{background:linear-gradient(135deg, #1e293b, #0f172a);color:white;border-radius:var(--radius);padding:20px;margin-bottom:24px;}
-    .income-overview-card .chart-title{color:white;}
-    .income-stats{display:flex;justify-content:space-around;margin-top:15px;flex-wrap:wrap;gap:15px;}
-    .income-stat-item{text-align:center;}
-    .income-stat-value{font-size:28px;font-weight:800;color:#fbbf24;}
-    .income-stat-label{font-size:11px;color:#94a3b8;margin-top:5px;}
-    .history-table{width:100%;border-collapse:collapse;margin-top:10px;}
-    .history-table th,.history-table td{padding:12px;text-align:left;border-bottom:1px solid var(--border);font-size:12px;}
-    .history-table th{background:var(--cream-lt);font-weight:700;color:var(--text);}
-    .history-table tr:hover td{background:var(--cream-lt);}
-    .badge-transaction{background:#dbeafe;color:#1e40af;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;}
-    .badge-activity{background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;}
-    .section-header{margin-bottom:16px;border-left:4px solid var(--orange);padding-left:12px;}
-    .section-header h2{font-size:1.2rem;font-weight:700;color:var(--text);}
-    .total-customers-badge{background:var(--orange);color:white;padding:4px 12px;border-radius:20px;font-size:11px;margin-left:10px;}
-    .establishment-card{background:linear-gradient(135deg, #0f172a, #1e293b);color:white;border-radius:var(--radius);padding:20px;margin-bottom:24px;text-align:center;}
-    .establishment-stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;margin-top:10px;}
-    .establishment-stat{text-align:center;}
-    .establishment-value{font-size:32px;font-weight:800;color:#fbbf24;}
-    .establishment-label{font-size:11px;color:#94a3b8;margin-top:5px;}
-    
-    /* Income Logs Table Styles */
-    .income-logs-section{margin-top:24px;}
-    .income-logs-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;}
-    .income-period-log-select{padding:8px 16px;border-radius:30px;border:1px solid #cbd5e1;background:white;font-size:12px;font-weight:500;cursor:pointer;}
-    .logs-table{width:100%;border-collapse:collapse;}
-    .logs-table th,.logs-table td{padding:12px;text-align:left;border-bottom:1px solid #e2e8f0;font-size:12px;}
-    .logs-table th{background:#f8fafc;font-weight:700;color:#1e293b;cursor:pointer;user-select:none;position:relative;}
-    .logs-table th:hover{background:#f1f5f9;}
-    .logs-table tr:hover td{background:#f8fafc;}
-    .badge-income{background:#dcfce7;color:#166534;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;display:inline-block;}
-    
-    .search-wrapper { position: relative; margin-bottom: 15px; }
-    .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-sm); font-size: 13px; }
-    .search-input { width: 100%; padding: 8px 12px 8px 35px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px; outline: none; transition: 0.2s; }
-    .search-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(207,99,34,0.1); }
-    
-    .sort-icon { font-size: 10px; margin-left: 5px; color: #94a3b8; }
-    .th-sort-active .sort-icon { color: var(--orange); }
-    
-    @media(max-width:900px){.stat-grid-4,.stat-grid-3,.two-col-grid,.three-col-grid{grid-template-columns:1fr;}.establishment-stats{gap:20px;}}
-  
-</style>
+      .stat-grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+      }
 
-<div class="app">
+      .stat-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+      }
 
-    <%- include('../partials/admin_sidebar', { active: 'Analytics & Reports' }) %>
+      .an-card {
+        border-radius: var(--radius);
+        padding: 20px;
+        background: var(--white);
+        box-shadow: var(--shadow);
+        text-align: center;
+      }
 
-    <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+      .an-icon {
+        font-size: 1.4rem;
+        margin-bottom: 6px;
+      }
 
-    <main class="content">
-      <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+      .an-val {
+        font-family: 'Poppins', sans-serif;
+        font-size: 2.1rem;
+        font-weight: 800;
+      }
 
-      <div class="page-header">
-        <h1 class="page-title">Analytics & Reports</h1>
-      </div>
+      .an-lbl {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: var(--text-sm);
+        margin-top: 3px;
+      }
 
-      <!-- ========== SINCE ESTABLISHMENT CARDS ========== -->
-      <div class="establishment-card">
-        <div class="chart-title" style="justify-content:center;"><i class="fa-solid fa-building" style="color:#fbbf24;"></i> Since Establishment (January 2024)</div>
-        <div class="establishment-stats">
-          <div class="establishment-stat">
-            <div class="establishment-value" id="totalCustomersSince">0</div>
-            <div class="establishment-label">Total Customers</div>
+      .chart-card {
+        background: var(--white);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+        margin-bottom: 24px;
+      }
+
+      .chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .chart-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .chart-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .chart-controls select {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        font-size: 12px;
+      }
+
+      .chart-box {
+        height: 260px;
+      }
+
+      .two-col-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+
+      .three-col-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+
+      .top-customer-list {
+        max-height: 280px;
+        overflow-y: auto;
+      }
+
+      .top-customer-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .top-customer-name {
+        font-weight: 700;
+        font-size: 13px;
+      }
+
+      .top-customer-hours {
+        font-weight: 800;
+        color: var(--orange);
+        font-size: 13px;
+      }
+
+      .badge-type {
+        background: var(--cream-lt);
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      .summary-card {
+        background: var(--white);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .summary-row:last-child {
+        border-bottom: none;
+      }
+
+      .summary-label {
+        font-weight: 600;
+        color: var(--text-md);
+      }
+
+      .summary-value {
+        font-weight: 800;
+        font-size: 1.1rem;
+      }
+
+      .total-revenue {
+        background: var(--green);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin-top: 10px;
+      }
+
+      .loss-amount {
+        background: #dc2626;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin-top: 10px;
+      }
+
+      .pending-badge {
+        background: #fef3c7;
+        color: #92400e;
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 11px;
+        display: inline-block;
+      }
+
+      .income-overview-card {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        color: white;
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 24px;
+      }
+
+      .income-overview-card .chart-title {
+        color: white;
+      }
+
+      .income-stats {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 15px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .income-stat-item {
+        text-align: center;
+      }
+
+      .income-stat-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: #fbbf24;
+      }
+
+      .income-stat-label {
+        font-size: 11px;
+        color: #94a3b8;
+        margin-top: 5px;
+      }
+
+      .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      .history-table th,
+      .history-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+      }
+
+      .history-table th {
+        background: var(--cream-lt);
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .history-table tr:hover td {
+        background: var(--cream-lt);
+      }
+
+      .badge-transaction {
+        background: #dbeafe;
+        color: #1e40af;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      .badge-activity {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      .section-header {
+        margin-bottom: 16px;
+        border-left: 4px solid var(--orange);
+        padding-left: 12px;
+      }
+
+      .section-header h2 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .total-customers-badge {
+        background: var(--orange);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        margin-left: 10px;
+      }
+
+      .establishment-card {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: white;
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+
+      .establishment-stats {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+
+      .establishment-stat {
+        text-align: center;
+      }
+
+      .establishment-value {
+        font-size: 32px;
+        font-weight: 800;
+        color: #fbbf24;
+      }
+
+      .establishment-label {
+        font-size: 11px;
+        color: #94a3b8;
+        margin-top: 5px;
+      }
+
+      /* Income Logs Table Styles */
+      .income-logs-section {
+        margin-top: 24px;
+      }
+
+      .income-logs-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .income-period-log-select {
+        padding: 8px 16px;
+        border-radius: 30px;
+        border: 1px solid #cbd5e1;
+        background: white;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .logs-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .logs-table th,
+      .logs-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 12px;
+      }
+
+      .logs-table th {
+        background: #f8fafc;
+        font-weight: 700;
+        color: #1e293b;
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+      }
+
+      .logs-table th:hover {
+        background: #f1f5f9;
+      }
+
+      .logs-table tr:hover td {
+        background: #f8fafc;
+      }
+
+      .badge-income {
+        background: #dcfce7;
+        color: #166534;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+        display: inline-block;
+      }
+
+      .search-wrapper {
+        position: relative;
+        margin-bottom: 15px;
+      }
+
+      .search-wrapper i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-sm);
+        font-size: 13px;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 8px 12px 8px 35px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        font-size: 13px;
+        outline: none;
+        transition: 0.2s;
+      }
+
+      .search-input:focus {
+        border-color: var(--orange);
+        box-shadow: 0 0 0 3px rgba(207, 99, 34, 0.1);
+      }
+
+      .sort-icon {
+        font-size: 10px;
+        margin-left: 5px;
+        color: #94a3b8;
+      }
+
+      .th-sort-active .sort-icon {
+        color: var(--orange);
+      }
+
+      @media(max-width:900px) {
+
+        .stat-grid-4,
+        .stat-grid-3,
+        .two-col-grid,
+        .three-col-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .establishment-stats {
+          gap: 20px;
+        }
+      }
+    </style>
+
+    <div class="app">
+
+      <%- include('../partials/admin_sidebar', { active: 'Analytics & Reports' }) %>
+
+        <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
+        <main class="content">
+          <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+
+          <div class="page-header">
+            <h1 class="page-title">Analytics & Reports</h1>
           </div>
-          <div class="establishment-stat">
-            <div class="establishment-value" id="totalIncomeSince">₱0</div>
-            <div class="establishment-label">Total Income</div>
-          </div>
-          <div class="establishment-stat">
-            <div class="establishment-value" id="totalHoursConsumed">0</div>
-            <div class="establishment-label">Total Hours Consumed</div>
-          </div>
-        </div>
-      </div>
 
-      <!-- ========== STATS CARDS ========== -->
-      <div class="stat-grid-4">
-        <div class="an-card"><div class="an-icon" style="color:var(--olive)"><i class="fa-solid fa-arrow-trend-up"></i></div><div class="an-val" id="statPeak">32</div><div class="an-lbl">Peak</div></div>
-        <div class="an-card"><div class="an-icon" style="color:var(--orange)"><i class="fa-solid fa-chart-bar"></i></div><div class="an-val" id="statAvg">18</div><div class="an-lbl">Average</div></div>
-        <div class="an-card"><div class="an-icon" style="color:#3498db"><i class="fa-solid fa-users"></i></div><div class="an-val" id="statTotal">169</div><div class="an-lbl">Total</div></div>
-        <div class="an-card"><div class="an-icon" style="color:var(--green)"><i class="fa-solid fa-arrow-trend-down"></i></div><div class="an-val" id="statLow">3</div><div class="an-lbl">Low</div></div>
-      </div>
-
-      <!-- ========== CUSTOMER TRAFFIC SECTION ========== -->
-      <div class="section-header">
-        <h2><i class="fa-solid fa-chart-line"></i> Customer Traffic</h2>
-      </div>
-      <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-title">Customer Traffic Overview</div>
-          <div class="chart-controls">
-            <select id="trafficPeriodSelect" onchange="updateTrafficChart()">
-              <option value="today">Peak Hours (Today)</option>
-              <option value="week">Daily (This Week)</option>
-              <option value="month">Weekly (Last 4 Weeks)</option>
-              <option value="halfyear">Monthly (Last 6 Months)</option>
-            </select>
-          </div>
-        </div>
-        <div class="chart-box"><canvas id="trafficChart"></canvas></div>
-      </div>
-
-      <!-- ========== INCOME SECTION ========== -->
-      <div class="section-header">
-        <h2><i class="fa-solid fa-coins"></i> Income</h2>
-      </div>
-
-      <!-- Income Overview Card (linked to Income Breakdown dropdown) -->
-      <div class="income-overview-card">
-        <div class="chart-title"><i class="fa-solid fa-chart-simple" style="color:#fbbf24;"></i> Income Overview</div>
-        <div class="income-stats">
-          <div class="income-stat-item">
-            <div class="income-stat-value" id="incomeTotal">₱0</div>
-            <div class="income-stat-label">Total Income</div>
-          </div>
-          <div class="income-stat-item">
-            <div class="income-stat-value" id="incomeAvg">₱0</div>
-            <div class="income-stat-label">Average per Day</div>
-          </div>
-          <div class="income-stat-item">
-            <div class="income-stat-value" id="incomeProjected">₱0</div>
-            <div class="income-stat-label">Projected (Month)</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Income Breakdown Chart -->
-      <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-title">Income Breakdown</div>
-          <div class="chart-controls">
-            <select id="incomePeriodSelect" onchange="updateIncomeChart()">
-              <option value="today">Peak Hours (Today)</option>
-              <option value="week">Daily (This Week)</option>
-              <option value="month">Weekly (Last 4 Weeks)</option>
-              <option value="halfyear">Monthly (Last 6 Months)</option>
-            </select>
-          </div>
-        </div>
-        <div class="chart-box"><canvas id="incomeChart"></canvas></div>
-      </div>
-
-      <!-- ========== INCOME LOGS SECTION (DAILY, WEEKLY, MONTHLY DROPDOWN) ========== -->
-      <div class="income-logs-section">
-        <div class="income-logs-header">
-          <div class="chart-title"><i class="fa-solid fa-receipt"></i> Income Logs & Transaction Details</div>
-          <div class="chart-controls">
-            <div class="search-wrapper" style="margin-bottom:0; width:200px;">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              <input type="text" class="search-input" id="incomeLogSearch" placeholder="Search logs..." oninput="renderIncomeLogs()">
+          <!-- ========== SINCE ESTABLISHMENT CARDS ========== -->
+          <div class="establishment-card">
+            <div class="chart-title" style="justify-content:center;"><i class="fa-solid fa-building"
+                style="color:#fbbf24;"></i> Since Establishment (January 2024)</div>
+            <div class="establishment-stats">
+              <div class="establishment-stat">
+                <div class="establishment-value" id="totalCustomersSince">0</div>
+                <div class="establishment-label">Total Customers</div>
+              </div>
+              <div class="establishment-stat">
+                <div class="establishment-value" id="totalIncomeSince">₱0</div>
+                <div class="establishment-label">Total Income</div>
+              </div>
+              <div class="establishment-stat">
+                <div class="establishment-value" id="totalHoursConsumed">0</div>
+                <div class="establishment-label">Total Hours Consumed</div>
+              </div>
             </div>
-            <select id="incomeLogsPeriodSelect" class="income-period-log-select" onchange="renderIncomeLogs()">
-              <option value="daily">Daily (Today's Transactions)</option>
-              <option value="week">Weekly (Last 7 Days)</option>
-              <option value="month">Monthly (Last 4 Weeks)</option>
-            </select>
           </div>
-        </div>
-        <div class="summary-card" style="overflow-x:auto;">
-          <table class="logs-table">
-            <thead>
-              <tr>
-                <th onclick="sortLogs('period')">Period <i class="fa-solid fa-sort sort-icon"></i></th>
-                <th onclick="sortLogs('totalIncome')">Total Income <i class="fa-solid fa-sort sort-icon"></i></th>
-                <th onclick="sortLogs('transactions')">Transactions <i class="fa-solid fa-sort sort-icon"></i></th>
-                <th>Reservations</th>
-                <th>WiFi Extensions</th>
-                <th>Plan Upgrades</th>
-                <th>Walk-ins</th>
-                <th>Payment Methods</th>
-              </tr>
-            </thead>
-            <tbody id="incomeLogsBody"></tbody>
-            </table>
-        </div>
-      </div>
 
-      <!-- ========== CUSTOMER BREAKDOWN SECTION ========== -->
-      <div class="section-header">
-        <h2><i class="fa-solid fa-users"></i> Customer Breakdown</h2>
-      </div>
-
-      <!-- Top Customers (Members vs Walk-ins) -->
-      <div class="two-col-grid">
-        <div class="summary-card">
-          <div class="chart-title"><i class="fa-solid fa-crown"></i> Top Members by Hours</div>
-          <div class="search-wrapper">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="search-input" id="memberSearch" placeholder="Search members..." oninput="renderTopCustomers()">
+          <!-- ========== STATS CARDS ========== -->
+          <div class="stat-grid-4">
+            <div class="an-card">
+              <div class="an-icon" style="color:var(--olive)"><i class="fa-solid fa-arrow-trend-up"></i></div>
+              <div class="an-val" id="statPeak">32</div>
+              <div class="an-lbl">Peak</div>
+            </div>
+            <div class="an-card">
+              <div class="an-icon" style="color:var(--orange)"><i class="fa-solid fa-chart-bar"></i></div>
+              <div class="an-val" id="statAvg">18</div>
+              <div class="an-lbl">Average</div>
+            </div>
+            <div class="an-card">
+              <div class="an-icon" style="color:#3498db"><i class="fa-solid fa-users"></i></div>
+              <div class="an-val" id="statTotal">169</div>
+              <div class="an-lbl">Total</div>
+            </div>
+            <div class="an-card">
+              <div class="an-icon" style="color:var(--green)"><i class="fa-solid fa-arrow-trend-down"></i></div>
+              <div class="an-val" id="statLow">3</div>
+              <div class="an-lbl">Low</div>
+            </div>
           </div>
-          <div class="top-customer-list" id="topMembersList"></div>
-          <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--text-sm);border-top:1px solid var(--border);padding-top:10px;">
-            Total Member Hours: <strong id="totalMemberHours">0</strong> hrs
+
+          <!-- ========== CUSTOMER TRAFFIC SECTION ========== -->
+          <div class="section-header">
+            <h2><i class="fa-solid fa-chart-line"></i> Customer Traffic</h2>
           </div>
-        </div>
-        <div class="summary-card">
-          <div class="chart-title"><i class="fa-solid fa-person-walking"></i> Top Walk-ins by Hours</div>
-          <div class="search-wrapper">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="search-input" id="walkinSearch" placeholder="Search walk-ins..." oninput="renderTopCustomers()">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">Customer Traffic Overview</div>
+              <div class="chart-controls">
+                <select id="trafficPeriodSelect" onchange="updateTrafficChart()">
+                  <option value="today">Peak Hours (Today)</option>
+                  <option value="week">Daily (This Week)</option>
+                  <option value="month">Weekly (Last 4 Weeks)</option>
+                  <option value="halfyear">Monthly (Last 6 Months)</option>
+                </select>
+              </div>
+            </div>
+            <div class="chart-box"><canvas id="trafficChart"></canvas></div>
           </div>
-          <div class="top-customer-list" id="topWalkinsList"></div>
-          <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--text-sm);border-top:1px solid var(--border);padding-top:10px;">
-            Total Walk-in Hours: <strong id="totalWalkinHours">0</strong> hrs
+
+          <!-- ========== INCOME SECTION ========== -->
+          <div class="section-header">
+            <h2><i class="fa-solid fa-coins"></i> Income</h2>
           </div>
-        </div>
-      </div>
 
-      <!-- Customer Type Breakdown with Total Customers -->
-      <div class="summary-card" style="margin-bottom:24px;">
-        <div class="chart-title"><i class="fa-solid fa-chart-pie"></i> Customer Type Breakdown</div>
-        <div class="chart-box" style="height:200px"><canvas id="typeChart"></canvas></div>
-        <div style="display:flex;justify-content:space-around;margin-top:16px;flex-wrap:wrap;gap:10px;">
-          <div><span style="background:#CF6322;display:inline-block;width:12px;height:12px;border-radius:50%;"></span> Members: <strong id="memberCount">0</strong></div>
-          <div><span style="background:#8A8636;display:inline-block;width:12px;height:12px;border-radius:50%;"></span> Walk-ins: <strong id="walkinCount">0</strong></div>
-          <div><span style="background:#4A7C59;display:inline-block;width:12px;height:12px;border-radius:50%;"></span> Premium: <strong id="premiumCount">0</strong></div>
-          <div><span class="total-customers-badge"><i class="fa-solid fa-users"></i> Total: <span id="totalCustomersCount">0</span></span></div>
-        </div>
-      </div>
+          <!-- Income Overview Card (linked to Income Breakdown dropdown) -->
+          <div class="income-overview-card">
+            <div class="chart-title"><i class="fa-solid fa-chart-simple" style="color:#fbbf24;"></i> Income Overview
+            </div>
+            <div class="income-stats">
+              <div class="income-stat-item">
+                <div class="income-stat-value" id="incomeTotal">₱0</div>
+                <div class="income-stat-label">Total Income</div>
+              </div>
+              <div class="income-stat-item">
+                <div class="income-stat-value" id="incomeAvg">₱0</div>
+                <div class="income-stat-label">Average per Day</div>
+              </div>
+              <div class="income-stat-item">
+                <div class="income-stat-value" id="incomeProjected">₱0</div>
+                <div class="income-stat-label">Projected (Month)</div>
+              </div>
+            </div>
+          </div>
 
-      <!-- ========== TRANSACTION & ACTIVITY SECTION ========== -->
-      <div class="section-header">
-        <h2><i class="fa-solid fa-receipt"></i> Transaction & Activity</h2>
-      </div>
+          <!-- Income Breakdown Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">Income Breakdown</div>
+              <div class="chart-controls">
+                <select id="incomePeriodSelect" onchange="updateIncomeChart()">
+                  <option value="today">Peak Hours (Today)</option>
+                  <option value="week">Daily (This Week)</option>
+                  <option value="month">Weekly (Last 4 Weeks)</option>
+                  <option value="halfyear">Monthly (Last 6 Months)</option>
+                </select>
+              </div>
+            </div>
+            <div class="chart-box"><canvas id="incomeChart"></canvas></div>
+          </div>
 
-      <!-- Transaction History Table -->
-      <div class="summary-card" style="margin-bottom:24px;">
-        <div class="search-wrapper">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" class="search-input" id="transSearch" placeholder="Search transactions..." oninput="renderTransactionHistory()">
-        </div>
-        <div style="overflow-x:auto;">
-          <table class="history-table">
-            <thead>
-              <tr>
-                <th onclick="sortTransactions('date')" style="cursor:pointer">Date <i class="fa-solid fa-sort sort-icon"></i></th>
-                <th onclick="sortTransactions('customer')" style="cursor:pointer">Customer <i class="fa-solid fa-sort sort-icon"></i></th>
-                <th>Type</th>
-                <th onclick="sortTransactions('amount')" style="cursor:pointer">Amount <i class="fa-solid fa-sort sort-icon"></i></th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="transactionHistoryBody"></tbody>
-          </table>
-        </div>
-      </div>
+          <!-- ========== INCOME LOGS SECTION (DAILY, WEEKLY, MONTHLY DROPDOWN) ========== -->
+          <div class="income-logs-section">
+            <div class="income-logs-header">
+              <div class="chart-title"><i class="fa-solid fa-receipt"></i> Income Logs & Transaction Details</div>
+              <div class="chart-controls">
+                <div class="search-wrapper" style="margin-bottom:0; width:200px;">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input type="text" class="search-input" id="incomeLogSearch" placeholder="Search logs..."
+                    oninput="renderIncomeLogs()">
+                </div>
+                <select id="incomeLogsPeriodSelect" class="income-period-log-select" onchange="renderIncomeLogs()">
+                  <option value="daily">Daily (Today's Transactions)</option>
+                  <option value="week">Weekly (Last 7 Days)</option>
+                  <option value="month">Monthly (Last 4 Weeks)</option>
+                </select>
+              </div>
+            </div>
+            <div class="summary-card" style="overflow-x:auto;">
+              <table class="logs-table">
+                <thead>
+                  <tr>
+                    <th onclick="sortLogs('period')">Period <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th onclick="sortLogs('totalIncome')">Total Income <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th onclick="sortLogs('transactions')">Transactions <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th>Reservations</th>
+                    <th>WiFi Extensions</th>
+                    <th>Plan Upgrades</th>
+                    <th>Walk-ins</th>
+                    <th>Payment Methods</th>
+                  </tr>
+                </thead>
+                <tbody id="incomeLogsBody"></tbody>
+              </table>
+            </div>
+          </div>
 
-      <!-- Activity History Table -->
-      <div class="summary-card" style="margin-bottom:24px;">
-        <div class="search-wrapper">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" class="search-input" id="activitySearch" placeholder="Search activities..." oninput="renderActivityHistory()">
-        </div>
-        <div style="overflow-x:auto;">
-          <table class="history-table">
-            <thead>
-              <tr>
-                <th onclick="sortActivity('timestamp')" style="cursor:pointer">Timestamp <i class="fa-solid fa-sort sort-icon"></i></th>
-                <th onclick="sortActivity('user')" style="cursor:pointer">User <i class="fa-solid fa-sort sort-icon"></i></th>
-                <th>Action</th>
-                <th>Details</th>
-              </tr>
-            </thead>
-            <tbody id="activityHistoryBody"></tbody>
-          </table>
-        </div>
-      </div>
+          <!-- ========== CUSTOMER BREAKDOWN SECTION ========== -->
+          <div class="section-header">
+            <h2><i class="fa-solid fa-users"></i> Customer Breakdown</h2>
+          </div>
 
-      <!-- ========== FINANCIAL SUMMARY SECTION (with LOSS) ========== -->
-      <div class="section-header">
-        <h2><i class="fa-solid fa-chart-simple"></i> Financial Summary</h2>
-      </div>
+          <!-- Top Customers (Members vs Walk-ins) -->
+          <div class="two-col-grid">
+            <div class="summary-card">
+              <div class="chart-title"><i class="fa-solid fa-crown"></i> Top Members by Hours</div>
+              <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" class="search-input" id="memberSearch" placeholder="Search members..."
+                  oninput="renderTopCustomers()">
+              </div>
+              <div class="top-customer-list" id="topMembersList"></div>
+              <div
+                style="margin-top:12px;text-align:center;font-size:12px;color:var(--text-sm);border-top:1px solid var(--border);padding-top:10px;">
+                Total Member Hours: <strong id="totalMemberHours">0</strong> hrs
+              </div>
+            </div>
+            <div class="summary-card">
+              <div class="chart-title"><i class="fa-solid fa-person-walking"></i> Top Walk-ins by Hours</div>
+              <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" class="search-input" id="walkinSearch" placeholder="Search walk-ins..."
+                  oninput="renderTopCustomers()">
+              </div>
+              <div class="top-customer-list" id="topWalkinsList"></div>
+              <div
+                style="margin-top:12px;text-align:center;font-size:12px;color:var(--text-sm);border-top:1px solid var(--border);padding-top:10px;">
+                Total Walk-in Hours: <strong id="totalWalkinHours">0</strong> hrs
+              </div>
+            </div>
+          </div>
 
-      <div class="three-col-grid">
-        <div class="summary-card">
-          <div class="chart-title"><i class="fa-solid fa-receipt"></i> Recent Transactions</div>
-          <div class="summary-row"><span class="summary-label">Reservations</span><span class="summary-value" id="revenueReservations">₱0</span></div>
-          <div class="summary-row"><span class="summary-label">WiFi Extensions</span><span class="summary-value" id="revenueWifi">₱0</span></div>
-          <div class="summary-row"><span class="summary-label">Plan Upgrades</span><span class="summary-value" id="revenueUpgrades">₱0</span></div>
-          <div class="summary-row total-revenue"><span class="summary-label">Total Revenue</span><span class="summary-value" id="totalRevenue">₱0</span></div>
-          <div class="summary-row loss-amount"><span class="summary-label">Loss (Pending/Unpaid)</span><span class="summary-value" id="lossAmount">₱0</span></div>
-        </div>
-        <div class="summary-card">
-          <div class="chart-title"><i class="fa-solid fa-clock"></i> Payment Status</div>
-          <div class="summary-row"><span class="summary-label">Pending Payments</span><span class="summary-value" id="pendingPayments">₱0</span></div>
-          <div class="summary-row"><span class="summary-label">Completed Payments</span><span class="summary-value" id="completedPayments">₱0</span></div>
-          <div class="summary-row"><span class="summary-label">Pending %</span><span class="pending-badge" id="pendingPercent">0%</span></div>
-          <div class="summary-row" style="margin-top:10px;"><span class="summary-label">Total Pending Customers</span><span class="summary-value" id="pendingCustomers">0</span></div>
-          <div class="summary-row"><span class="summary-label">Total Paid Customers</span><span class="summary-value" id="paidCustomers">0</span></div>
-        </div>
-        <div class="summary-card">
-          <div class="chart-title"><i class="fa-solid fa-calendar-week"></i> Weekly Customer Summary</div>
-          <div class="summary-row"><span class="summary-label">Members (This Week)</span><span class="summary-value" id="weeklyMembers">0</span></div>
-          <div class="summary-row"><span class="summary-label">Walk-ins (This Week)</span><span class="summary-value" id="weeklyWalkins">0</span></div>
-          <div class="summary-row"><span class="summary-label">Premium (This Week)</span><span class="summary-value" id="weeklyPremium">0</span></div>
-          <div class="summary-row total-revenue" style="background:#3498db"><span class="summary-label">Total This Week</span><span class="summary-value" id="weeklyTotal">0</span></div>
-        </div>
-      </div>
+          <!-- Customer Type Breakdown with Total Customers -->
+          <div class="summary-card" style="margin-bottom:24px;">
+            <div class="chart-title"><i class="fa-solid fa-chart-pie"></i> Customer Type Breakdown</div>
+            <div class="chart-box" style="height:200px"><canvas id="typeChart"></canvas></div>
+            <div style="display:flex;justify-content:space-around;margin-top:16px;flex-wrap:wrap;gap:10px;">
+              <div><span
+                  style="background:#CF6322;display:inline-block;width:12px;height:12px;border-radius:50%;"></span>
+                Members: <strong id="memberCount">0</strong></div>
+              <div><span
+                  style="background:#8A8636;display:inline-block;width:12px;height:12px;border-radius:50%;"></span>
+                Walk-ins: <strong id="walkinCount">0</strong></div>
+              <div><span
+                  style="background:#4A7C59;display:inline-block;width:12px;height:12px;border-radius:50%;"></span>
+                Premium: <strong id="premiumCount">0</strong></div>
+              <div><span class="total-customers-badge"><i class="fa-solid fa-users"></i> Total: <span
+                    id="totalCustomersCount">0</span></span></div>
+            </div>
+          </div>
 
-      <!-- Global Generate Report Button -->
-      <div style="display:flex;justify-content:flex-end;margin-top:16px;">
-        <button class="btn btn-primary" onclick="generateReport()" style="padding:12px 24px;"><i class="fa-solid fa-file-arrow-down"></i> Generate Full Report</button>
-      </div>
+          <!-- ========== TRANSACTION & ACTIVITY SECTION ========== -->
+          <div class="section-header">
+            <h2><i class="fa-solid fa-receipt"></i> Transaction & Activity</h2>
+          </div>
 
-    </main>
-  </div>
+          <!-- Transaction History Table -->
+          <div class="summary-card" style="margin-bottom:24px;">
+            <div class="search-wrapper">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" class="search-input" id="transSearch" placeholder="Search transactions..."
+                oninput="renderTransactionHistory()">
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th onclick="sortTransactions('date')" style="cursor:pointer">Date <i
+                        class="fa-solid fa-sort sort-icon"></i></th>
+                    <th onclick="sortTransactions('customer')" style="cursor:pointer">Customer <i
+                        class="fa-solid fa-sort sort-icon"></i></th>
+                    <th>Type</th>
+                    <th onclick="sortTransactions('amount')" style="cursor:pointer">Amount <i
+                        class="fa-solid fa-sort sort-icon"></i></th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionHistoryBody"></tbody>
+              </table>
+            </div>
+          </div>
 
-<%- contentFor('script') %>
-<script>
-    // ======================== DATA MODELS ========================
-    const trafficData = {
-      today: [4, 7, 12, 18, 22, 28, 32, 27, 20, 15, 10, 7, 3],
-      week: [120, 145, 132, 160, 155, 142, 138],
-      month: [820, 940, 770, 1010, 880, 960, 740, 990, 860, 1100, 920, 850],
-      halfyear: [3450, 3780, 4120, 3980, 4350, 4670]
-    };
-    const trafficLabels = {
-      today: ['9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm'],
-      week: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      month: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'],
-      halfyear: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
-    };
-    const incomeData = {
-      today: [450, 680, 890, 1200, 1450, 1780, 2100, 1950, 1600, 1250, 980, 720, 450],
-      week: [12500, 14800, 13500, 16200, 15800, 14500, 13200],
-      month: [85000, 92000, 78000, 105000, 91000, 98000, 76000, 102000, 89000, 112000, 95000, 88000],
-      halfyear: [350000, 385000, 420000, 405000, 445000, 478000]
-    };
+          <!-- Activity History Table -->
+          <div class="summary-card" style="margin-bottom:24px;">
+            <div class="search-wrapper">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" class="search-input" id="activitySearch" placeholder="Search activities..."
+                oninput="renderActivityHistory()">
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th onclick="sortActivity('timestamp')" style="cursor:pointer">Timestamp <i
+                        class="fa-solid fa-sort sort-icon"></i></th>
+                    <th onclick="sortActivity('user')" style="cursor:pointer">User <i
+                        class="fa-solid fa-sort sort-icon"></i></th>
+                    <th>Action</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody id="activityHistoryBody"></tbody>
+              </table>
+            </div>
+          </div>
 
-    // Detailed income logs data for DAILY, WEEKLY, MONTHLY breakdown
-    const dailyIncomeLogs = [
-      { period: "April 27, 2026", totalIncome: 12500, transactions: 18, reservations: 5200, wifiExtensions: 1800, planUpgrades: 5500, walkIns: 1200, paymentMethods: "GCash: 8, Cashier: 10" },
-      { period: "April 26, 2026", totalIncome: 14800, transactions: 22, reservations: 6800, wifiExtensions: 2200, planUpgrades: 5800, walkIns: 1500, paymentMethods: "GCash: 12, Cashier: 10" },
-      { period: "April 25, 2026", totalIncome: 13500, transactions: 19, reservations: 6200, wifiExtensions: 1900, planUpgrades: 5400, walkIns: 1300, paymentMethods: "GCash: 10, Cashier: 9" },
-      { period: "April 24, 2026", totalIncome: 16200, transactions: 25, reservations: 7500, wifiExtensions: 2500, planUpgrades: 6200, walkIns: 1600, paymentMethods: "GCash: 14, Cashier: 11" },
-      { period: "April 23, 2026", totalIncome: 15800, transactions: 23, reservations: 7200, wifiExtensions: 2300, planUpgrades: 6300, walkIns: 1500, paymentMethods: "GCash: 13, Cashier: 10" },
-      { period: "April 22, 2026", totalIncome: 14500, transactions: 21, reservations: 6800, wifiExtensions: 2100, planUpgrades: 5600, walkIns: 1400, paymentMethods: "GCash: 11, Cashier: 10" },
-      { period: "April 21, 2026", totalIncome: 13200, transactions: 18, reservations: 5800, wifiExtensions: 1800, planUpgrades: 5600, walkIns: 1100, paymentMethods: "GCash: 9, Cashier: 9" }
-    ];
+          <!-- ========== FINANCIAL SUMMARY SECTION (with LOSS) ========== -->
+          <div class="section-header">
+            <h2><i class="fa-solid fa-chart-simple"></i> Financial Summary</h2>
+          </div>
 
-    const weeklyIncomeLogs = [
-      { period: "Week 1 (Apr 1-7)", totalIncome: 125000, transactions: 42, reservations: 58000, wifiExtensions: 15000, planUpgrades: 52000, walkIns: 8000, paymentMethods: "GCash: 24, Cashier: 18" },
-      { period: "Week 2 (Apr 8-14)", totalIncome: 148000, transactions: 48, reservations: 68000, wifiExtensions: 18000, planUpgrades: 62000, walkIns: 10000, paymentMethods: "GCash: 28, Cashier: 20" },
-      { period: "Week 3 (Apr 15-21)", totalIncome: 135000, transactions: 39, reservations: 62000, wifiExtensions: 16000, planUpgrades: 57000, walkIns: 9000, paymentMethods: "GCash: 22, Cashier: 17" },
-      { period: "Week 4 (Apr 22-28)", totalIncome: 162000, transactions: 55, reservations: 75000, wifiExtensions: 22000, planUpgrades: 65000, walkIns: 12000, paymentMethods: "GCash: 32, Cashier: 23" }
-    ];
+          <div class="three-col-grid">
+            <div class="summary-card">
+              <div class="chart-title"><i class="fa-solid fa-receipt"></i> Recent Transactions</div>
+              <div class="summary-row"><span class="summary-label">Reservations</span><span class="summary-value"
+                  id="revenueReservations">₱0</span></div>
+              <div class="summary-row"><span class="summary-label">WiFi Extensions</span><span class="summary-value"
+                  id="revenueWifi">₱0</span></div>
+              <div class="summary-row"><span class="summary-label">Plan Upgrades</span><span class="summary-value"
+                  id="revenueUpgrades">₱0</span></div>
+              <div class="summary-row total-revenue"><span class="summary-label">Total Revenue</span><span
+                  class="summary-value" id="totalRevenue">₱0</span></div>
+              <div class="summary-row loss-amount"><span class="summary-label">Loss (Pending/Unpaid)</span><span
+                  class="summary-value" id="lossAmount">₱0</span></div>
+            </div>
+            <div class="summary-card">
+              <div class="chart-title"><i class="fa-solid fa-clock"></i> Payment Status</div>
+              <div class="summary-row"><span class="summary-label">Pending Payments</span><span class="summary-value"
+                  id="pendingPayments">₱0</span></div>
+              <div class="summary-row"><span class="summary-label">Completed Payments</span><span class="summary-value"
+                  id="completedPayments">₱0</span></div>
+              <div class="summary-row"><span class="summary-label">Pending %</span><span class="pending-badge"
+                  id="pendingPercent">0%</span></div>
+              <div class="summary-row" style="margin-top:10px;"><span class="summary-label">Total Pending
+                  Customers</span><span class="summary-value" id="pendingCustomers">0</span></div>
+              <div class="summary-row"><span class="summary-label">Total Paid Customers</span><span
+                  class="summary-value" id="paidCustomers">0</span></div>
+            </div>
+            <div class="summary-card">
+              <div class="chart-title"><i class="fa-solid fa-calendar-week"></i> Weekly Customer Summary</div>
+              <div class="summary-row"><span class="summary-label">Members (This Week)</span><span class="summary-value"
+                  id="weeklyMembers">0</span></div>
+              <div class="summary-row"><span class="summary-label">Walk-ins (This Week)</span><span
+                  class="summary-value" id="weeklyWalkins">0</span></div>
+              <div class="summary-row"><span class="summary-label">Premium (This Week)</span><span class="summary-value"
+                  id="weeklyPremium">0</span></div>
+              <div class="summary-row total-revenue" style="background:#3498db"><span class="summary-label">Total This
+                  Week</span><span class="summary-value" id="weeklyTotal">0</span></div>
+            </div>
+          </div>
 
-    const monthlyIncomeLogs = [
-      { period: "April 2026", totalIncome: 405000, transactions: 145, reservations: 191000, wifiExtensions: 51000, planUpgrades: 163000, walkIns: 25000, paymentMethods: "GCash: 85, Cashier: 60" },
-      { period: "March 2026", totalIncome: 420000, transactions: 152, reservations: 198000, wifiExtensions: 52000, planUpgrades: 170000, walkIns: 28000, paymentMethods: "GCash: 88, Cashier: 64" },
-      { period: "February 2026", totalIncome: 385000, transactions: 138, reservations: 182000, wifiExtensions: 48000, planUpgrades: 155000, walkIns: 22000, paymentMethods: "GCash: 79, Cashier: 59" },
-      { period: "January 2026", totalIncome: 350000, transactions: 120, reservations: 165000, wifiExtensions: 45000, planUpgrades: 140000, walkIns: 18000, paymentMethods: "GCash: 68, Cashier: 52" }
-    ];
+          <!-- Global Generate Report Button -->
+          <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+            <button class="btn btn-primary" onclick="generateReport()" style="padding:12px 24px;"><i
+                class="fa-solid fa-file-arrow-down"></i> Generate Full Report</button>
+          </div>
 
-    const topMembers = [
-      { rank: 1, name: "Monkey D. Luffy", hours: 28.5 },
-      { rank: 2, name: "Vivi Nefertari", hours: 24.2 },
-      { rank: 3, name: "Roronoa Zoro", hours: 22.0 },
-      { rank: 4, name: "Nami Catburglar", hours: 18.7 },
-      { rank: 5, name: "Tony Chopper", hours: 15.3 }
-    ];
+        </main>
+    </div>
 
-    const topWalkins = [
-      { rank: 1, name: "Brook", hours: 14.5 },
-      { rank: 2, name: "Tony Chopper", hours: 11.2 },
-      { rank: 3, name: "Jinbe", hours: 9.8 },
-      { rank: 4, name: "Vivi Nefertari", hours: 8.5 },
-      { rank: 5, name: "Usopp", hours: 6.2 }
-    ];
+    <%- contentFor('script') %>
+      <script>
+        // ======================== DATA MODELS ========================
+        const trafficData = {
+          today: [4, 7, 12, 18, 22, 28, 32, 27, 20, 15, 10, 7, 3],
+          week: [120, 145, 132, 160, 155, 142, 138],
+          month: [820, 940, 770, 1010, 880, 960, 740, 990, 860, 1100, 920, 850],
+          halfyear: [3450, 3780, 4120, 3980, 4350, 4670]
+        };
+        const trafficLabels = {
+          today: ['9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm'],
+          week: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          month: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'],
+          halfyear: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+        };
+        const incomeData = {
+          today: [450, 680, 890, 1200, 1450, 1780, 2100, 1950, 1600, 1250, 980, 720, 450],
+          week: [12500, 14800, 13500, 16200, 15800, 14500, 13200],
+          month: [85000, 92000, 78000, 105000, 91000, 98000, 76000, 102000, 89000, 112000, 95000, 88000],
+          halfyear: [350000, 385000, 420000, 405000, 445000, 478000]
+        };
 
-    const transactionHistory = [
-      { date: "2026-04-27 09:30", customer: "Monkey D. Luffy", type: "Reservation", amount: 250, status: "Paid" },
-      { date: "2026-04-27 10:15", customer: "Brook", type: "Walk-in", amount: 150, status: "Paid" },
-      { date: "2026-04-27 11:00", customer: "Nami", type: "WiFi Extension", amount: 100, status: "Pending" },
-      { date: "2026-04-26 14:30", customer: "Sanji", type: "Plan Upgrade", amount: 1199, status: "Paid" },
-      { date: "2026-04-26 09:00", customer: "Vivi Nefertari", type: "Reservation", amount: 300, status: "Paid" },
-      { date: "2026-04-25 16:20", customer: "Jinbe", type: "WiFi Extension", amount: 50, status: "Pending" }
-    ];
+        // Detailed income logs data for DAILY, WEEKLY, MONTHLY breakdown
+        const dailyIncomeLogs = [
+          { period: "April 27, 2026", totalIncome: 12500, transactions: 18, reservations: 5200, wifiExtensions: 1800, planUpgrades: 5500, walkIns: 1200, paymentMethods: "GCash: 8, Cashier: 10" },
+          { period: "April 26, 2026", totalIncome: 14800, transactions: 22, reservations: 6800, wifiExtensions: 2200, planUpgrades: 5800, walkIns: 1500, paymentMethods: "GCash: 12, Cashier: 10" },
+          { period: "April 25, 2026", totalIncome: 13500, transactions: 19, reservations: 6200, wifiExtensions: 1900, planUpgrades: 5400, walkIns: 1300, paymentMethods: "GCash: 10, Cashier: 9" },
+          { period: "April 24, 2026", totalIncome: 16200, transactions: 25, reservations: 7500, wifiExtensions: 2500, planUpgrades: 6200, walkIns: 1600, paymentMethods: "GCash: 14, Cashier: 11" },
+          { period: "April 23, 2026", totalIncome: 15800, transactions: 23, reservations: 7200, wifiExtensions: 2300, planUpgrades: 6300, walkIns: 1500, paymentMethods: "GCash: 13, Cashier: 10" },
+          { period: "April 22, 2026", totalIncome: 14500, transactions: 21, reservations: 6800, wifiExtensions: 2100, planUpgrades: 5600, walkIns: 1400, paymentMethods: "GCash: 11, Cashier: 10" },
+          { period: "April 21, 2026", totalIncome: 13200, transactions: 18, reservations: 5800, wifiExtensions: 1800, planUpgrades: 5600, walkIns: 1100, paymentMethods: "GCash: 9, Cashier: 9" }
+        ];
 
-    const activityHistory = [
-      { timestamp: "2026-04-27 08:45", user: "Staff Zoro", action: "Door Unlock", details: "RFID access granted" },
-      { timestamp: "2026-04-27 09:30", user: "Admin", action: "Reservation Confirmed", details: "Luffy - Seat A3" },
-      { timestamp: "2026-04-27 10:00", user: "Staff Nami", action: "Walk-in Added", details: "Brook - Seat A7" },
-      { timestamp: "2026-04-27 11:15", user: "System", action: "WiFi Extension", details: "Nami requested 1hr extension" },
-      { timestamp: "2026-04-26 15:00", user: "Admin", action: "Plan Upgrade", details: "Sanji upgraded to Premium" },
-      { timestamp: "2026-04-26 09:30", user: "Staff Zoro", action: "Seat Transfer", details: "Chopper moved to C1" }
-    ];
+        const weeklyIncomeLogs = [
+          { period: "Week 1 (Apr 1-7)", totalIncome: 125000, transactions: 42, reservations: 58000, wifiExtensions: 15000, planUpgrades: 52000, walkIns: 8000, paymentMethods: "GCash: 24, Cashier: 18" },
+          { period: "Week 2 (Apr 8-14)", totalIncome: 148000, transactions: 48, reservations: 68000, wifiExtensions: 18000, planUpgrades: 62000, walkIns: 10000, paymentMethods: "GCash: 28, Cashier: 20" },
+          { period: "Week 3 (Apr 15-21)", totalIncome: 135000, transactions: 39, reservations: 62000, wifiExtensions: 16000, planUpgrades: 57000, walkIns: 9000, paymentMethods: "GCash: 22, Cashier: 17" },
+          { period: "Week 4 (Apr 22-28)", totalIncome: 162000, transactions: 55, reservations: 75000, wifiExtensions: 22000, planUpgrades: 65000, walkIns: 12000, paymentMethods: "GCash: 32, Cashier: 23" }
+        ];
 
-    // Since Establishment Data (January 2024)
-    let sinceEstablishment = {
-      totalCustomers: 1247,
-      totalIncome: 458920,
-      totalHoursConsumed: 3245
-    };
+        const monthlyIncomeLogs = [
+          { period: "April 2026", totalIncome: 405000, transactions: 145, reservations: 191000, wifiExtensions: 51000, planUpgrades: 163000, walkIns: 25000, paymentMethods: "GCash: 85, Cashier: 60" },
+          { period: "March 2026", totalIncome: 420000, transactions: 152, reservations: 198000, wifiExtensions: 52000, planUpgrades: 170000, walkIns: 28000, paymentMethods: "GCash: 88, Cashier: 64" },
+          { period: "February 2026", totalIncome: 385000, transactions: 138, reservations: 182000, wifiExtensions: 48000, planUpgrades: 155000, walkIns: 22000, paymentMethods: "GCash: 79, Cashier: 59" },
+          { period: "January 2026", totalIncome: 350000, transactions: 120, reservations: 165000, wifiExtensions: 45000, planUpgrades: 140000, walkIns: 18000, paymentMethods: "GCash: 68, Cashier: 52" }
+        ];
 
-    let customerStats = {
-      totalMembers: 42,
-      totalWalkins: 28,
-      totalPremium: 15,
-      weeklyMembers: 18,
-      weeklyWalkins: 12,
-      weeklyPremium: 6,
-      pendingCustomers: 8,
-      paidCustomers: 77
-    };
+        const topMembers = [
+          { rank: 1, name: "Monkey D. Luffy", hours: 28.5 },
+          { rank: 2, name: "Vivi Nefertari", hours: 24.2 },
+          { rank: 3, name: "Roronoa Zoro", hours: 22.0 },
+          { rank: 4, name: "Nami Catburglar", hours: 18.7 },
+          { rank: 5, name: "Tony Chopper", hours: 15.3 }
+        ];
 
-    let transactionData = {
-      reservations: 12500,
-      wifiExtensions: 3450,
-      planUpgrades: 8380,
-      pendingPayments: 6548,
-      completedPayments: 17782
-    };
+        const topWalkins = [
+          { rank: 1, name: "Brook", hours: 14.5 },
+          { rank: 2, name: "Tony Chopper", hours: 11.2 },
+          { rank: 3, name: "Jinbe", hours: 9.8 },
+          { rank: 4, name: "Vivi Nefertari", hours: 8.5 },
+          { rank: 5, name: "Usopp", hours: 6.2 }
+        ];
 
-    let trafficChart = null;
-    let incomeChart = null;
-    let typeChart = null;
+        const transactionHistory = [
+          { date: "2026-04-27 09:30", customer: "Monkey D. Luffy", type: "Reservation", amount: 250, status: "Paid" },
+          { date: "2026-04-27 10:15", customer: "Brook", type: "Walk-in", amount: 150, status: "Paid" },
+          { date: "2026-04-27 11:00", customer: "Nami", type: "WiFi Extension", amount: 100, status: "Pending" },
+          { date: "2026-04-26 14:30", customer: "Sanji", type: "Plan Upgrade", amount: 1199, status: "Paid" },
+          { date: "2026-04-26 09:00", customer: "Vivi Nefertari", type: "Reservation", amount: 300, status: "Paid" },
+          { date: "2026-04-25 16:20", customer: "Jinbe", type: "WiFi Extension", amount: 50, status: "Pending" }
+        ];
 
-    // Sort States
-    let transSort = { key: 'date', dir: 'desc' };
-    let activitySort = { key: 'timestamp', dir: 'desc' };
-    let logsSort = { key: 'period', dir: 'desc' };
+        const activityHistory = [
+          { timestamp: "2026-04-27 08:45", user: "Staff Zoro", action: "Door Unlock", details: "RFID access granted" },
+          { timestamp: "2026-04-27 09:30", user: "Admin", action: "Reservation Confirmed", details: "Luffy - Seat A3" },
+          { timestamp: "2026-04-27 10:00", user: "Staff Nami", action: "Walk-in Added", details: "Brook - Seat A7" },
+          { timestamp: "2026-04-27 11:15", user: "System", action: "WiFi Extension", details: "Nami requested 1hr extension" },
+          { timestamp: "2026-04-26 15:00", user: "Admin", action: "Plan Upgrade", details: "Sanji upgraded to Premium" },
+          { timestamp: "2026-04-26 09:30", user: "Staff Zoro", action: "Seat Transfer", details: "Chopper moved to C1" }
+        ];
 
-    function sortTransactions(key) {
-      if (transSort.key === key) transSort.dir = transSort.dir === 'asc' ? 'desc' : 'asc';
-      else { transSort.key = key; transSort.dir = 'asc'; }
-      renderTransactionHistory();
-    }
+        // Since Establishment Data (January 2024)
+        let sinceEstablishment = {
+          totalCustomers: 1247,
+          totalIncome: 458920,
+          totalHoursConsumed: 3245
+        };
 
-    function sortActivity(key) {
-      if (activitySort.key === key) activitySort.dir = activitySort.dir === 'asc' ? 'desc' : 'asc';
-      else { activitySort.key = key; activitySort.dir = 'asc'; }
-      renderActivityHistory();
-    }
+        let customerStats = {
+          totalMembers: 42,
+          totalWalkins: 28,
+          totalPremium: 15,
+          weeklyMembers: 18,
+          weeklyWalkins: 12,
+          weeklyPremium: 6,
+          pendingCustomers: 8,
+          paidCustomers: 77
+        };
 
-    function sortLogs(key) {
-      if (logsSort.key === key) logsSort.dir = logsSort.dir === 'asc' ? 'desc' : 'asc';
-      else { logsSort.key = key; logsSort.dir = 'asc'; }
-      renderIncomeLogs();
-    }
+        let transactionData = {
+          reservations: 12500,
+          wifiExtensions: 3450,
+          planUpgrades: 8380,
+          pendingPayments: 6548,
+          completedPayments: 17782
+        };
 
-    function universalSort(data, key, dir) {
-      return data.sort((a, b) => {
-        let valA = a[key];
-        let valB = b[key];
-        if (typeof valA === 'string') valA = valA.toLowerCase();
-        if (typeof valB === 'string') valB = valB.toLowerCase();
-        if (valA < valB) return dir === 'asc' ? -1 : 1;
-        if (valA > valB) return dir === 'asc' ? 1 : -1;
-        return 0;
-      });
-    }
+        let trafficChart = null;
+        let incomeChart = null;
+        let typeChart = null;
 
-    function formatPHP(amount) { return '₱' + amount.toLocaleString(); }
+        // Sort States
+        let transSort = { key: 'date', dir: 'desc' };
+        let activitySort = { key: 'timestamp', dir: 'desc' };
+        let logsSort = { key: 'period', dir: 'desc' };
 
-    function updateSinceEstablishment() {
-      document.getElementById('totalCustomersSince').textContent = sinceEstablishment.totalCustomers.toLocaleString();
-      document.getElementById('totalIncomeSince').innerHTML = formatPHP(sinceEstablishment.totalIncome);
-      document.getElementById('totalHoursConsumed').textContent = sinceEstablishment.totalHoursConsumed.toLocaleString();
-    }
+        function sortTransactions(key) {
+          if (transSort.key === key) transSort.dir = transSort.dir === 'asc' ? 'desc' : 'asc';
+          else { transSort.key = key; transSort.dir = 'asc'; }
+          renderTransactionHistory();
+        }
 
-    function calculateIncomeStats(period) {
-      const data = incomeData[period];
-      const total = data.reduce((a, b) => a + b, 0);
-      const avg = Math.round(total / data.length);
-      const projected = Math.round(total + (total * 0.12));
-      return { total, avg, projected };
-    }
+        function sortActivity(key) {
+          if (activitySort.key === key) activitySort.dir = activitySort.dir === 'asc' ? 'desc' : 'asc';
+          else { activitySort.key = key; activitySort.dir = 'asc'; }
+          renderActivityHistory();
+        }
 
-    function updateIncomeOverview(period) {
-      const stats = calculateIncomeStats(period);
-      document.getElementById('incomeTotal').innerHTML = formatPHP(stats.total);
-      document.getElementById('incomeAvg').innerHTML = formatPHP(stats.avg);
-      document.getElementById('incomeProjected').innerHTML = formatPHP(stats.projected);
-    }
+        function sortLogs(key) {
+          if (logsSort.key === key) logsSort.dir = logsSort.dir === 'asc' ? 'desc' : 'asc';
+          else { logsSort.key = key; logsSort.dir = 'asc'; }
+          renderIncomeLogs();
+        }
 
-    function updateStatsFromTraffic(period) {
-      const data = trafficData[period];
-      const peak = Math.max(...data);
-      const avg = Math.round(data.reduce((a, b) => a + b, 0) / data.length);
-      const total = data.reduce((a, b) => a + b, 0);
-      const low = Math.min(...data);
-      document.getElementById('statPeak').textContent = peak;
-      document.getElementById('statAvg').textContent = avg;
-      document.getElementById('statTotal').textContent = total;
-      document.getElementById('statLow').textContent = low;
-    }
+        function universalSort(data, key, dir) {
+          return data.sort((a, b) => {
+            let valA = a[key];
+            let valB = b[key];
+            if (typeof valA === 'string') valA = valA.toLowerCase();
+            if (typeof valB === 'string') valB = valB.toLowerCase();
+            if (valA < valB) return dir === 'asc' ? -1 : 1;
+            if (valA > valB) return dir === 'asc' ? 1 : -1;
+            return 0;
+          });
+        }
 
-    function updateTrafficChart() {
-      const period = document.getElementById('trafficPeriodSelect').value;
-      const dataset = trafficData[period];
-      const labels = trafficLabels[period];
-      if (trafficChart) trafficChart.destroy();
-      const ctx = document.getElementById('trafficChart').getContext('2d');
-      trafficChart = new Chart(ctx, {
-        type: 'line',
-        data: { labels: labels, datasets: [{ label: 'Customers', data: dataset, borderColor: '#CF6322', backgroundColor: 'rgba(207,99,34,.12)', borderWidth: 2.5, fill: true, tension: 0.4, pointBackgroundColor: '#CF6322', pointRadius: 4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-      });
-      updateStatsFromTraffic(period);
-    }
+        function formatPHP(amount) { return '₱' + amount.toLocaleString(); }
 
-    function updateIncomeChart() {
-      const period = document.getElementById('incomePeriodSelect').value;
-      const dataset = incomeData[period];
-      const labels = trafficLabels[period];
-      if (incomeChart) incomeChart.destroy();
-      const ctx = document.getElementById('incomeChart').getContext('2d');
-      incomeChart = new Chart(ctx, {
-        type: 'bar',
-        data: { labels: labels, datasets: [{ label: 'Income (₱)', data: dataset, backgroundColor: '#8A8636', borderRadius: 6 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `₱${ctx.raw.toLocaleString()}` } } }, scales: { y: { beginAtZero: true, ticks: { callback: (val) => '₱' + val.toLocaleString() } } } }
-      });
-      updateIncomeOverview(period);
-    }
+        function updateSinceEstablishment() {
+          document.getElementById('totalCustomersSince').textContent = sinceEstablishment.totalCustomers.toLocaleString();
+          document.getElementById('totalIncomeSince').innerHTML = formatPHP(sinceEstablishment.totalIncome);
+          document.getElementById('totalHoursConsumed').textContent = sinceEstablishment.totalHoursConsumed.toLocaleString();
+        }
 
-    // Render Income Logs based on selected period (DAILY, WEEKLY, MONTHLY)
-    function renderIncomeLogs() {
-      const period = document.getElementById('incomeLogsPeriodSelect').value;
-      const q = document.getElementById('incomeLogSearch').value.toLowerCase();
-      let logsData = [];
-      
-      if (period === 'daily') logsData = [...dailyIncomeLogs];
-      else if (period === 'week') logsData = [...weeklyIncomeLogs];
-      else logsData = [...monthlyIncomeLogs];
-      
-      // Filter
-      logsData = logsData.filter(log => 
-        log.period.toLowerCase().includes(q) || 
-        log.paymentMethods.toLowerCase().includes(q)
-      );
+        function calculateIncomeStats(period) {
+          const data = incomeData[period];
+          const total = data.reduce((a, b) => a + b, 0);
+          const avg = Math.round(total / data.length);
+          const projected = Math.round(total + (total * 0.12));
+          return { total, avg, projected };
+        }
 
-      // Sort
-      universalSort(logsData, logsSort.key, logsSort.dir);
-      
-      const tbody = document.getElementById('incomeLogsBody');
-      tbody.innerHTML = logsData.map(log => `
+        function updateIncomeOverview(period) {
+          const stats = calculateIncomeStats(period);
+          document.getElementById('incomeTotal').innerHTML = formatPHP(stats.total);
+          document.getElementById('incomeAvg').innerHTML = formatPHP(stats.avg);
+          document.getElementById('incomeProjected').innerHTML = formatPHP(stats.projected);
+        }
+
+        function updateStatsFromTraffic(period) {
+          const data = trafficData[period];
+          const peak = Math.max(...data);
+          const avg = Math.round(data.reduce((a, b) => a + b, 0) / data.length);
+          const total = data.reduce((a, b) => a + b, 0);
+          const low = Math.min(...data);
+          document.getElementById('statPeak').textContent = peak;
+          document.getElementById('statAvg').textContent = avg;
+          document.getElementById('statTotal').textContent = total;
+          document.getElementById('statLow').textContent = low;
+        }
+
+        function updateTrafficChart() {
+          const period = document.getElementById('trafficPeriodSelect').value;
+          const dataset = trafficData[period];
+          const labels = trafficLabels[period];
+          if (trafficChart) trafficChart.destroy();
+          const ctx = document.getElementById('trafficChart').getContext('2d');
+          trafficChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: labels, datasets: [{ label: 'Customers', data: dataset, borderColor: '#CF6322', backgroundColor: 'rgba(207,99,34,.12)', borderWidth: 2.5, fill: true, tension: 0.4, pointBackgroundColor: '#CF6322', pointRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+          });
+          updateStatsFromTraffic(period);
+        }
+
+        function updateIncomeChart() {
+          const period = document.getElementById('incomePeriodSelect').value;
+          const dataset = incomeData[period];
+          const labels = trafficLabels[period];
+          if (incomeChart) incomeChart.destroy();
+          const ctx = document.getElementById('incomeChart').getContext('2d');
+          incomeChart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ label: 'Income (₱)', data: dataset, backgroundColor: '#8A8636', borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `₱${ctx.raw.toLocaleString()}` } } }, scales: { y: { beginAtZero: true, ticks: { callback: (val) => '₱' + val.toLocaleString() } } } }
+          });
+          updateIncomeOverview(period);
+        }
+
+        // Render Income Logs based on selected period (DAILY, WEEKLY, MONTHLY)
+        function renderIncomeLogs() {
+          const period = document.getElementById('incomeLogsPeriodSelect').value;
+          const q = document.getElementById('incomeLogSearch').value.toLowerCase();
+          let logsData = [];
+
+          if (period === 'daily') logsData = [...dailyIncomeLogs];
+          else if (period === 'week') logsData = [...weeklyIncomeLogs];
+          else logsData = [...monthlyIncomeLogs];
+
+          // Filter
+          logsData = logsData.filter(log =>
+            log.period.toLowerCase().includes(q) ||
+            log.paymentMethods.toLowerCase().includes(q)
+          );
+
+          // Sort
+          universalSort(logsData, logsSort.key, logsSort.dir);
+
+          const tbody = document.getElementById('incomeLogsBody');
+          tbody.innerHTML = logsData.map(log => `
         <tr>
           <td><strong>${log.period}</strong></td>
           <td><span style="font-weight:800;color:#CF6322;">${formatPHP(log.totalIncome)}</span></td>
@@ -581,144 +1004,143 @@
           <td><span style="font-size:11px;">${log.paymentMethods}</span></td>
         </tr>
       `).join('');
-    }
+        }
 
-    function renderTopCustomers() {
-      const memQ = document.getElementById('memberSearch').value.toLowerCase();
-      const walkQ = document.getElementById('walkinSearch').value.toLowerCase();
-      
-      const membersContainer = document.getElementById('topMembersList');
-      const walkinsContainer = document.getElementById('topWalkinsList');
-      
-      const filteredMembers = topMembers.filter(m => m.name.toLowerCase().includes(memQ));
-      const filteredWalkins = topWalkins.filter(w => w.name.toLowerCase().includes(walkQ));
+        function renderTopCustomers() {
+          const memQ = document.getElementById('memberSearch').value.toLowerCase();
+          const walkQ = document.getElementById('walkinSearch').value.toLowerCase();
 
-      const totalMemberHours = topMembers.reduce((sum, m) => sum + m.hours, 0);
-      const totalWalkinHours = topWalkins.reduce((sum, w) => sum + w.hours, 0);
-      
-      membersContainer.innerHTML = filteredMembers.map(m => `<div class="top-customer-item"><div><span class="top-customer-name">${m.rank}. ${m.name}</span></div><div class="top-customer-hours">${m.hours} hrs</div></div>`).join('');
-      walkinsContainer.innerHTML = filteredWalkins.map(w => `<div class="top-customer-item"><div><span class="top-customer-name">${w.rank}. ${w.name}</span></div><div class="top-customer-hours">${w.hours} hrs</div></div>`).join('');
-      
-      document.getElementById('totalMemberHours').textContent = totalMemberHours;
-      document.getElementById('totalWalkinHours').textContent = totalWalkinHours;
-    }
+          const membersContainer = document.getElementById('topMembersList');
+          const walkinsContainer = document.getElementById('topWalkinsList');
 
-    function renderTypeChart() {
-      if (typeChart) typeChart.destroy();
-      const ctx = document.getElementById('typeChart').getContext('2d');
-      typeChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: { labels: ['Members', 'Walk-ins', 'Premium'], datasets: [{ data: [customerStats.totalMembers, customerStats.totalWalkins, customerStats.totalPremium], backgroundColor: ['#CF6322', '#8A8636', '#4A7C59'], borderWidth: 0, hoverOffset: 8 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
-      });
-      document.getElementById('memberCount').textContent = customerStats.totalMembers;
-      document.getElementById('walkinCount').textContent = customerStats.totalWalkins;
-      document.getElementById('premiumCount').textContent = customerStats.totalPremium;
-      document.getElementById('totalCustomersCount').textContent = customerStats.totalMembers + customerStats.totalWalkins + customerStats.totalPremium;
-    }
+          const filteredMembers = topMembers.filter(m => m.name.toLowerCase().includes(memQ));
+          const filteredWalkins = topWalkins.filter(w => w.name.toLowerCase().includes(walkQ));
 
-    function renderTransactionHistory() {
-      const q = document.getElementById('transSearch').value.toLowerCase();
-      let data = [...transactionHistory];
-      
-      // Filter
-      data = data.filter(t => t.customer.toLowerCase().includes(q) || t.type.toLowerCase().includes(q));
-      
-      // Sort
-      universalSort(data, transSort.key, transSort.dir);
+          const totalMemberHours = topMembers.reduce((sum, m) => sum + m.hours, 0);
+          const totalWalkinHours = topWalkins.reduce((sum, w) => sum + w.hours, 0);
 
-      const tbody = document.getElementById('transactionHistoryBody');
-      tbody.innerHTML = data.map(t => `<tr><td>${t.date}</td><td>${t.customer}</td><td><span class="badge-transaction">${t.type}</span></td><td>${formatPHP(t.amount)}</td><td><span class="${t.status === 'Paid' ? 'badge-income' : 'pending-badge'}">${t.status}</span></td>`).join('');
-    }
+          membersContainer.innerHTML = filteredMembers.map(m => `<div class="top-customer-item"><div><span class="top-customer-name">${m.rank}. ${m.name}</span></div><div class="top-customer-hours">${m.hours} hrs</div></div>`).join('');
+          walkinsContainer.innerHTML = filteredWalkins.map(w => `<div class="top-customer-item"><div><span class="top-customer-name">${w.rank}. ${w.name}</span></div><div class="top-customer-hours">${w.hours} hrs</div></div>`).join('');
 
-    function renderActivityHistory() {
-      const q = document.getElementById('activitySearch').value.toLowerCase();
-      let data = [...activityHistory];
-      
-      // Filter
-      data = data.filter(a => a.user.toLowerCase().includes(q) || a.action.toLowerCase().includes(q) || a.details.toLowerCase().includes(q));
-      
-      // Sort
-      universalSort(data, activitySort.key, activitySort.dir);
+          document.getElementById('totalMemberHours').textContent = totalMemberHours;
+          document.getElementById('totalWalkinHours').textContent = totalWalkinHours;
+        }
 
-      const tbody = document.getElementById('activityHistoryBody');
-      tbody.innerHTML = data.map(a => `<tr><td>${a.timestamp}</td><td>${a.user}</td><td><span class="badge-activity">${a.action}</span></td><td>${a.details}</td>`).join('');
-    }
+        function renderTypeChart() {
+          if (typeChart) typeChart.destroy();
+          const ctx = document.getElementById('typeChart').getContext('2d');
+          typeChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: ['Members', 'Walk-ins', 'Premium'], datasets: [{ data: [customerStats.totalMembers, customerStats.totalWalkins, customerStats.totalPremium], backgroundColor: ['#CF6322', '#8A8636', '#4A7C59'], borderWidth: 0, hoverOffset: 8 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
+          });
+          document.getElementById('memberCount').textContent = customerStats.totalMembers;
+          document.getElementById('walkinCount').textContent = customerStats.totalWalkins;
+          document.getElementById('premiumCount').textContent = customerStats.totalPremium;
+          document.getElementById('totalCustomersCount').textContent = customerStats.totalMembers + customerStats.totalWalkins + customerStats.totalPremium;
+        }
 
-    function renderTransactionSummary() {
-      const totalRevenue = transactionData.reservations + transactionData.wifiExtensions + transactionData.planUpgrades;
-      const lossAmount = transactionData.pendingPayments;
-      const pendingPercent = ((transactionData.pendingPayments / totalRevenue) * 100).toFixed(1);
-      document.getElementById('revenueReservations').innerHTML = formatPHP(transactionData.reservations);
-      document.getElementById('revenueWifi').innerHTML = formatPHP(transactionData.wifiExtensions);
-      document.getElementById('revenueUpgrades').innerHTML = formatPHP(transactionData.planUpgrades);
-      document.getElementById('totalRevenue').innerHTML = formatPHP(totalRevenue);
-      document.getElementById('lossAmount').innerHTML = formatPHP(lossAmount);
-      document.getElementById('pendingPayments').innerHTML = formatPHP(transactionData.pendingPayments);
-      document.getElementById('completedPayments').innerHTML = formatPHP(transactionData.completedPayments);
-      document.getElementById('pendingPercent').innerHTML = `${pendingPercent}% of total revenue`;
-      document.getElementById('pendingCustomers').textContent = customerStats.pendingCustomers;
-      document.getElementById('paidCustomers').textContent = customerStats.paidCustomers;
-      document.getElementById('weeklyMembers').textContent = customerStats.weeklyMembers;
-      document.getElementById('weeklyWalkins').textContent = customerStats.weeklyWalkins;
-      document.getElementById('weeklyPremium').textContent = customerStats.weeklyPremium;
-      document.getElementById('weeklyTotal').textContent = customerStats.weeklyMembers + customerStats.weeklyWalkins + customerStats.weeklyPremium;
-    }
+        function renderTransactionHistory() {
+          const q = document.getElementById('transSearch').value.toLowerCase();
+          let data = [...transactionHistory];
 
-    function generateReport() {
-      const trafficPeriod = document.getElementById('trafficPeriodSelect').value;
-      const trafficPeriodName = document.getElementById('trafficPeriodSelect').options[document.getElementById('trafficPeriodSelect').selectedIndex].text;
-      const incomePeriod = document.getElementById('incomePeriodSelect').value;
-      const incomePeriodName = document.getElementById('incomePeriodSelect').options[document.getElementById('incomePeriodSelect').selectedIndex].text;
-      const trafficDataPoint = trafficData[trafficPeriod];
-      const incomeDataPoint = incomeData[incomePeriod];
-      const totalTraffic = trafficDataPoint.reduce((a, b) => a + b, 0);
-      const totalIncomeVal = incomeDataPoint.reduce((a, b) => a + b, 0);
-      const totalRevenue = transactionData.reservations + transactionData.wifiExtensions + transactionData.planUpgrades;
-      const lossAmount = transactionData.pendingPayments;
-      let reportContent = `THE LAST MUSTER - ANALYTICS REPORT\n=====================================\nGenerated: ${new Date().toLocaleString()}\n\n`;
-      reportContent += `🏢 SINCE ESTABLISHMENT (January 2024)\n- Total Customers: ${sinceEstablishment.totalCustomers.toLocaleString()}\n- Total Income: ${formatPHP(sinceEstablishment.totalIncome)}\n- Total Hours Consumed: ${sinceEstablishment.totalHoursConsumed.toLocaleString()}\n\n`;
-      reportContent += `📊 CUSTOMER TRAFFIC (${trafficPeriodName})\n- Total Customers: ${totalTraffic}\n- Peak: ${Math.max(...trafficDataPoint)}\n- Average: ${Math.round(totalTraffic / trafficDataPoint.length)}\n- Low: ${Math.min(...trafficDataPoint)}\n\n`;
-      reportContent += `💰 INCOME (${incomePeriodName})\n- Total Income: ${formatPHP(totalIncomeVal)}\n- Average per Day: ${formatPHP(Math.round(totalIncomeVal / incomeDataPoint.length))}\n- Projected Monthly: ${formatPHP(Math.round(totalIncomeVal + (totalIncomeVal * 0.12)))}\n\n`;
-      reportContent += `👥 CUSTOMER TYPE BREAKDOWN\n- Members: ${customerStats.totalMembers}\n- Walk-ins: ${customerStats.totalWalkins}\n- Premium: ${customerStats.totalPremium}\n- Total Active Customers: ${customerStats.totalMembers + customerStats.totalWalkins + customerStats.totalPremium}\n\n`;
-      reportContent += `🏆 TOP MEMBERS BY HOURS\n${topMembers.map(m => `  ${m.rank}. ${m.name} - ${m.hours} hours`).join('\n')}\n\n`;
-      reportContent += `🏆 TOP WALK-INS BY HOURS\n${topWalkins.map(w => `  ${w.rank}. ${w.name} - ${w.hours} hours`).join('\n')}\n\n`;
-      reportContent += `💰 FINANCIAL SUMMARY\n- Total Revenue: ${formatPHP(totalRevenue)}\n- Loss (Pending/Unpaid): ${formatPHP(lossAmount)}\n- Net Profit: ${formatPHP(totalRevenue - lossAmount)}\n\n`;
-      reportContent += `💰 TRANSACTION SUMMARY\n- Reservations: ${formatPHP(transactionData.reservations)}\n- WiFi Extensions: ${formatPHP(transactionData.wifiExtensions)}\n- Plan Upgrades: ${formatPHP(transactionData.planUpgrades)}\n- Total Revenue: ${formatPHP(totalRevenue)}\n- Pending Payments: ${formatPHP(transactionData.pendingPayments)} (${((transactionData.pendingPayments / totalRevenue) * 100).toFixed(1)}%)\n- Completed Payments: ${formatPHP(transactionData.completedPayments)}\n- Pending Customers: ${customerStats.pendingCustomers}\n- Paid Customers: ${customerStats.paidCustomers}\n\n`;
-      reportContent += `📅 WEEKLY SUMMARY\n- Members: ${customerStats.weeklyMembers}\n- Walk-ins: ${customerStats.weeklyWalkins}\n- Premium: ${customerStats.weeklyPremium}\n- Total: ${customerStats.weeklyMembers + customerStats.weeklyWalkins + customerStats.weeklyPremium}\n\n`;
-      reportContent += `📋 RECENT TRANSACTIONS\n${transactionHistory.map(t => `- ${t.date} | ${t.customer} | ${t.type} | ${formatPHP(t.amount)} | ${t.status}`).join('\n')}\n\n`;
-      reportContent += `📋 ACTIVITY HISTORY\n${activityHistory.map(a => `- ${a.timestamp} | ${a.user} | ${a.action} | ${a.details}`).join('\n')}`;
-      const blob = new Blob([reportContent], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `cramberryfi_report_${Date.now()}.txt`;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      alert('Full report generated and downloaded!');
-    }
+          // Filter
+          data = data.filter(t => t.customer.toLowerCase().includes(q) || t.type.toLowerCase().includes(q));
 
-    
-    function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
-    function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+          // Sort
+          universalSort(data, transSort.key, transSort.dir);
 
-    function init() {
-      // Set Chart.js Defaults
-      Chart.defaults.font.family = "'Montserrat', sans-serif";
-      Chart.defaults.color = "#1E2A38";
-      Chart.defaults.plugins.tooltip.titleFont = { family: "'Poppins', sans-serif", weight: '700' };
-      Chart.defaults.plugins.tooltip.bodyFont = { family: "'Montserrat', sans-serif" };
+          const tbody = document.getElementById('transactionHistoryBody');
+          tbody.innerHTML = data.map(t => `<tr><td>${t.date}</td><td>${t.customer}</td><td><span class="badge-transaction">${t.type}</span></td><td>${formatPHP(t.amount)}</td><td><span class="${t.status === 'Paid' ? 'badge-income' : 'pending-badge'}">${t.status}</span></td>`).join('');
+        }
 
-      updateSinceEstablishment();
-      renderTopCustomers();
-      renderTypeChart();
-      renderTransactionHistory();
-      renderActivityHistory();
-      renderTransactionSummary();
-      updateTrafficChart();
-      updateIncomeChart();
-      renderIncomeLogs();
-    }
-    init();
-  </script>
+        function renderActivityHistory() {
+          const q = document.getElementById('activitySearch').value.toLowerCase();
+          let data = [...activityHistory];
 
+          // Filter
+          data = data.filter(a => a.user.toLowerCase().includes(q) || a.action.toLowerCase().includes(q) || a.details.toLowerCase().includes(q));
+
+          // Sort
+          universalSort(data, activitySort.key, activitySort.dir);
+
+          const tbody = document.getElementById('activityHistoryBody');
+          tbody.innerHTML = data.map(a => `<tr><td>${a.timestamp}</td><td>${a.user}</td><td><span class="badge-activity">${a.action}</span></td><td>${a.details}</td>`).join('');
+        }
+
+        function renderTransactionSummary() {
+          const totalRevenue = transactionData.reservations + transactionData.wifiExtensions + transactionData.planUpgrades;
+          const lossAmount = transactionData.pendingPayments;
+          const pendingPercent = ((transactionData.pendingPayments / totalRevenue) * 100).toFixed(1);
+          document.getElementById('revenueReservations').innerHTML = formatPHP(transactionData.reservations);
+          document.getElementById('revenueWifi').innerHTML = formatPHP(transactionData.wifiExtensions);
+          document.getElementById('revenueUpgrades').innerHTML = formatPHP(transactionData.planUpgrades);
+          document.getElementById('totalRevenue').innerHTML = formatPHP(totalRevenue);
+          document.getElementById('lossAmount').innerHTML = formatPHP(lossAmount);
+          document.getElementById('pendingPayments').innerHTML = formatPHP(transactionData.pendingPayments);
+          document.getElementById('completedPayments').innerHTML = formatPHP(transactionData.completedPayments);
+          document.getElementById('pendingPercent').innerHTML = `${pendingPercent}% of total revenue`;
+          document.getElementById('pendingCustomers').textContent = customerStats.pendingCustomers;
+          document.getElementById('paidCustomers').textContent = customerStats.paidCustomers;
+          document.getElementById('weeklyMembers').textContent = customerStats.weeklyMembers;
+          document.getElementById('weeklyWalkins').textContent = customerStats.weeklyWalkins;
+          document.getElementById('weeklyPremium').textContent = customerStats.weeklyPremium;
+          document.getElementById('weeklyTotal').textContent = customerStats.weeklyMembers + customerStats.weeklyWalkins + customerStats.weeklyPremium;
+        }
+
+        function generateReport() {
+          const trafficPeriod = document.getElementById('trafficPeriodSelect').value;
+          const trafficPeriodName = document.getElementById('trafficPeriodSelect').options[document.getElementById('trafficPeriodSelect').selectedIndex].text;
+          const incomePeriod = document.getElementById('incomePeriodSelect').value;
+          const incomePeriodName = document.getElementById('incomePeriodSelect').options[document.getElementById('incomePeriodSelect').selectedIndex].text;
+          const trafficDataPoint = trafficData[trafficPeriod];
+          const incomeDataPoint = incomeData[incomePeriod];
+          const totalTraffic = trafficDataPoint.reduce((a, b) => a + b, 0);
+          const totalIncomeVal = incomeDataPoint.reduce((a, b) => a + b, 0);
+          const totalRevenue = transactionData.reservations + transactionData.wifiExtensions + transactionData.planUpgrades;
+          const lossAmount = transactionData.pendingPayments;
+          let reportContent = `THE LAST MUSTER - ANALYTICS REPORT\n=====================================\nGenerated: ${new Date().toLocaleString()}\n\n`;
+          reportContent += `🏢 SINCE ESTABLISHMENT (January 2024)\n- Total Customers: ${sinceEstablishment.totalCustomers.toLocaleString()}\n- Total Income: ${formatPHP(sinceEstablishment.totalIncome)}\n- Total Hours Consumed: ${sinceEstablishment.totalHoursConsumed.toLocaleString()}\n\n`;
+          reportContent += `📊 CUSTOMER TRAFFIC (${trafficPeriodName})\n- Total Customers: ${totalTraffic}\n- Peak: ${Math.max(...trafficDataPoint)}\n- Average: ${Math.round(totalTraffic / trafficDataPoint.length)}\n- Low: ${Math.min(...trafficDataPoint)}\n\n`;
+          reportContent += `💰 INCOME (${incomePeriodName})\n- Total Income: ${formatPHP(totalIncomeVal)}\n- Average per Day: ${formatPHP(Math.round(totalIncomeVal / incomeDataPoint.length))}\n- Projected Monthly: ${formatPHP(Math.round(totalIncomeVal + (totalIncomeVal * 0.12)))}\n\n`;
+          reportContent += `👥 CUSTOMER TYPE BREAKDOWN\n- Members: ${customerStats.totalMembers}\n- Walk-ins: ${customerStats.totalWalkins}\n- Premium: ${customerStats.totalPremium}\n- Total Active Customers: ${customerStats.totalMembers + customerStats.totalWalkins + customerStats.totalPremium}\n\n`;
+          reportContent += `🏆 TOP MEMBERS BY HOURS\n${topMembers.map(m => `  ${m.rank}. ${m.name} - ${m.hours} hours`).join('\n')}\n\n`;
+          reportContent += `🏆 TOP WALK-INS BY HOURS\n${topWalkins.map(w => `  ${w.rank}. ${w.name} - ${w.hours} hours`).join('\n')}\n\n`;
+          reportContent += `💰 FINANCIAL SUMMARY\n- Total Revenue: ${formatPHP(totalRevenue)}\n- Loss (Pending/Unpaid): ${formatPHP(lossAmount)}\n- Net Profit: ${formatPHP(totalRevenue - lossAmount)}\n\n`;
+          reportContent += `💰 TRANSACTION SUMMARY\n- Reservations: ${formatPHP(transactionData.reservations)}\n- WiFi Extensions: ${formatPHP(transactionData.wifiExtensions)}\n- Plan Upgrades: ${formatPHP(transactionData.planUpgrades)}\n- Total Revenue: ${formatPHP(totalRevenue)}\n- Pending Payments: ${formatPHP(transactionData.pendingPayments)} (${((transactionData.pendingPayments / totalRevenue) * 100).toFixed(1)}%)\n- Completed Payments: ${formatPHP(transactionData.completedPayments)}\n- Pending Customers: ${customerStats.pendingCustomers}\n- Paid Customers: ${customerStats.paidCustomers}\n\n`;
+          reportContent += `📅 WEEKLY SUMMARY\n- Members: ${customerStats.weeklyMembers}\n- Walk-ins: ${customerStats.weeklyWalkins}\n- Premium: ${customerStats.weeklyPremium}\n- Total: ${customerStats.weeklyMembers + customerStats.weeklyWalkins + customerStats.weeklyPremium}\n\n`;
+          reportContent += `📋 RECENT TRANSACTIONS\n${transactionHistory.map(t => `- ${t.date} | ${t.customer} | ${t.type} | ${formatPHP(t.amount)} | ${t.status}`).join('\n')}\n\n`;
+          reportContent += `📋 ACTIVITY HISTORY\n${activityHistory.map(a => `- ${a.timestamp} | ${a.user} | ${a.action} | ${a.details}`).join('\n')}`;
+          const blob = new Blob([reportContent], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `cramberryfi_report_${Date.now()}.txt`;
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          alert('Full report generated and downloaded!');
+        }
+
+
+        function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+        function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+
+        function init() {
+          // Set Chart.js Defaults
+          Chart.defaults.font.family = "'Montserrat', sans-serif";
+          Chart.defaults.color = "#1E2A38";
+          Chart.defaults.plugins.tooltip.titleFont = { family: "'Poppins', sans-serif", weight: '700' };
+          Chart.defaults.plugins.tooltip.bodyFont = { family: "'Montserrat', sans-serif" };
+
+          updateSinceEstablishment();
+          renderTopCustomers();
+          renderTypeChart();
+          renderTransactionHistory();
+          renderActivityHistory();
+          renderTransactionSummary();
+          updateTrafficChart();
+          updateIncomeChart();
+          renderIncomeLogs();
+        }
+        init();
+      </script>

@@ -10,7 +10,7 @@ async function autoCleanup() {
             SELECT id, element_id FROM reservations 
             WHERE status = 'confirmed' AND end_time < NOW()
         `);
-        
+
         if (expired.length > 0) {
             console.log(`Auto-cleaning ${expired.length} expired reservations...`);
             for (const r of expired) {
@@ -20,10 +20,10 @@ async function autoCleanup() {
                 await db.query('UPDATE floor_elements SET status = "open" WHERE id = ?', [r.element_id]);
             }
         }
-        
+
         // 2. Mark active sessions as completed
         await db.query('UPDATE active_sessions SET status = "completed" WHERE status = "active" AND end_time < NOW()');
-        
+
     } catch (e) {
         console.error('Auto-Cleanup Error:', e);
     }
@@ -40,10 +40,10 @@ router.get('/layout', async (req, res) => {
         if (plans.length === 0) {
             return res.json({ items: null });
         }
-        
+
         const planId = plans[0].id;
         const [elements] = await db.query('SELECT * FROM floor_elements WHERE floor_plan_id = ?', [planId]);
-        
+
         // Transform elements into expected format
         const items = elements.map(e => ({
             id: e.id,
@@ -58,7 +58,7 @@ router.get('/layout', async (req, res) => {
             seats: e.capacity,
             statuses: [e.status]
         }));
-        
+
         res.json({ items });
     } catch (error) {
         console.error(error);
@@ -75,7 +75,7 @@ router.post('/layout', async (req, res) => {
         await db.query('DELETE FROM floor_plans WHERE is_active = 1');
         const [result] = await db.query('INSERT INTO floor_plans (name) VALUES (?)', ['Main Floor']);
         const planId = result.insertId;
-        
+
         if (items && items.length > 0) {
             const values = items.map(i => [
                 planId, i.type, i.label || null, i.x, i.y, i.w, i.h, i.rot || 0, i.color || null, i.seats || 1, i.statuses ? i.statuses[0] : 'open'
@@ -84,7 +84,7 @@ router.post('/layout', async (req, res) => {
                 (floor_plan_id, element_type, label, pos_x, pos_y, width, height, rotation, color, capacity, status) 
                 VALUES ?`, [values]);
         }
-        
+
         res.json({ success: true });
     } catch (error) {
         console.error(error);
@@ -101,7 +101,7 @@ router.get('/users', async (req, res) => {
     if (status) { query += ' AND status = ?'; params.push(status); }
     if (role) { query += ' AND role = ?'; params.push(role); }
     if (type) { query += ' AND type = ?'; params.push(type); }
-    
+
     // typeGroup: 'walkin' => type LIKE '%walk%'
     // typeGroup: 'member' => type IN ('member','premium') OR type IS NULL
     if (typeGroup === 'walkin') {
@@ -181,11 +181,11 @@ router.post('/session/extend', async (req, res) => {
     const { minutes, userId } = req.body;
     // Admin/Staff can specify userId, otherwise use session user (for customer self-extend)
     const targetUserId = userId || (req.session.user ? req.session.user.id : null);
-    
+
     if (!targetUserId || !minutes) {
         return res.status(400).json({ success: false, error: 'Invalid request' });
     }
-    
+
     try {
         await db.query(
             'UPDATE active_sessions SET end_time = DATE_ADD(end_time, INTERVAL ? MINUTE) WHERE user_id = ? AND status = "active"',
@@ -247,19 +247,19 @@ router.post('/transfer-requests/:id/approve', async (req, res) => {
     try {
         const [requests] = await db.query('SELECT * FROM seat_transfer_requests WHERE id = ?', [req.params.id]);
         if (requests.length === 0) return res.status(404).json({ error: 'Request not found' });
-        
+
         const reqData = requests[0];
-        
+
         // 1. Update reservation
         await db.query('UPDATE reservations SET element_id = ? WHERE user_id = ? AND status = "confirmed"', [reqData.requested_element_id, reqData.user_id]);
-        
+
         // 2. Update floor elements status
         await db.query('UPDATE floor_elements SET status = "open" WHERE id = ?', [reqData.current_element_id]);
         await db.query('UPDATE floor_elements SET status = "taken" WHERE id = ?', [reqData.requested_element_id]);
-        
+
         // 3. Update request status
         await db.query('UPDATE seat_transfer_requests SET status = "approved" WHERE id = ?', [req.params.id]);
-        
+
         res.json({ success: true });
     } catch (error) {
         console.error(error);
@@ -284,16 +284,16 @@ router.post('/session/start', async (req, res) => {
     try {
         const startTime = new Date();
         const endTime = new Date(startTime.getTime() + hours * 60 * 60 * 1000);
-        
+
         // 1. Create session
         await db.query('INSERT INTO active_sessions (user_id, start_time, end_time, status) VALUES (?, ?, ?, "active")', [userId, startTime, endTime]);
-        
+
         // 2. Create reservation/booking record
         await db.query('INSERT INTO reservations (user_id, element_id, start_time, end_time, status) VALUES (?, ?, ?, ?, "confirmed")', [userId, elementId, startTime, endTime]);
-        
+
         // 3. Update element status
         await db.query('UPDATE floor_elements SET status = "taken" WHERE id = ?', [elementId]);
-        
+
         res.json({ success: true });
     } catch (error) {
         console.error(error);
@@ -325,15 +325,15 @@ router.post('/reservations/:id/status', async (req, res) => {
     const { status, payment_status } = req.body;
     try {
         console.log(`Updating reservation ${req.params.id} to status: ${status}`);
-        
+
         // 1. Get the reservation to find the element_id
         const [rows] = await db.query('SELECT element_id FROM reservations WHERE id = ?', [req.params.id]);
         if (rows.length > 0) {
             const elementId = rows[0].element_id;
-            
+
             // 2. Update reservation
             await db.query('UPDATE reservations SET status = ?, payment_status = ? WHERE id = ?', [status, payment_status, req.params.id]);
-            
+
             // 3. Update floor element status if applicable
             if (status === 'confirmed') {
                 await db.query('UPDATE floor_elements SET status = "taken" WHERE id = ?', [elementId]);
@@ -341,7 +341,7 @@ router.post('/reservations/:id/status', async (req, res) => {
                 await db.query('UPDATE floor_elements SET status = "open" WHERE id = ?', [elementId]);
             }
         }
-        
+
         res.json({ success: true });
     } catch (error) {
         console.error(`Error updating reservation ${req.params.id}:`, error);
@@ -413,13 +413,13 @@ router.post('/transfer-requests/manual', async (req, res) => {
     try {
         // 1. Update reservation
         await db.query('UPDATE reservations SET element_id = ? WHERE user_id = ? AND status = "confirmed"', [newElementId, userId]);
-        
+
         // 2. Update floor elements status
         if (currentElementId) {
             await db.query('UPDATE floor_elements SET status = "open" WHERE id = ?', [currentElementId]);
         }
         await db.query('UPDATE floor_elements SET status = "taken" WHERE id = ?', [newElementId]);
-        
+
         res.json({ success: true });
     } catch (error) {
         console.error(error);
@@ -440,16 +440,40 @@ router.get('/events', async (req, res) => {
 
 // Create event
 router.post('/events', async (req, res) => {
-    const { title, description, date, location, price, maxAttendees, image, createdBy } = req.body;
+    const { title, description, date, location, price, maxAttendees, image } = req.body;
+    console.log('API Request: Create Event', { title, date, location });
+    
     try {
-        await db.query(
+        // Get user ID from session or find an existing admin
+        let userId = req.session.user ? req.session.user.id : null;
+        
+        if (!userId) {
+            const [admins] = await db.query('SELECT id FROM users WHERE role = "admin" LIMIT 1');
+            if (admins.length > 0) userId = admins[0].id;
+        }
+
+        console.log('Target User ID for Event:', userId);
+
+        // Validate required fields
+        if (!title || !date) {
+            return res.status(400).json({ success: false, error: 'Title and Date are required' });
+        }
+
+        const priceNum = parseFloat(price) || 0;
+        const attendeesNum = parseInt(maxAttendees) || 100;
+
+        console.log('Inserting event with params:', [title, description, date, location, priceNum, attendeesNum, userId]);
+
+        const [result] = await db.execute(
             'INSERT INTO events (title, description, event_date, location, price, max_attendees, image, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [title, description, date, location, price, maxAttendees, image, createdBy]
+            [title, description, date, location, priceNum, attendeesNum, image || null, userId]
         );
-        res.json({ success: true });
+        
+        console.log('Event created successfully, ID:', result.insertId);
+        res.json({ success: true, id: result.insertId });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Database error' });
+        console.error("Event Creation Error Detail:", error);
+        res.status(500).json({ success: false, error: 'Database error: ' + error.message });
     }
 });
 
@@ -457,14 +481,17 @@ router.post('/events', async (req, res) => {
 router.put('/events/:id', async (req, res) => {
     const { title, description, date, location, price, maxAttendees, image } = req.body;
     try {
+        const priceNum = parseFloat(price) || 0;
+        const attendeesNum = parseInt(maxAttendees) || 100;
+
         await db.query(
             'UPDATE events SET title=?, description=?, event_date=?, location=?, price=?, max_attendees=?, image=? WHERE id=?',
-            [title, description, date, location, price, maxAttendees, image, req.params.id]
+            [title, description, date, location, priceNum, attendeesNum, image, req.params.id]
         );
         res.json({ success: true });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Database error' });
+        console.error("Event Update Error:", error);
+        res.status(500).json({ success: false, error: error.message || 'Database error' });
     }
 });
 
@@ -474,8 +501,8 @@ router.delete('/events/:id', async (req, res) => {
         await db.query('DELETE FROM events WHERE id = ?', [req.params.id]);
         res.json({ success: true });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Database error' });
+        console.error("Event Delete Error:", error);
+        res.status(500).json({ success: false, error: error.message || 'Database error' });
     }
 });
 
@@ -591,7 +618,7 @@ router.get('/audit-logs', async (req, res) => {
 
         // Combine and sort
         const allLogs = [...doorLogs, ...resLogs, ...wifiLogs].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        
+
         res.json({ logs: allLogs });
     } catch (error) {
         console.error(error);
@@ -636,6 +663,83 @@ router.put('/users/profile', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Get all users (for messaging/management)
+router.get('/users', async (req, res) => {
+    try {
+        const [rows] = await db.query('SELECT id, first_name, last_name, email, role, status FROM users');
+        res.json({ users: rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Get broadcast history
+router.get('/messages', async (req, res) => {
+    try {
+        const [rows] = await db.query('SELECT * FROM broadcasts ORDER BY created_at DESC');
+        res.json({ messages: rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Save sent broadcast and send internal notifications
+router.post('/messages', async (req, res) => {
+    const { audience, recipients, subject, body } = req.body;
+    try {
+        let senderId = req.session.user ? req.session.user.id : null;
+        if (!senderId) {
+            const [admins] = await db.query('SELECT id FROM users WHERE role = "admin" LIMIT 1');
+            if (admins.length > 0) senderId = admins[0].id;
+        }
+
+        console.log('Processing broadcast for audience:', audience);
+
+        // 1. Save to broadcast history
+        await db.query(
+            'INSERT INTO broadcasts (audience, recipients, subject, body, sender_id) VALUES (?, ?, ?, ?, ?)',
+            [audience, recipients, subject, body, senderId]
+        );
+
+        // 2. Identify target user IDs for internal notifications
+        let targetUserIds = [];
+        if (audience === 'all') {
+            const [users] = await db.query('SELECT id FROM users WHERE role != "admin"');
+            targetUserIds = users.map(u => u.id);
+        } else if (audience === 'members') {
+            const [users] = await db.query('SELECT id FROM users WHERE role = "customer" AND status = "approved"');
+            targetUserIds = users.map(u => u.id);
+        } else if (audience === 'walkins') {
+            const [users] = await db.query('SELECT id FROM users WHERE role = "customer" AND status = "pending"');
+            targetUserIds = users.map(u => u.id);
+        } else if (audience === 'staff') {
+            const [users] = await db.query('SELECT id FROM users WHERE role = "staff"');
+            targetUserIds = users.map(u => u.id);
+        } else if (audience.startsWith('Specific')) {
+            // Extract emails from recipients string and find user IDs
+            const emails = recipients.split(',').map(e => e.trim());
+            if (emails.length > 0) {
+                const [users] = await db.query('SELECT id FROM users WHERE email IN (?)', [emails]);
+                targetUserIds = users.map(u => u.id);
+            }
+        }
+
+        // 3. Insert notifications for each target user
+        if (targetUserIds.length > 0) {
+            const values = targetUserIds.map(uid => [uid, subject, body]);
+            await db.query('INSERT INTO notifications (user_id, title, message) VALUES ?', [values]);
+            console.log(`Sent internal notifications to ${targetUserIds.length} users`);
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Message/Notification Error:", error);
+        res.status(500).json({ success: false, error: 'Database error: ' + error.message });
     }
 });
 
