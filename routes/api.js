@@ -94,13 +94,21 @@ router.post('/layout', async (req, res) => {
 
 // Get users by status/role
 router.get('/users', async (req, res) => {
-    const { status, role, type } = req.query;
+    const { status, role, type, typeGroup } = req.query;
     let query = 'SELECT id, email, first_name, last_name, role, type, status, phone, location, schedule, created_at FROM users WHERE role != "super_admin"';
     const params = [];
 
     if (status) { query += ' AND status = ?'; params.push(status); }
     if (role) { query += ' AND role = ?'; params.push(role); }
     if (type) { query += ' AND type = ?'; params.push(type); }
+    
+    // typeGroup: 'walkin' => type LIKE '%walk%'
+    // typeGroup: 'member' => type IN ('member','premium') OR type IS NULL
+    if (typeGroup === 'walkin') {
+        query += ' AND type LIKE "%walk%"';
+    } else if (typeGroup === 'member') {
+        query += ' AND (type IN ("member", "premium") OR type IS NULL)';
+    }
 
     try {
         const [users] = await db.query(query, params);

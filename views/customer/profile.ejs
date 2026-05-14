@@ -337,14 +337,39 @@
     function openModal(id){ document.getElementById(id).classList.add('open'); }
     function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
+    // MAC Address Formatter
+    function formatMAC(input) {
+      let value = input.value.toUpperCase().replace(/[^0-9A-F]/g, '');
+      if (value.length > 12) value = value.slice(0, 12);
+      const formatted = value.match(/.{1,2}/g)?.join(':') || value;
+      input.value = formatted;
+    }
+
+    const macInput = document.getElementById('ep-mac');
+    if (macInput) {
+      macInput.placeholder = "XX:XX:XX:XX:XX:XX";
+      macInput.addEventListener('input', () => formatMAC(macInput));
+      // Format initial value
+      formatMAC(macInput);
+    }
+
     // DATABASE SAVE: Profile Info
     async function saveProfile() {
+      const macInput = document.getElementById('ep-mac');
+      const macValue = macInput.value;
+      
+      // Basic MAC Validation (optional but recommended)
+      if (macValue && !/^([0-9A-F]{2}:){5}([0-9A-F]{2})$/.test(macValue)) {
+        alert("Invalid MAC address format. Expected XX:XX:XX:XX:XX:XX");
+        return;
+      }
+
       const data = {
         fullName: document.getElementById('ep-name').value,
         email: document.getElementById('ep-email').value,
         phone: document.getElementById('ep-phone').value,
         location: document.getElementById('ep-loc').value,
-        mac_address: document.getElementById('ep-mac').value
+        mac_address: macValue
       };
 
       console.log("Sending data:", data);

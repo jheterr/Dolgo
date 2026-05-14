@@ -3,6 +3,7 @@
 :root {
   --orange: #CF6322;
   --orange-dk: #a84d18;
+  --gold: #D4AF37;
   --olive: #8A8636;
   --olive-dk: #6b682a;
   --green: #3d7a52;
@@ -90,11 +91,13 @@ body {
   margin-bottom: 4px;
 }
 
-.logo-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+.logo-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #fff;
+  letter-spacing: 0.03em;
+  margin-bottom: -2px;
 }
 
 .logo-sub {
@@ -165,6 +168,26 @@ body {
   width: 3px;
   background: var(--orange);
   border-radius: 0 3px 3px 0;
+}
+
+/* Membership (pro) highlight */
+.nav-link.membership-link {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.nav-link.membership-link:hover {
+  color: #fff;
+}
+
+.nav-link.membership-link.active {
+  color: #fff;
+  background: rgba(212,175,55,0.12);
+  font-weight: 700;
+}
+
+.nav-link.membership-link.active::before {
+  background: var(--gold);
 }
 
 .sidebar-footer {
