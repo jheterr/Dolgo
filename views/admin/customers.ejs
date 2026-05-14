@@ -441,9 +441,7 @@
         const activeSessions = (await resAct.json()).customers || [];
 
         const memberBody = document.getElementById('custBody');
-        const walkinBody = document.getElementById('walkinsBody');
         memberBody.innerHTML = '';
-        walkinBody.innerHTML = '';
 
         function buildRow(user, typeLabel) {
           const session = activeSessions.find(s => s.id === user.id);
@@ -490,7 +488,7 @@
 
         // Populate Walk-in tab — only users with type LIKE '%walk%'
         walkins.forEach(user => {
-          walkinBody.appendChild(buildRow(user, 'Walk-in'));
+          memberBody.appendChild(buildRow(user, 'Walk-in'));
         });
 
       } catch (err) { console.error(err); }
@@ -575,7 +573,7 @@
       const tbody = document.getElementById('pendingBody');
       const badge = document.getElementById('pendingBadge');
       try {
-        const res = await fetch('/api/users?status=pending');
+        const res = await fetch('/api/users?status=pending&role=customer');
         const data = await res.json();
         const pending = data.users || [];
 
@@ -790,43 +788,26 @@
       currentMacCount++;
     }
 
-    function filterMembers() {
-      const typeVal = document.getElementById('memberTypeFilter').value;
-      const statusVal = document.getElementById('memberStatusFilter').value;
+    function filterCustomers() {
+      const typeVal = document.getElementById('custTypeFilter').value;
+      const statusVal = document.getElementById('custStatusFilter').value;
       const searchVal = document.getElementById('custSearch').value.toLowerCase().trim();
+      
       document.querySelectorAll('#custBody tr').forEach(tr => {
         const type   = tr.getAttribute('data-type') || '';
         const status = tr.getAttribute('data-status') || '';
         const name   = tr.getAttribute('data-name') || '';
         const email  = tr.getAttribute('data-email') || '';
-        const typeOk   = typeVal === 'all' || type === typeVal;
+
+        const typeOk = typeVal === 'all' || type === typeVal;
         const statusOk = statusVal === 'all' || status === statusVal;
         const searchOk = !searchVal || name.includes(searchVal) || email.includes(searchVal);
         tr.style.display = (typeOk && statusOk && searchOk) ? '' : 'none';
       });
     }
 
-    function filterWalkins() {
-      const statusVal = document.getElementById('walkinStatusFilter').value;
-      const searchVal = document.getElementById('custSearch').value.toLowerCase().trim();
-      document.querySelectorAll('#walkinsBody tr').forEach(tr => {
-        const status = tr.getAttribute('data-status') || '';
-        const name   = tr.getAttribute('data-name') || '';
-        const email  = tr.getAttribute('data-email') || '';
-        const statusOk = statusVal === 'all' || status === statusVal;
-        const searchOk = !searchVal || name.includes(searchVal) || email.includes(searchVal);
-        tr.style.display = (statusOk && searchOk) ? '' : 'none';
-      });
-    }
-
     function searchCustomers() {
-      // Apply search across whichever tab is active
-      const activePanel = document.querySelector('.tab-panel.active');
-      if (activePanel && activePanel.id === 'tab-members') {
-        filterMembers();
-      } else if (activePanel && activePanel.id === 'tab-walkins') {
-        filterWalkins();
-      }
+      filterCustomers();
     }
 
     function switchTab(event, id) { 

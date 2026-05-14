@@ -257,8 +257,13 @@ async function fetchCustomersForSelect() {
   try {
     const res = await fetch('/api/users?role=customer');
     const data = await res.json();
-    allCustomers = data.users || []; // Extract from { users: [] }
-    filterCustomers(); // Initial render of the results container if search is empty
+    allCustomers = data.users || []; 
+    
+    // Sort descending: active > pending > inactive
+    const statusOrder = { 'active': 1, 'pending': 2, 'inactive': 3 };
+    allCustomers.sort((a, b) => (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99));
+
+    filterCustomers(); 
   } catch (e) { console.error('Error fetching customers:', e); }
 }
 
@@ -288,7 +293,10 @@ function filterCustomers() {
          class="cust-result-item"
          onmouseover="this.style.background='#f1f5f9'"
          onmouseout="this.style.background='transparent'">
-      <div style="font-weight: 700; font-size: 12px; color: #1e293b;">${c.first_name} ${c.last_name}</div>
+      <div style="font-weight: 700; font-size: 12px; color: #1e293b; display: flex; justify-content: space-between;">
+        <span>${c.first_name} ${c.last_name}</span>
+        <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: ${c.status === 'active' ? '#dcfce7' : '#fee2e2'}; color: ${c.status === 'active' ? '#166534' : '#991b1b'};">${c.status.toUpperCase()}</span>
+      </div>
       <div style="font-size: 10px; color: #64748b; display: flex; justify-content: space-between;">
         <span>${c.email || ''}</span>
         <span style="text-transform: uppercase; font-weight: 800; color: var(--orange);">${c.type || 'Member'}</span>
@@ -326,17 +334,28 @@ async function confirmAssignment() {
   
   if(confirm(`Assign ${customerName} to this seat for ${hours} hour(s)?`)) {
     try {
+        console.log('Sending assignment request:', { userId: customerId, elementId: currentSelectedElementId, hours });
         const res = await fetch('/api/session/start', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: customerId, elementId: currentSelectedElementId, hours })
         });
-        if ((await res.json()).success) {
+        
+        const data = await res.json();
+        console.log('Assignment response:', data);
+        
+        if (data.success) {
             alert('Assignment successful!');
-            cancelAssignment(); closeDetail();
-            loadData();
+            cancelAssignment(); 
+            closeDetail();
+            await loadData(); // Wait for data to load
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error occurred'));
         }
-    } catch(e) { console.error(e); }
+    } catch(e) { 
+        console.error('Assignment Fetch Error:', e);
+        alert('Failed to connect to server. Please check your connection.');
+    }
   }
 }
 
@@ -428,12 +447,26 @@ async function buildList(){
       if (data.customers && data.customers.length > 0) {
           data.customers.forEach(c => {
               const d = document.createElement('div'); d.className = 'cust-row';
-              const startTime = new Date(c.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+              const now = new Date();
+              const end = new Date(c.end_time);
+              const diffMs = end - now;
+              let timeStr = 'Expired';
+              
+              if (diffMs > 0) {
+                  const diffHrs = Math.floor(diffMs / 3600000);
+                  const diffMins = Math.round((diffMs % 3600000) / 60000);
+                  timeStr = diffHrs > 0 ? `${diffHrs}h ${diffMins}m left` : `${diffMins}m left`;
+              }
               
               d.innerHTML = `
                 <div style="flex:1" onclick="highlightUserSeat('${c.seat_label}', '${c.first_name} ${c.last_name}', '${c.id}')">
                     <div class="cust-row-name">${c.first_name} ${c.last_name}</div>
-                    <div class="cust-row-sub"><i class="fa-solid fa-couch" style="font-size:10px"></i> ${c.seat_label || 'No Seat'} · ${startTime}</div>
+                    <div class="cust-row-sub">
+                      <i class="fa-solid fa-couch" style="font-size:10px"></i> ${c.seat_label || 'No Seat'} · 
+                      <span style="color: ${diffMs < 900000 ? '#ef4444' : 'inherit'}; font-weight: ${diffMs < 900000 ? '700' : 'normal'}">
+                        ${timeStr}
+                      </span>
+                    </div>
                 </div>
                 <button class="btn btn-ghost btn-icon" onclick="event.stopPropagation();doTransferFor('${c.first_name} ${c.last_name}')" title="Transfer Seat">
                     <i class="fa-solid fa-arrow-right-arrow-left"></i>
@@ -560,5 +593,14 @@ function renderCanvas() {
 }
 
 window.onload = init;
+
+// Close search results when clicking outside
+window.addEventListener('click', function(e) {
+  const container = document.getElementById('custResultsContainer');
+  const searchInput = document.getElementById('custSearchInput');
+  if (container && !container.contains(e.target) && e.target !== searchInput) {
+    container.style.display = 'none';
+  }
+});
 </script>
 

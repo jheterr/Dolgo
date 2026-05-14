@@ -414,9 +414,16 @@
       <div class="table-header">
         <h3 class="section-title" style="margin-bottom:0">Access & Activity Logs</h3>
         <div class="filter-group" id="desktopFilterGroup">
+          <div class="search-container" style="position:relative; margin-right:10px;">
+            <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:12px;"></i>
+            <input type="text" id="logSearchInput" placeholder="Search name or door..." 
+                   style="padding:6px 14px 6px 34px; border:1.5px solid #e2e8f0; border-radius:20px; font-size:0.7rem; outline:none;"
+                   oninput="handleSearch()">
+          </div>
           <button class="filter-btn active" data-filter="all" onclick="filterLogs('all', this)">All Activity</button>
-          <button class="filter-btn" data-filter="Unlock" onclick="filterLogs('Unlock', this)">Unlocks</button>
-          <button class="filter-btn" data-filter="Lock" onclick="filterLogs('Lock', this)">Locks</button>
+          <button class="filter-btn" data-filter="granted" onclick="filterLogs('granted', this)">Granted</button>
+          <button class="filter-btn" data-filter="unlocked" onclick="filterLogs('unlocked', this)">Unlocked</button>
+          <button class="filter-btn" data-filter="denied" onclick="filterLogs('denied', this)">Denied</button>
         </div>
       </div>
       
@@ -455,6 +462,7 @@ const currentUser = <%- JSON.stringify(locals.user || {}) %>;
 let activityLogs = [];
 let filteredLogs = [];
 let currentFilter = "all";
+let searchTerm = "";
 
 async function fetchLogs() {
   try {
@@ -469,11 +477,28 @@ async function fetchLogs() {
 
 function applyFilters() {
   filteredLogs = [...activityLogs];
+  
   if (currentFilter !== "all") {
-    filteredLogs = filteredLogs.filter(log => log.status === currentFilter.toLowerCase() || log.status === currentFilter);
+    filteredLogs = filteredLogs.filter(log => log.status === currentFilter);
   }
+  
+  if (searchTerm) {
+    const term = searchTerm.toLowerCase();
+    filteredLogs = filteredLogs.filter(log => 
+      (log.first_name && log.first_name.toLowerCase().includes(term)) ||
+      (log.last_name && log.last_name.toLowerCase().includes(term)) ||
+      (log.door_name && log.door_name.toLowerCase().includes(term)) ||
+      (log.method && log.method.toLowerCase().includes(term))
+    );
+  }
+  
   renderDesktopLogs();
   renderMobileLogs();
+}
+
+function handleSearch() {
+  searchTerm = document.getElementById('logSearchInput').value;
+  applyFilters();
 }
 
 // Helper: Escape HTML

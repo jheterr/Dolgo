@@ -282,13 +282,30 @@ router.post('/transfer-requests/:id/decline', async (req, res) => {
 router.post('/session/start', async (req, res) => {
     const { userId, elementId, hours } = req.body;
     try {
+        // 1. Check if user already has an active session
+        const [existing] = await db.query('SELECT id, end_time FROM active_sessions WHERE user_id = ? AND status = "active" LIMIT 1', [userId]);
+        
         const startTime = new Date();
-        const endTime = new Date(startTime.getTime() + hours * 60 * 60 * 1000);
+        let endTime;
+
+        if (existing.length > 0) {
+            // Extend existing session
+            const currentEndTime = new Date(existing[0].end_time);
+            // If the current session already expired but autoCleanup hasn't run, 
+            // use the current time as base, otherwise use current end_time
+            const baseTime = currentEndTime > startTime ? currentEndTime : startTime;
+            endTime = new Date(baseTime.getTime() + hours * 60 * 60 * 1000);
+            
+            await db.query('UPDATE active_sessions SET end_time = ? WHERE id = ?', [endTime, existing[0].id]);
+            console.log(`Extended session for user ${userId} to ${endTime}`);
+        } else {
+            // Create new session
+            endTime = new Date(startTime.getTime() + hours * 60 * 60 * 1000);
+            await db.query('INSERT INTO active_sessions (user_id, start_time, end_time, status) VALUES (?, ?, ?, "active")', [userId, startTime, endTime]);
+            console.log(`Started new session for user ${userId} until ${endTime}`);
+        }
         
-        // 1. Create session
-        await db.query('INSERT INTO active_sessions (user_id, start_time, end_time, status) VALUES (?, ?, ?, "active")', [userId, startTime, endTime]);
-        
-        // 2. Create reservation/booking record
+        // 2. Create reservation/booking record (always creates a record of this specific assignment)
         await db.query('INSERT INTO reservations (user_id, element_id, start_time, end_time, status) VALUES (?, ?, ?, ?, "confirmed")', [userId, elementId, startTime, endTime]);
         
         // 3. Update element status
@@ -296,7 +313,7 @@ router.post('/session/start', async (req, res) => {
         
         res.json({ success: true });
     } catch (error) {
-        console.error(error);
+        console.error('Session Start Error:', error);
         res.status(500).json({ error: 'Database error' });
     }
 });

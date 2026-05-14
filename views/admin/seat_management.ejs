@@ -598,11 +598,22 @@
               <div style="font-size: 11px; font-weight: 800; color: var(--orange); text-transform: uppercase; margin-bottom: 18px; letter-spacing:0.05em;">Customer Assignment</div>
               
               <div style="margin-bottom: 18px;">
-                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-md); margin-bottom: 8px;">Select Customer</label>
-                <select id="assignCustSelect" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; font-family:'Montserrat', sans-serif; background:white;">
-                  <option value="">-- Choose Customer --</option>
-                  <!-- Customers will be populated via JS -->
-                </select>
+                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-md); margin-bottom: 8px;">Find Customer</label>
+                <div style="display: grid; grid-template-columns: 1fr 100px; gap: 8px; margin-bottom: 4px;">
+                  <input type="text" id="custSearchInput" placeholder="Enter full name..." style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; font-family:'Montserrat', sans-serif; box-sizing: border-box;" oninput="filterCustomers()" onfocus="document.getElementById('custResultsContainer').style.display='block'">
+                  <select id="custTypeFilter" style="width: 100%; padding: 10px 4px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 11px; font-weight: 700; font-family:'Montserrat', sans-serif; cursor: pointer; background: white; box-sizing: border-box;" onchange="filterCustomers()">
+                    <option value="all">All Types</option>
+                    <option value="member">Member</option>
+                    <option value="walkin">Walk-in</option>
+                  </select>
+                </div>
+                
+                <div id="custResultsContainer" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 10px; background: white; padding: 4px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                  <!-- Results will be injected here -->
+                  <div style="padding: 10px; font-size: 12px; color: #94a3b8; text-align: center;">Start typing to find...</div>
+                </div>
+                <input type="hidden" id="assignCustId">
+                <input type="hidden" id="assignCustName">
               </div>
               
               <div style="margin-bottom: 24px;">
@@ -616,7 +627,7 @@
               </div>
 
               <div style="display: flex; gap: 10px;">
-                <button class="btn btn-primary" style="flex:2; justify-content: center; padding:14px; border-radius:12px;" onclick="confirmAssignment()">
+                <button class="btn btn-primary" id="confirmAssignBtn" style="flex:2; justify-content: center; padding:14px; border-radius:12px; opacity: 0.6;" onclick="confirmAssignment()" disabled>
                   <i class="fa-solid fa-check"></i> Confirm
                 </button>
                 <button class="btn btn-ghost" style="flex:1; justify-content: center; padding:14px; border-radius:12px; border:1px solid var(--border);" onclick="cancelAssignment()">
@@ -757,16 +768,67 @@
     async function fetchCustomersForSelect() {
       try {
         const res = await fetch('/api/users?role=customer');
-        allCustomers = await res.json();
-        const select = document.getElementById('assignCustSelect');
-        if (select) {
-          select.innerHTML = '<option value="">-- Choose Customer --</option>';
-          allCustomers.forEach(c => {
-            select.innerHTML += `<option value="${c.id}">${c.first_name} ${c.last_name}</option>`;
-          });
-        }
+        const data = await res.json();
+        allCustomers = data.users || [];
+        
+        // Sort descending: active > pending > inactive
+        const statusOrder = { 'active': 1, 'pending': 2, 'inactive': 3 };
+        allCustomers.sort((a, b) => (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99));
+
+        filterCustomers();
       } catch (e) { console.error('Error fetching customers:', e); }
     }
+
+    function filterCustomers() {
+      const searchTerm = document.getElementById('custSearchInput').value.toLowerCase();
+      const typeFilter = document.getElementById('custTypeFilter').value;
+      const container = document.getElementById('custResultsContainer');
+      
+      container.style.display = 'block';
+
+      const filtered = allCustomers.filter(c => {
+        const fullName = `${c.first_name || ''} ${c.last_name || ''}`.toLowerCase();
+        const matchesName = fullName.includes(searchTerm) || (c.email && c.email.toLowerCase().includes(searchTerm));
+        const matchesType = typeFilter === 'all' || (c.type && c.type.toLowerCase().includes(typeFilter));
+        return matchesName && matchesType;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #94a3b8; text-align: center;">No customers found</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(c => `
+        <div onclick="selectCustomerForAssign(${c.id}, '${c.first_name} ${c.last_name}')" 
+             style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.2s;"
+             class="cust-result-item"
+             onmouseover="this.style.background='#f1f5f9'"
+             onmouseout="this.style.background='transparent'">
+          <div style="font-weight: 700; font-size: 12px; color: #1e293b; display: flex; justify-content: space-between;">
+            <span>${c.first_name} ${c.last_name}</span>
+            <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: ${c.status === 'active' ? '#dcfce7' : '#fee2e2'}; color: ${c.status === 'active' ? '#166534' : '#991b1b'};">${c.status.toUpperCase()}</span>
+          </div>
+          <div style="font-size: 10px; color: #64748b; display: flex; justify-content: space-between;">
+            <span>${c.email || ''}</span>
+            <span style="text-transform: uppercase; font-weight: 800; color: var(--orange);">${c.type || 'Member'}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.selectCustomerForAssign = function(id, name) {
+      document.getElementById('assignCustId').value = id;
+      document.getElementById('assignCustName').value = name;
+      document.getElementById('custSearchInput').value = name;
+      document.getElementById('custResultsContainer').style.display = 'none';
+
+      const btn = document.getElementById('confirmAssignBtn');
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      
+      document.getElementById('custSearchInput').style.borderColor = '#10b981';
+      document.getElementById('custSearchInput').style.background = '#f0fdf4';
+    };
 
     async function loadData() {
       try {
@@ -1027,30 +1089,55 @@
     function cancelAssignment() {
       document.getElementById('assignForm').style.display = 'none';
       document.getElementById('detailActions').style.display = 'flex';
+
+      // Reset search fields
+      document.getElementById('custSearchInput').value = '';
+      document.getElementById('custSearchInput').style.borderColor = 'var(--border)';
+      document.getElementById('custSearchInput').style.background = 'white';
+      document.getElementById('assignCustId').value = '';
+      document.getElementById('assignCustName').value = '';
+      
+      const btn = document.getElementById('confirmAssignBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+      }
+      
+      if (allCustomers.length > 0) filterCustomers();
     }
 
     async function confirmAssignment() {
-      const select = document.getElementById('assignCustSelect');
+      const customerId = document.getElementById('assignCustId').value;
+      const customerName = document.getElementById('assignCustName').value;
       const planSelect = document.getElementById('assignPlan');
-      const userId = select.value;
       const hours = parseInt(planSelect.value);
       
-      if (!userId) { alert('Please select a customer'); return; }
+      if (!customerId) { alert('Please select a customer'); return; }
       
-      const customerName = select.options[select.selectedIndex].text;
       if (confirm(`Assign ${customerName} to this seat for ${hours} hour(s)?`)) {
         try {
+            console.log('Sending assignment request:', { userId: customerId, elementId: currentSelectedElementId, hours });
             const res = await fetch('/api/session/start', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, elementId: currentSelectedElementId, hours })
+                body: JSON.stringify({ userId: customerId, elementId: currentSelectedElementId, hours })
             });
-            if ((await res.json()).success) {
+            
+            const data = await res.json();
+            console.log('Assignment response:', data);
+            
+            if (data.success) {
                 alert('Assignment successful!');
-                cancelAssignment(); closeDetail();
-                loadData();
+                cancelAssignment(); 
+                closeDetail();
+                await loadData(); // Wait for data to load
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error occurred'));
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { 
+            console.error('Assignment Fetch Error:', e);
+            alert('Failed to connect to server. Please check your connection.');
+        }
       }
     }
 
@@ -1173,12 +1260,26 @@
           if (data.customers && data.customers.length > 0) {
               data.customers.forEach(c => {
                   const d = document.createElement('div'); d.className = 'cust-row';
-                  const startTime = new Date(c.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                  const now = new Date();
+                  const end = new Date(c.end_time);
+                  const diffMs = end - now;
+                  let timeStr = 'Expired';
+                  
+                  if (diffMs > 0) {
+                      const diffHrs = Math.floor(diffMs / 3600000);
+                      const diffMins = Math.round((diffMs % 3600000) / 60000);
+                      timeStr = diffHrs > 0 ? `${diffHrs}h ${diffMins}m left` : `${diffMins}m left`;
+                  }
                   
                   d.innerHTML = `
                     <div style="flex:1" onclick="highlightUserSeat('${c.seat_label}', '${c.first_name} ${c.last_name}', '${c.id}')">
                         <div class="cust-row-name">${c.first_name} ${c.last_name}</div>
-                        <div class="cust-row-sub"><i class="fa-solid fa-couch" style="font-size:10px"></i> ${c.seat_label || 'No Seat'} · ${startTime}</div>
+                        <div class="cust-row-sub">
+                          <i class="fa-solid fa-couch" style="font-size:10px"></i> ${c.seat_label || 'No Seat'} · 
+                          <span style="color: ${diffMs < 900000 ? '#ef4444' : 'inherit'}; font-weight: ${diffMs < 900000 ? '700' : 'normal'}">
+                            ${timeStr}
+                          </span>
+                        </div>
                     </div>
                     <button class="btn btn-ghost btn-icon" onclick="startManualTransferFromList(${JSON.stringify(c).replace(/"/g, '&quot;')})" title="Transfer Seat">
                         <i class="fa-solid fa-arrow-right-arrow-left"></i>
@@ -1294,6 +1395,15 @@
     }
 
     window.onload = init;
+
+    // Close search results when clicking outside
+    window.addEventListener('click', function(e) {
+      const container = document.getElementById('custResultsContainer');
+      const searchInput = document.getElementById('custSearchInput');
+      if (container && !container.contains(e.target) && e.target !== searchInput) {
+        container.style.display = 'none';
+      }
+    });
   </script>
 <% if (locals.scripts) { %>
     <%- locals.scripts %>

@@ -715,12 +715,11 @@
 
     async function loadStaff() {
       try {
-        // Fetch users with admin or staff roles
-        const res = await fetch('/api/users'); 
+        // Fetch users with staff role only
+        const res = await fetch('/api/users?role=staff'); 
         const data = await res.json();
         
-        // Filter for management roles only
-        const staff = (data.users || []).filter(u => u.role === 'admin' || u.role === 'staff');
+        const staff = data.users || [];
         renderStaffTable(staff);
       } catch (err) { 
         console.error('Error loading staff:', err);
@@ -742,6 +741,10 @@
       staff.forEach(s => {
         const tr = document.createElement('tr');
         const roleLabel = s.role.charAt(0).toUpperCase() + s.role.slice(1);
+        tr.setAttribute('data-name', (s.first_name + ' ' + s.last_name).toLowerCase());
+        tr.setAttribute('data-email', (s.email || '').toLowerCase());
+        tr.setAttribute('data-phone', (s.phone || '').toLowerCase());
+
         tr.innerHTML = `
           <td class="td-bold">${escapeHtml(s.first_name)} ${escapeHtml(s.last_name)}</td>
           <td>${escapeHtml(s.email)}</td>
@@ -761,6 +764,10 @@
 
         const card = document.createElement('div');
         card.className = 'staff-card';
+        card.setAttribute('data-name', (s.first_name + ' ' + s.last_name).toLowerCase());
+        card.setAttribute('data-email', (s.email || '').toLowerCase());
+        card.setAttribute('data-phone', (s.phone || '').toLowerCase());
+
         card.innerHTML = `
           <div class="staff-info">
             <div class="staff-name">${escapeHtml(s.first_name)} ${escapeHtml(s.last_name)} <span class="staff-role">${roleLabel}</span></div>
@@ -772,6 +779,28 @@
           <div class="staff-status"><span class="status-toggle" style="background:${s.status==='active'?'#d1fae5':'#fee2e2'};color:${s.status==='active'?'#166534':'#991b1b'};">${s.status==='active'?'Active':'Inactive'}</span></div>
         `;
         container.appendChild(card);
+      });
+    }
+
+    function filterStaff() {
+      const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+      
+      // Filter Table Rows
+      document.querySelectorAll('#staffTableBody tr').forEach(tr => {
+        const name  = tr.getAttribute('data-name') || '';
+        const email = tr.getAttribute('data-email') || '';
+        const phone = tr.getAttribute('data-phone') || '';
+        const match = !searchVal || name.includes(searchVal) || email.includes(searchVal) || phone.includes(searchVal);
+        tr.style.display = match ? '' : 'none';
+      });
+
+      // Filter Cards
+      document.querySelectorAll('#staffCardsContainer .staff-card').forEach(card => {
+        const name  = card.getAttribute('data-name') || '';
+        const email = card.getAttribute('data-email') || '';
+        const phone = card.getAttribute('data-phone') || '';
+        const match = !searchVal || name.includes(searchVal) || email.includes(searchVal) || phone.includes(searchVal);
+        card.style.display = match ? '' : 'none';
       });
     }
 
