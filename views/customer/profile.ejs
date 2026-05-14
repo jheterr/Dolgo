@@ -78,25 +78,45 @@
       gap: 10px;
     }
 
-    .choice-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      padding: 24px;
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      flex: 1;
+    /* Choice row (Premium Sync) */
+    .choice-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+    .choice-card {
+      display:flex; flex-direction:column; align-items:center; gap:10px;
+      padding:20px 12px; border-radius:16px; border:1.5px solid #e2e8f0;
+      background:#fafafa; cursor:pointer; transition:all .2s;
     }
-    .choice-btn:hover {
-      border-color: var(--orange);
-      background: var(--cream-lt);
-      transform: translateY(-2px);
+    .choice-card:hover {
+      border-color:var(--orange,#e47a2e);
+      background:#fff7ed;
+      transform:translateY(-3px);
+      box-shadow:0 6px 20px rgba(228,122,46,.12);
     }
-    .choice-btn i { font-size: 2rem; color: var(--orange); }
-    .choice-btn span { font-size: 13px; font-weight: 700; color: var(--text); }
+    .choice-card-icon {
+      width:48px; height:48px; border-radius:14px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px; transition:.2s;
+    }
+    .choice-card-icon.upload { background:#eff6ff; color:#3b82f6; }
+    .choice-card-icon.camera { background:#f0fdf4; color:#22c55e; }
+    .choice-card:hover .choice-card-icon.upload { background:#dbeafe; }
+    .choice-card:hover .choice-card-icon.camera { background:#dcfce7; }
+    .choice-card span { font-size:12px; font-weight:700; color:#475569; }
+
+    /* Photo Modal Styling Sync */
+    .photo-modal {
+      background:#fff; border-radius:24px; padding:36px 32px 28px;
+      width:100%; max-width:500px;
+      box-shadow:0 30px 60px rgba(0,0,0,.18);
+      position:relative; text-align:center;
+    }
+    .photo-modal-icon {
+      width:64px; height:64px; border-radius:50%;
+      background:linear-gradient(135deg,#fff7ed,#fee2c3);
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto 16px; font-size:28px; color:var(--orange,#e47a2e);
+    }
+    .photo-modal-title { font-family:'Poppins',sans-serif; font-size:1.3rem; font-weight:800; color:#0f172a; margin-bottom:6px; }
+    .photo-modal-sub { font-size:13px; color:#94a3b8; margin-bottom:24px; }
 
     .camera-container {
       width: 100%;
@@ -218,19 +238,20 @@
 
     <!-- Modals -->
     <div class="modal-overlay" id="avatarChoiceModal">
-      <div class="modal" style="max-width: 400px;">
-        <div class="modal-header">
-          <div class="modal-title">Update Profile Picture</div>
-          <button class="modal-close" onclick="closeModal('avatarChoiceModal')">&times;</button>
-        </div>
-        <div class="modal-body" style="flex-direction: row; gap: 16px;">
-          <div class="choice-btn" onclick="startCamera()">
-            <i class="fa-solid fa-camera"></i>
-            <span>Take Photo</span>
-          </div>
-          <div class="choice-btn" onclick="document.getElementById('avatarInput').click(); closeModal('avatarChoiceModal');">
-            <i class="fa-solid fa-upload"></i>
+      <div class="photo-modal">
+        <button class="modal-close" style="position:absolute; top:18px; right:20px;" onclick="closeModal('avatarChoiceModal')">&times;</button>
+        <div class="photo-modal-icon"><i class="fa-solid fa-image"></i></div>
+        <div class="photo-modal-title">Change Profile Photo</div>
+        <div class="photo-modal-sub">Upload from your device or snap a selfie</div>
+        
+        <div class="choice-row">
+          <div class="choice-card" onclick="document.getElementById('avatarInput').click(); closeModal('avatarChoiceModal');">
+            <div class="choice-card-icon upload"><i class="fa-solid fa-cloud-arrow-up"></i></div>
             <span>Upload Photo</span>
+          </div>
+          <div class="choice-card" onclick="startCamera()">
+            <div class="choice-card-icon camera"><i class="fa-solid fa-camera"></i></div>
+            <span>Take a Selfie</span>
           </div>
         </div>
       </div>

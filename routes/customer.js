@@ -246,9 +246,29 @@ router.post('/notifications/read-all', async (req, res) => {
 const genericPages = [
   { route: '/dashboard_static', view: 'customer/dashboard',      active: 'Dashboard' },
   { route: '/membership',       view: 'customer/membership',     active: 'Membership' },
-  { route: '/reserve-history',  view: 'customer/reserve_history',active: 'Reserve History' },
   { route: '/reserve-new',      view: 'customer/reserve_new',    active: 'Reserve New' },
 ];
+
+router.get('/reserve-history', async (req, res) => {
+    try {
+        const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2);
+        const [rows] = await db.execute(`
+            SELECT r.*, fe.label as seat_label, 
+            DATE_FORMAT(r.start_time, '%b %d, %Y') as date,
+            DATE_FORMAT(r.start_time, '%h:%i %p') as start_time_fmt,
+            DATE_FORMAT(r.end_time, '%h:%i %p') as end_time_fmt,
+            TIMESTAMPDIFF(HOUR, r.start_time, r.end_time) as duration_hours
+            FROM reservations r
+            JOIN floor_elements fe ON r.element_id = fe.id
+            WHERE r.user_id = ?
+            ORDER BY r.start_time DESC
+        `, [userId]);
+        res.render('customer/reserve_history', { active: 'Reserve History', role: 'customer', reservations: rows, session: null });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
+});
 
 genericPages.forEach(({ route, view, active }) => {
   router.get(route, (req, res) => res.render(view, { active, role: 'customer', session: null }));

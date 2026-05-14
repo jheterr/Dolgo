@@ -891,7 +891,7 @@
             visual.classList.add('chair-icon');
             visual.style.webkitMaskImage = 'url(/images/chair.png)';
             visual.style.maskImage = 'url(/images/chair.png)';
-            const status = item.status || 'open';
+            const status = (item.statuses && item.statuses[0]) || item.status || 'open';
             if (status === 'taken') visual.style.backgroundColor = '#d65c29';
             else if (status === 'reserved') visual.style.backgroundColor = '#1e293b';
             else if (status === 'idle') visual.style.backgroundColor = '#facc15';
@@ -899,7 +899,7 @@
           }
           el.onclick = (e) => { e.stopPropagation(); handleItemClick(e, item.id) };
         } else if (item.type === 'chair-sq') {
-          const status = item.status || 'open';
+          const status = (item.statuses && item.statuses[0]) || item.status || 'open';
           const sqColor = isEditMode ? '#faecd4' : (status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981');
           visual.style.background = sqColor;
           visual.style.borderRadius = '6px';
@@ -914,7 +914,7 @@
           visual.style.borderRadius = '8px';
           visual.style.border = '2px solid #f97316';
         } else if (item.type === 'room') {
-          const status = item.status || 'open';
+          const status = (item.statuses && item.statuses[0]) || item.status || 'open';
           const roomColor = status === 'taken' ? '#9ca3af' : status === 'reserved' ? '#ef4444' : item.color;
           visual.style.background = roomColor;
           visual.style.borderRadius = '8px';
@@ -933,12 +933,12 @@
           lbl.className = 'item-label';
           if (item.type !== 'chair' && item.type !== 'chair-sq') {
             lbl.classList.add('center');
-            const status = item.status || 'open';
+            const status = (item.statuses && item.statuses[0]) || item.status || 'open';
             const isDark = (item.color === '#22c55e' || status === 'taken' || status === 'reserved');
             lbl.style.color = isDark ? '#fff' : '#1e293b';
           } else if (item.type === 'chair-sq') {
             lbl.classList.add('center');
-            const status = item.status || 'open';
+            const status = (item.statuses && item.statuses[0]) || item.status || 'open';
             const isDark = (status === 'taken' || status === 'reserved');
             lbl.style.color = isDark ? '#fff' : '#1e293b';
           }

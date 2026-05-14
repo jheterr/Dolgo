@@ -97,33 +97,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Today, Apr 12</td>
-                            <td>12:30 - 2:30 PM</td>
-                            <td>3 hours</td>
-                            <td>5</td>
-                            <td style="text-align: left; padding-left: 32px;"><span class="status-pill">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Apr 10</td>
-                            <td>2:30 - 5:30 PM</td>
-                            <td>3 hours</td>
-                            <td>8</td>
-                            <td style="text-align: left; padding-left: 32px;"><span class="status-pill">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Apr 7</td>
-                            <td>10:30 - 11:30 AM</td>
-                            <td>1 hour</td>
-                            <td>15</td>
-                            <td style="text-align: left; padding-left: 32px;"><span class="status-pill">Completed</span></td>
-                        </tr>
-                        <!-- Empty rows -->
-                        <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr class="empty-row" style="border-bottom: none;"><td></td><td></td><td></td><td></td><td></td></tr>
+                        <% if (reservations && reservations.length > 0) { %>
+                            <% reservations.forEach(res => { %>
+                                <tr>
+                                    <td><%= res.date %></td>
+                                    <td><%= res.start_time_fmt %> - <%= res.end_time_fmt %></td>
+                                    <td><%= res.duration_hours %> hours</td>
+                                    <td><%= res.seat_label %></td>
+                                    <td style="text-align: left; padding-left: 32px;"><span class="status-pill"><%= res.status %></span></td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #64748b; padding: 40px;">No reservation history found.</td>
+                            </tr>
+                        <% } %>
+                        <!-- Empty rows to maintain layout if needed -->
+                        <% if (reservations.length < 5) { %>
+                            <% for(let i=0; i < (5 - reservations.length); i++) { %>
+                                <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td></tr>
+                            <% } %>
+                        <% } %>
                     </tbody>
                 </table>
             </div>

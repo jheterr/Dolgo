@@ -422,6 +422,7 @@
           </div>
           <button class="filter-btn active" data-filter="all" onclick="filterLogs('all', this)">All Activity</button>
           <button class="filter-btn" data-filter="granted" onclick="filterLogs('granted', this)">Granted</button>
+          <button class="filter-btn" data-filter="unlocked" onclick="filterLogs('unlocked', this)">Unlocked</button>
           <button class="filter-btn" data-filter="denied" onclick="filterLogs('denied', this)">Denied</button>
         </div>
       </div>
@@ -517,9 +518,10 @@ function renderDesktopLogs() {
   if (!tbody) return;
   
   tbody.innerHTML = filteredLogs.map(log => {
-    const status = log.status || 'denied';
-    const badgeClass = status === 'granted' ? 'badge-green' : 'badge-red';
-    const icon = status === 'granted' ? 'fa-lock-open' : 'fa-lock';
+    const status = (log.status || 'denied').toLowerCase();
+    const isUnlock = status === 'unlock' || status === 'unlocked' || status === 'granted';
+    const badgeClass = isUnlock ? 'badge-green' : 'badge-red';
+    const icon = isUnlock ? 'fa-lock-open' : 'fa-lock';
     const name = log.first_name ? `${log.first_name} ${log.last_name}` : 'Unknown';
     const time = new Date(log.access_time).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' });
     
@@ -537,9 +539,10 @@ function renderDesktopLogs() {
 
 // ========== MOBILE CARD VIEW RENDER ==========
 function getMobileCardHTML(log) {
-  const status = log.status || 'denied';
-  const badgeClass = status === 'granted' ? 'success' : 'danger';
-  const badgeIcon = status === 'granted' ? 'fa-lock-open' : 'fa-lock';
+  const status = (log.status || 'denied').toLowerCase();
+  const isUnlock = status === 'unlock' || status === 'unlocked' || status === 'granted';
+  const badgeClass = isUnlock ? 'success' : 'danger';
+  const badgeIcon = isUnlock ? 'fa-lock-open' : 'fa-lock';
   const name = log.first_name ? `${log.first_name} ${log.last_name}` : 'Unknown';
   const time = new Date(log.access_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   

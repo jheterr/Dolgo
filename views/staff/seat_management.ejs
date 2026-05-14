@@ -214,18 +214,44 @@ function closeSidebar(){
   document.getElementById('mobileOverlay').classList.remove('show');
 }
 
-const customers = [
-  {seat:'T3-S1',name:'Monkey D. Luffy',time:'09:30 AM'},
-  {seat:'T3-S5',name:'Nami Catburglar',time:'10:15 AM'},
-  {seat:'T3-S6',name:'Sanji Vinsmoke',time:'11:00 AM'},
-  {seat:'RT1-S2',name:'Zoro Roronoa',time:'08:45 AM'},
-  {seat:'RT2-S1',name:'Jinbe',time:'09:50 AM'},
-  {seat:'C1-S2',name:'Brook',time:'09:10 AM'},
-  {seat:'RT3-S1',name:'Franky',time:'10:30 AM'},
-  {seat:'RT3-S4',name:'Robin',time:'08:00 AM'},
-];
-
 let allCustomers = [];
+let items = [];
+let trackInterval = null;
+
+async function init() {
+  await loadData();
+  await loadTransferRequests();
+  
+  // Set up live tracking interval (every 5 seconds)
+  trackInterval = setInterval(() => {
+    loadData();
+    loadTransferRequests();
+  }, 5000);
+}
+
+async function loadTransferRequests() {
+    try {
+        const res = await fetch('/api/transfer-requests');
+        const data = await res.json();
+        const container = document.querySelector('.transfer-card');
+        const info = container.querySelector('.transfer-info');
+        
+        if (data.requests && data.requests.length > 0) {
+            container.style.display = 'block';
+            const r = data.requests[0]; // Show first pending
+            info.innerHTML = `
+                <div class="transfer-name">${r.first_name} ${r.last_name}</div>
+                <div class="transfer-sub">Current: ${r.current_label} → Requested: ${r.requested_label}</div>
+                <div class="transfer-btns">
+                    <button class="btn btn-success btn-sm" onclick="acceptTransfer(${r.id})" style="flex:1"><i class="fa-solid fa-check"></i> Accept</button>
+                    <button class="btn btn-danger btn-sm" onclick="declineTransfer(${r.id})" style="flex:1"><i class="fa-solid fa-xmark"></i> Decline</button>
+                </div>
+            `;
+        } else {
+            container.style.display = 'none';
+        }
+    } catch(e) { console.error(e); }
+}
 
 async function fetchCustomersForSelect() {
   try {
@@ -290,23 +316,36 @@ window.selectCustomerForAssign = function(id, name) {
   document.getElementById('custSearchInput').style.background = '#f0fdf4';
 };
 
-function confirmAssignment() {
+async function confirmAssignment() {
   const customerId = document.getElementById('assignCustId').value;
   const customerName = document.getElementById('assignCustName').value;
+  const planSelect = document.getElementById('assignPlan');
+  const hours = parseInt(planSelect.value);
   
   if(!customerId) { alert('Please select a customer'); return; }
   
-  if(confirm(`Assign ${customerName} to this seat?`)) {
-    // In a real app, you'd send this to the API
-    // For now, let's simulate the API call logic
-    alert(`Successfully assigned ${customerName}!`);
-    cancelAssignment();
-    closeDetail();
-    loadLayout(); // Refresh the map
+  if(confirm(`Assign ${customerName} to this seat for ${hours} hour(s)?`)) {
+    try {
+        const res = await fetch('/api/session/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: customerId, elementId: currentSelectedElementId, hours })
+        });
+        if ((await res.json()).success) {
+            alert('Assignment successful!');
+            cancelAssignment(); closeDetail();
+            loadData();
+        }
+    } catch(e) { console.error(e); }
   }
 }
 
-function showDetail(name,seat,time, isAvailable = false){
+let currentSelectedElementId = null;
+let currentSelectedElementLabel = null;
+
+function showDetail(name, seatLabel, time, isAvailable = false, elementId) {
+  currentSelectedElementId = elementId;
+  currentSelectedElementLabel = seatLabel;
   document.getElementById('detailName').textContent = name;
   
   const badge = document.getElementById('detailStatusBadge');
@@ -363,41 +402,57 @@ function doTransfer(){
   }
 }
 
-function acceptTransfer(){
+async function acceptTransfer(id){
   if(confirm('Accept this transfer request?')){
-
+    try {
+        const res = await fetch(`/api/transfer-requests/${id}/approve`, { method: 'POST' });
+        if((await res.json()).success) { loadData(); loadTransferRequests(); }
+    } catch(e) { console.error(e); }
   }
 }
 
-function declineTransfer(){
+async function declineTransfer(id){
   if(confirm('Decline this transfer request?')){
-
+    try {
+        const res = await fetch(`/api/transfer-requests/${id}/decline`, { method: 'POST' });
+        if((await res.json()).success) { loadTransferRequests(); }
+    } catch(e) { console.error(e); }
   }
 }
 
-function buildList(){
-  const el = document.getElementById('custList'); 
-  el.innerHTML='';
-  
-  customers.forEach(c=>{
-    const d=document.createElement('div'); 
-    d.className='cust-row';
-    
-    d.innerHTML=`
-      <div>
-        <div class="cust-row-name">${c.name}</div>
-        <div class="cust-row-sub">
-          <i class="fa-solid fa-couch" style="font-size:10px"></i> ${c.seat} · ${c.time}
-        </div>
-      </div>
-      <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();doTransferFor('${c.name}')">
-        <i class="fa-solid fa-arrow-right-arrow-left"></i>
-      </button>
-    `;
-    
-    d.onclick=()=>showDetail(c.name,c.seat,c.time);
-    el.appendChild(d);
-  });
+async function buildList(){
+  const el = document.getElementById('custList'); el.innerHTML = '';
+  try {
+      const res = await fetch('/api/active-customers');
+      const data = await res.json();
+      if (data.customers && data.customers.length > 0) {
+          data.customers.forEach(c => {
+              const d = document.createElement('div'); d.className = 'cust-row';
+              const startTime = new Date(c.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+              
+              d.innerHTML = `
+                <div style="flex:1" onclick="highlightUserSeat('${c.seat_label}', '${c.first_name} ${c.last_name}', '${c.id}')">
+                    <div class="cust-row-name">${c.first_name} ${c.last_name}</div>
+                    <div class="cust-row-sub"><i class="fa-solid fa-couch" style="font-size:10px"></i> ${c.seat_label || 'No Seat'} · ${startTime}</div>
+                </div>
+                <button class="btn btn-ghost btn-icon" onclick="event.stopPropagation();doTransferFor('${c.first_name} ${c.last_name}')" title="Transfer Seat">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                </button>
+              `;
+              d.onclick = () => highlightUserSeat(c.seat_label, `${c.first_name} ${c.last_name}`, c.id);
+              el.appendChild(d);
+          });
+      } else {
+          el.innerHTML = '<div style="text-align:center; padding:20px; font-size:11px; color:#94a3b8;">No active customers</div>';
+      }
+  } catch(e) { console.error(e); }
+}
+
+function highlightUserSeat(label, name, userId) {
+    const item = items.find(i => i.label === label);
+    if (item) {
+        showDetail(name, label, '', false, item.id);
+    }
 }
 
 function doTransferFor(name){
@@ -405,7 +460,7 @@ function doTransferFor(name){
   }
 }
 
-let items = [];
+
 
 function escapeHtml(text) {
   const div = document.createElement('div');
@@ -413,13 +468,14 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-async function loadLayout() {
+async function loadData() {
   try {
     const res = await fetch('/api/layout');
     const data = await res.json();
     if (data && data.items) {
       items = data.items;
       renderCanvas();
+      buildList();
     }
   } catch (e) {
     console.error(e);
@@ -451,14 +507,14 @@ function renderCanvas() {
       else if (status === 'reserved') visual.style.backgroundColor = '#1e293b';
       else if (status === 'idle') visual.style.backgroundColor = '#facc15';
       else visual.style.backgroundColor = '#10b981';
-      el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Seat', item.label, '9:30 AM', status === 'open'); };
+      el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Seat', item.label, 'Now', status === 'open', item.id); };
     } else if (item.type === 'chair-sq') {
       const status = item.statuses ? item.statuses[0] : 'open';
       const sqColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981';
       visual.style.background = sqColor;
       visual.style.borderRadius = '6px';
       visual.style.border = '2px solid #8B4513';
-      el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Seat', item.label, '9:30 AM', status === 'open'); };
+      el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Seat', item.label, 'Now', status === 'open', item.id); };
     } else if (item.type === 'round-table') {
       visual.style.background = item.color;
       visual.style.borderRadius = '50%';
@@ -503,9 +559,6 @@ function renderCanvas() {
   });
 }
 
-window.onload = () => {
-  buildList();
-  loadLayout();
-};
+window.onload = init;
 </script>
 

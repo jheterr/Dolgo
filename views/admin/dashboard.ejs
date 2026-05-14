@@ -366,22 +366,22 @@
             <div class="stat-card sc-gold">
               <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
               <div class="stat-lbl">TOTAL ACTIVE USERS</div>
-              <div class="stat-val">3</div>
+              <div class="stat-val"><%= stats.activeUsers %></div>
             </div>
             <div class="stat-card sc-orange">
               <div class="stat-icon"><i class="fa-solid fa-user"></i></div>
               <div class="stat-lbl">TOTAL CUSTOMERS</div>
-              <div class="stat-val">100</div>
+              <div class="stat-val"><%= stats.totalCustomers %></div>
             </div>
             <div class="stat-card sc-teal">
               <div class="stat-icon"><i class="fa-solid fa-wifi"></i></div>
               <div class="stat-lbl">ACTIVE WI-FI SESSION</div>
-              <div class="stat-val">100</div>
+              <div class="stat-val"><%= stats.wifiSessions %></div>
             </div>
             <div class="stat-card sc-green">
               <div class="stat-icon"><i class="fa-solid fa-couch"></i></div>
               <div class="stat-lbl">SEAT AVAILABLE</div>
-              <div class="stat-val" id="statAvailable">0/0</div>
+              <div class="stat-val" id="statAvailable"><%= stats.availableSeats %></div>
             </div>
           </div>
 
@@ -494,10 +494,7 @@
         function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
 
         // Pending Payments Data
-        let pendingReservations = [
-          { id: 1, name: "Monkey D. Luffy", seat: "A3", date: "2026-04-16", time: "10:00 AM", amount: 250, paid: false },
-          { id: 2, name: "Roronoa Zoro", seat: "B2", date: "2026-04-17", time: "09:00 AM", amount: 300, paid: false }
-        ];
+        let pendingReservations = <%- JSON.stringify(pendingReservations) %>;
 
         let pendingWifiExtensions = [
           { id: 1, name: "Sanji Vinsmoke", seat: "A1", hours: 1, amount: 50, paid: false },
@@ -515,9 +512,8 @@
         // Render Reservation Payments
         function renderReservationPayments() {
           const container = document.getElementById('reservationPaymentsList');
-          const unpaid = pendingReservations.filter(item => !item.paid);
-          if (unpaid.length === 0) { container.innerHTML = '<div class="empty-payments">No pending payments</div>'; return; }
-          container.innerHTML = unpaid.map(item => `<div class="payment-item"><div class="payment-info"><div class="payment-name">${escapeHtml(item.name)}</div><div class="payment-detail">Seat ${item.seat} • ${item.date}</div></div><div class="payment-amount">${formatPHP(item.amount)}</div><button class="pay-btn" onclick="markPaymentPaid('reservation', ${item.id})">Pay Now</button></div>`).join('');
+          if (pendingReservations.length === 0) { container.innerHTML = '<div class="empty-payments">No pending payments</div>'; return; }
+          container.innerHTML = pendingReservations.map(item => `<div class="payment-item"><div class="payment-info"><div class="payment-name">${escapeHtml(item.name)}</div><div class="payment-detail">Seat ${item.seat} • ${item.date}</div></div><div class="payment-amount">${formatPHP(item.amount)}</div><button class="pay-btn" onclick="markPaymentPaid('reservation', ${item.id})">Pay Now</button></div>`).join('');
         }
 
         function renderWifiPayments() {
@@ -543,11 +539,11 @@
 
         // Render Activity Feed
         function renderActivityFeed() {
-          const activityFeed = [
-            { seat: "C1-S1", action: "occupied", time: "2m", type: "in" }, { seat: "C2-S1", action: "vacated", time: "5m", type: "out" },
-            { seat: "T3-S2", action: "occupied", time: "8m", type: "in" }, { seat: "RT1-S3", action: "vacated", time: "11m", type: "out" },
-            { seat: "C3-S1", action: "occupied", time: "14m", type: "in" }, { seat: "C3-S2", action: "occupied", time: "14m", type: "in" }
-          ];
+          const activityFeed = <%- JSON.stringify(activities) %>;
+          if (activityFeed.length === 0) {
+            document.getElementById('activityFeed').innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:11px;">No recent activity</div>';
+            return;
+          }
           document.getElementById('activityFeed').innerHTML = activityFeed.map(a => `<div class="feed-item"><span class="feed-seat ${a.type}">${a.seat}</span><span class="feed-text">Seat ${a.action}</span><span class="feed-time">${a.time}</span></div>`).join('');
         }
 
