@@ -3,7 +3,7 @@
 This document outlines the core functional tests that must be performed to ensure the system is production-ready.
 
 ## 1. Authentication & Security
-- [ ] **Admin Login:** Access `thelastmuster@gmail.com` and verify redirection to the Admin Dashboard.
+- [✅] **Admin Login:** Access `thelastmuster@gmail.com` and verify redirection to the Admin Dashboard.
 - [ ] **Staff Login:** Access `belle.staff@randomplay.com` and verify access to operational tools.
 - [ ] **Customer Login:** Access a member account and verify the personalized landing/reservation page.
 - [ ] **Logout:** Ensure session is cleared and user is redirected to the login page.
