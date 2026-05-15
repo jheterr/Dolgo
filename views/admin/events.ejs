@@ -349,7 +349,7 @@
             </div>
             <div class="form-group"><label class="form-label">Description</label><textarea class="form-control" id="ev-desc" style="min-height:70px" placeholder="Event description…"></textarea></div>
           </div>
-          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('createEventModal')">Cancel</button><button class="btn btn-primary" onclick="createEvent()"><i class="fa-solid fa-plus"></i> Create</button></div>
+          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('createEventModal')">Cancel</button><button class="btn btn-primary" onclick="handleCreateEvent()"><i class="fa-solid fa-plus"></i> Create</button></div>
         </div>
       </div>
       
@@ -379,7 +379,10 @@
       <div class="modal-overlay" id="eventDetailModal">
         <div class="modal"><div class="modal-header"><div class="modal-title"><i class="fa-solid fa-calendar-star"></i> Event Details</div><button class="modal-close" onclick="closeModal('eventDetailModal')">&times;</button></div>
           <div class="modal-body" id="eventDetailBody"></div>
-          <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('eventDetailModal')">Close</button></div>
+          <div class="modal-footer">
+            <button class="btn btn-danger" id="btnDeleteEvent" style="display:none; background:#dc2626; color:white;"><i class="fa-solid fa-trash"></i> Delete Event</button>
+            <button class="btn btn-ghost" onclick="closeModal('eventDetailModal')">Close</button>
+          </div>
         </div>
       </div>
       
@@ -509,8 +512,7 @@ function getTimeHour(timeStr) {
 
 function getCustomersForTimeSlot(date, timeSlot) {
   const resOnDate = customerReservations.filter(r => {
-      const d = new Date(r.start_time).toISOString().split('T')[0];
-      return d === date && r.status === 'confirmed';
+      return getLocalDateString(r.start_time) === date && r.status === 'confirmed';
   });
   const slotHour = getTimeHour(timeSlot);
   return resOnDate.filter(r => {
@@ -521,8 +523,7 @@ function getCustomersForTimeSlot(date, timeSlot) {
 
 function getEventsForTimeSlot(date, timeSlot) {
   const eventsOnDate = events.filter(e => {
-      const d = new Date(e.event_date).toISOString().split('T')[0];
-      return d === date;
+      return getLocalDateString(e.event_date) === date;
   });
   const slotHour = getTimeHour(timeSlot);
   return eventsOnDate.filter(e => {
@@ -538,7 +539,7 @@ function showScheduleModal(dateStr) {
     month: 'long', 
     day: 'numeric' 
   });
-  const dayEvents = events.filter(e => e.date === dateStr);
+  const dayEvents = getEventsByDate(dateStr);
   
   let scheduleHtml = `<div class="date-title">Schedule - ${formattedDate}</div>`;
   
@@ -547,10 +548,11 @@ function showScheduleModal(dateStr) {
     scheduleHtml += `<div style="background:#fff8f0; padding:12px; border-radius:12px; margin-bottom:16px; border-left:4px solid var(--orange);">
       <div style="font-weight:700; margin-bottom:8px; color:var(--orange);"><i class="fa-solid fa-calendar-star"></i> Events</div>`;
     dayEvents.forEach(e => {
+      const timeStr = new Date(e.event_date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
       scheduleHtml += `
         <div style="padding:6px 0; border-bottom:1px solid #e2e8f0; cursor:pointer;" onclick="showEventDetail(${JSON.stringify(e).replace(/"/g, '&quot;')})">
-          <span style="font-weight:700;">${escapeHtml(e.name)}</span>
-          <span style="font-size:11px; color:#64748b; margin-left:8px;">${e.time || 'All day'}</span>
+          <span style="font-weight:700;">${escapeHtml(e.title)}</span>
+          <span style="font-size:11px; color:#64748b; margin-left:8px;">${timeStr}</span>
           <span style="font-size:10px; color:#94a3b8; margin-left:8px;">📍 ${e.location}</span>
         </div>
       `;
@@ -566,7 +568,10 @@ function showScheduleModal(dateStr) {
     let customersHtml = '';
     
     if (customers.length > 0) {
-      customersHtml = customers.map(c => `<span onclick="showReservationDetail(${JSON.stringify(c).replace(/"/g, '&quot;')})" style="cursor:pointer;">${escapeHtml(c.customerName)} (Seat ${c.seat})</span>`).join('');
+      customersHtml = customers.map(c => {
+        const name = `${c.first_name} ${c.last_name}`;
+        return `<span onclick="showReservationDetail(${JSON.stringify(c).replace(/"/g, '&quot;')})" style="cursor:pointer;">${escapeHtml(name)} (Seat ${c.seat_label})</span>`;
+      }).join('');
     } else {
       customersHtml = '<span class="schedule-empty">No reservations</span>';
     }
@@ -605,48 +610,55 @@ async function loadAllData() {
 setInterval(loadAllData, 10000);
 loadAllData();
 
+function getLocalDateString(date) {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 function getEventsByDate(dateStr){ 
-    return events.filter(e => new Date(e.event_date).toISOString().split('T')[0] === dateStr); 
+    return events.filter(e => getLocalDateString(e.event_date) === dateStr); 
 }
 function getReservationsByDate(dateStr){ 
-    return customerReservations.filter(r => new Date(r.start_time).toISOString().split('T')[0] === dateStr); 
+    return customerReservations.filter(r => getLocalDateString(r.start_time) === dateStr); 
 }
 function isToday(dateStr){
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
-  return dateStr === todayStr;
+  return dateStr === getLocalDateString(new Date());
 }
 function getTodayReservations(){
-  const todayStr = new Date().toISOString().split('T')[0];
-  return customerReservations.filter(r => new Date(r.start_time).toISOString().split('T')[0] === todayStr && r.status === 'confirmed');
+  const todayStr = getLocalDateString(new Date());
+  return customerReservations.filter(r => getLocalDateString(r.start_time) === todayStr && r.status === 'confirmed');
 }
 function getUpcomingReservations(){
-  const todayStr = new Date().toISOString().split('T')[0];
-  return customerReservations.filter(r => new Date(r.start_time).toISOString().split('T')[0] > todayStr && r.status === 'confirmed');
+  const todayStr = getLocalDateString(new Date());
+  return customerReservations.filter(r => getLocalDateString(r.start_time) > todayStr && r.status === 'confirmed');
 }
 function getUpcomingEvents(){
-  const todayStr = new Date().toISOString().split('T')[0];
-  return events.filter(e => new Date(e.event_date).toISOString().split('T')[0] >= todayStr);
+  const todayStr = getLocalDateString(new Date());
+  return events.filter(e => getLocalDateString(e.event_date) >= todayStr);
 }
 function getPastEvents(){
-  const todayStr = new Date().toISOString().split('T')[0];
-  return events.filter(e => new Date(e.event_date).toISOString().split('T')[0] < todayStr);
+  const todayStr = getLocalDateString(new Date());
+  return events.filter(e => getLocalDateString(e.event_date) < todayStr);
 }
 
 function sortItems(items, isEvent){
   const sortType = document.getElementById('sortSelect').value;
-  if(sortType === 'date_asc') return [...items].sort((a,b)=>a.event_date.localeCompare(b.event_date));
-  if(sortType === 'date_desc') return [...items].sort((a,b)=>b.event_date.localeCompare(a.event_date));
-  if(sortType === 'name_asc') return [...items].sort((a,b)=>a.title.localeCompare(b.title));
-  if(sortType === 'name_desc') return [...items].sort((a,b)=>b.title.localeCompare(a.title));
+  if(sortType === 'date_asc') return [...items].sort((a,b)=>new Date(a.event_date) - new Date(b.event_date));
+  if(sortType === 'date_desc') return [...items].sort((a,b)=>new Date(b.event_date) - new Date(a.event_date));
+  if(sortType === 'name_asc') return [...items].sort((a,b)=>(a.title||'').localeCompare(b.title||''));
+  if(sortType === 'name_desc') return [...items].sort((a,b)=>(b.title||'').localeCompare(a.title||''));
   return items;
 }
 function sortReservations(items){
   const sortType = document.getElementById('sortSelect').value;
-  if(sortType === 'date_asc') return [...items].sort((a,b)=>a.start_time.localeCompare(b.start_time));
-  if(sortType === 'date_desc') return [...items].sort((a,b)=>b.start_time.localeCompare(a.start_time));
+  if(sortType === 'date_asc') return [...items].sort((a,b)=>new Date(a.start_time) - new Date(b.start_time));
+  if(sortType === 'date_desc') return [...items].sort((a,b)=>new Date(b.start_time) - new Date(a.start_time));
   if(sortType === 'name_asc') return [...items].sort((a,b)=>`${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`));
-  if(sortType === 'name_desc') return [...items].sort((a,b)=>`${b.first_name} ${b.last_name}`.localeCompare(`${a.first_name} ${a.last_name}`));
+  if(sortType === 'name_desc') return [...items].sort((a,b)=>`${b.last_name} ${b.last_name}`.localeCompare(`${a.first_name} ${a.last_name}`));
   return items;
 }
 
@@ -806,7 +818,29 @@ function showEventDetail(event){
     <div class="event-detail-row"><span class="reservation-label">Location:</span><span class="reservation-value">${event.location}</span></div>
     <div class="event-detail-row"><span class="reservation-label">Price:</span><span class="reservation-value">₱${event.price}</span></div>
     <div class="event-detail-row"><span class="reservation-label">Description:</span><span class="reservation-value">${escapeHtml(event.description)}</span></div>`;
+  
+  const deleteBtn = document.getElementById('btnDeleteEvent');
+  if (deleteBtn) {
+    deleteBtn.style.display = 'block';
+    deleteBtn.onclick = () => deleteEvent(event.id);
+  }
+
   openModal('eventDetailModal');
+}
+
+async function deleteEvent(id) {
+  if (!confirm('Are you sure you want to delete this event?')) return;
+  try {
+    const res = await fetch(`/api/events/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      alert('Event deleted successfully');
+      closeModal('eventDetailModal');
+      loadAllData();
+    } else {
+      alert('Error deleting event: ' + data.error);
+    }
+  } catch (e) { console.error(e); alert('Failed to delete event'); }
 }
 
 function renderCal() {
@@ -930,35 +964,73 @@ function changeMonth(dir){
   navigateCal(dir);
 }
 
-async function createEvent(){
-  const name=document.getElementById('ev-name').value.trim(), date=document.getElementById('ev-date').value, loc=document.getElementById('ev-loc').value;
-  if(!name||!date){ alert('Name and date are required'); return; }
-  const time=document.getElementById('ev-time').value||'00:00', desc=document.getElementById('ev-desc').value||'', imageData=document.getElementById('ev-image-data').value;
+async function handleCreateEvent(){
+  const nameInput = document.getElementById('ev-name');
+  const dateInput = document.getElementById('ev-date');
+  const locInput = document.getElementById('ev-loc');
+  const timeInput = document.getElementById('ev-time');
+  const descInput = document.getElementById('ev-desc');
+  const imageDataInput = document.getElementById('ev-image-data');
+
+  if (!nameInput || !dateInput) return;
+
+  const name = nameInput.value.trim();
+  const date = dateInput.value;
+  const loc = locInput ? locInput.value : 'Default';
+  const time = timeInput ? (timeInput.value || '00:00') : '00:00';
+  const desc = descInput ? descInput.value : '';
+  const imageData = imageDataInput ? imageDataInput.value : null;
+
+  console.log('Attempting to create event:', {name, date, loc, time});
+  
+  if(!name || !date){ 
+      alert('Event Name and Date are required'); 
+      return; 
+  }
+  
+  const payload = {
+      title: name,
+      description: desc,
+      date: `${date} ${time}:00`,
+      location: loc,
+      price: 0,
+      maxAttendees: 100,
+      image: imageData && imageData.trim() !== '' ? imageData : null
+  };
   
   try {
       const res = await fetch('/api/events', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-              title: name,
-              description: desc,
-              date: `${date} ${time}:00`,
-              location: loc,
-              price: 0,
-              maxAttendees: 100,
-              image: imageData,
-              createdBy: 1 // TODO: Get actual user ID
-          })
+          body: JSON.stringify(payload)
       });
+      
       const data = await res.json();
+      console.log('Server response:', data);
+      
       if(data.success) {
           alert('Event created successfully!');
           closeModal('createEventModal');
+          
+          // Reset form fields
+          nameInput.value = '';
+          dateInput.value = '';
+          if(timeInput) timeInput.value = '';
+          if(descInput) descInput.value = '';
+          if(document.getElementById('ev-image-preview')) {
+              document.getElementById('ev-image-preview').src = '';
+              document.getElementById('ev-image-preview').classList.remove('show');
+          }
+          if(imageDataInput) imageDataInput.value = '';
+          
           loadAllData();
       } else {
-          alert('Error: ' + data.message);
+          alert('Error from server: ' + (data.error || 'Unknown error occurred'));
       }
-  } catch (e) { console.error(e); alert('Failed to create event'); }
+  } catch (e) { 
+      console.error('Network or Parse error:', e); 
+      alert('Failed to create event. Network or server error occurred.'); 
+  }
 }
 
 function escapeHtml(str){ if(!str)return ''; return String(str).replace(/[&<>]/g,function(m){if(m==='&')return '&amp;';if(m==='<')return '&lt;';if(m==='>')return '&gt;';return m;}); }
