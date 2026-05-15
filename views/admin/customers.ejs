@@ -23,8 +23,12 @@
   .wifi-edit-btn{background:none;border:none;cursor:pointer;color:var(--orange);margin-left:5px;font-size:11px;transition:0.2s;}
   .wifi-edit-btn:hover{color:#b85520;transform:scale(1.1);}
   .page-header-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
-  .btn-add-walkin{background:#8A8636;color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;}
-  .btn-add-walkin:hover{background:#726f2c;}
+  .btn-add-walkin{background:#8A8636;color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;transition: 0.2s;}
+  .btn-add-walkin:hover{background:#726f2c;transform: translateY(-2px);}
+  .btn-add-member{background:#CF6322;color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;transition: 0.2s;}
+  .btn-add-member:hover{background:#b85520;transform: translateY(-2px);}
+  .btn-upgrade{background:#4A7C59;color:white;border:none;padding:5px 10px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;transition:0.2s;}
+  .btn-upgrade:hover{background:#3d6a4a;transform:scale(1.05);}
 
   /* Filter dropdown styles */
   .filter-group {
@@ -233,7 +237,7 @@
       <div class="page-header">
         <h1 class="page-title">Customers List</h1>
         <div class="page-header-actions">
-          <button class="btn-add-walkin" style="background: #1e293b;" onclick="openAddUserModal('member')"><i class="fa-solid fa-user-plus"></i> Add Member</button>
+          <button class="btn-add-member" onclick="openAddUserModal('member')"><i class="fa-solid fa-user-plus"></i> Add Member</button>
           <button class="btn-add-walkin" onclick="openAddUserModal('walkin')"><i class="fa-solid fa-person-walking-arrow-right"></i> Add Walk-in</button>
           <div class="search-bar">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -473,6 +477,7 @@
               <div style="display:flex;gap:5px">
                 <button class="btn btn-ghost btn-sm" onclick='viewCustomer(${JSON.stringify(user)})' title="View"><i class="fa-solid fa-eye"></i></button>
                 <button class="btn btn-ghost btn-sm" onclick='openEditCustomerModal(${JSON.stringify(user)})' title="Edit"><i class="fa-solid fa-pen"></i></button>
+                ${typeLabel === 'Walk-in' ? `<button class="btn-upgrade" onclick="upgradeToMember(${user.id})" title="Upgrade to Member"><i class="fa-solid fa-star"></i> Upgrade</button>` : ''}
                 <button class="btn btn-danger btn-sm" onclick="removeUser(${user.id})" title="Delete"><i class="fa-solid fa-trash"></i></button>
               </div>
             </td>
@@ -614,6 +619,40 @@
           toast("User approved!", "success");
           renderPendingTable();
           loadRealUsers();
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    async function upgradeToMember(id) {
+      if(!confirm("Upgrade this walk-in customer to a full Member?")) return;
+      try {
+        const res = await fetch(`/api/users/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'member' }) // Backend will preserve other fields if we use PATCH or if API is robust
+        });
+        // Note: Our PUT route at 208 expects all fields. Let's make it smarter or fetch first.
+        // For simplicity, I'll fetch user data first then update.
+        const userRes = await fetch(`/api/users/${id}`);
+        const userData = (await userRes.json()).user;
+        
+        if (userData) {
+          const updateRes = await fetch(`/api/users/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              firstName: userData.first_name, 
+              lastName: userData.last_name, 
+              email: userData.email, 
+              role: userData.role, 
+              status: userData.status,
+              type: 'member' 
+            })
+          });
+          if ((await updateRes.json()).success) {
+            toast("Customer upgraded to Member!", "success");
+            loadRealUsers();
+          }
         }
       } catch (err) { console.error(err); }
     }

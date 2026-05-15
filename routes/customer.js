@@ -328,7 +328,7 @@ router.post('/reserve', async (req, res) => {
     console.log('New reservation request received:', req.body);
     try {
         const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 3);
-        const { elementId, date, startTime, endTime } = req.body;
+        const { elementId, date, startTime, endTime, paymentMethod, paymentImage } = req.body;
         
         if (!elementId) {
             console.log('Reservation failed: Missing elementId');
@@ -345,9 +345,9 @@ router.post('/reserve', async (req, res) => {
         const amount = diffHrs * 50;
 
         await db.execute(
-            `INSERT INTO reservations (user_id, element_id, start_time, end_time, amount, status) 
-             VALUES (?, ?, ?, ?, ?, 'pending')`,
-            [userId, elementId, start, end, amount]
+            `INSERT INTO reservations (user_id, element_id, start_time, end_time, amount, status, payment_method, payment_image) 
+             VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)`,
+            [userId, elementId, start, end, amount, paymentMethod || 'gcash', paymentImage || null]
         );
 
         console.log('Reservation saved for user:', userId);

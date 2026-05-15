@@ -516,8 +516,16 @@
           </div>
           <!-- CANVAS VIEWPORT -->
           <div class="canvas-viewport">
-            <div class="canvas-board mode-select" id="canvas" onmousedown="canvasDown(event)"
-              onmousemove="canvasMove(event)" onmouseup="canvasUp(event)"></div>
+            <!-- Transfer Mode Banner -->
+          <div id="transferBanner" style="display:none; position:absolute; top:20px; left:50%; transform:translateX(-50%); background:var(--orange); color:white; padding:12px 24px; border-radius:30px; font-weight:700; font-size:0.9rem; z-index:100; box-shadow:0 10px 25px rgba(249, 115, 22, 0.3); align-items:center; gap:12px;">
+            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+            <span id="transferBannerText">Select a new seat</span>
+            <button onclick="cancelManualTransfer()" style="background:rgba(0,0,0,0.2); border:none; color:white; border-radius:50%; width:24px; height:24px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                <i class="fa-solid fa-xmark" style="font-size:12px;"></i>
+            </button>
+          </div>
+
+          <div id="canvas" onmousedown="canvasDown(event)" onmousemove="canvasMove(event)" onmouseup="canvasUp(event)" onmouseleave="canvasUp(event)"></div>
           </div>
           <!-- LEGEND -->
           <div class="legend" id="canvasLegend">
@@ -566,6 +574,11 @@
             <div class="cust-list" id="custList"></div>
           </div>
 
+          <div class="active-cust-card" id="todayResCard">
+            <div class="section-title" style="color: var(--orange);"><i class="fa-solid fa-calendar-day"></i> Upcoming Today</div>
+            <div class="cust-list" id="todayResList"></div>
+          </div>
+
           <!-- Side Detail Panel (Figma Style) -->
           <div class="detail-panel" id="sideDetailPanel" style="display:none; margin:0; flex:none; position:relative; padding:24px; font-family:'Montserrat', sans-serif;">
             <button onclick="closeDetail()" style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.05); border:none; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#64748b; transition:0.2s; z-index:10;">
@@ -590,6 +603,9 @@
               </button>
               <button class="btn btn-ghost" id="btnTransfer" onclick="startManualTransfer()" style="width:100%; justify-content: center; padding:12px; border-radius:12px; border:1px solid var(--border);">
                 <i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer Seat
+              </button>
+              <button class="btn btn-danger" id="btnEndSession" onclick="endCustomerSession()" style="width:100%; justify-content: center; padding:12px; border-radius:12px;">
+                <i class="fa-solid fa-user-minus"></i> End Session
               </button>
             </div>
 
@@ -759,6 +775,7 @@
     async function init() {
       await loadData();
       await loadTransferRequests();
+      await loadTodayReservations();
       setAppMode('track');
     }
 
@@ -919,6 +936,7 @@
         trackInterval = setInterval(() => {
           loadData();
           loadTransferRequests();
+          loadTodayReservations();
         }, 5000);
 
         // Update timers every second for smooth countdown
@@ -938,6 +956,11 @@
             if ((item.status === 'taken' || item.status === 'idle') && (item.endTime || item.remainingSeconds)) {
                 const el = document.querySelector(`[data-id="${item.id}"]`);
                 if (el) {
+                    // Update Title Tooltip
+                    if (item.userName) {
+                        el.title = `Occupied by: ${item.userName}`;
+                    }
+
                     let tag = el.querySelector('.timer-tag');
                     if (!tag) {
                         tag = document.createElement('div');
@@ -956,10 +979,20 @@
                         el.appendChild(tag);
                     }
                     const timeLeft = formatTimeLeft(item.endTime, item.isPaused, item.remainingSeconds);
-                    tag.textContent = timeLeft + (item.isPaused ? ' (P)' : '');
+                    
+                    // Show name + time if available
+                    let displayLabel = timeLeft;
+                    if (item.userName && !item.label.includes('T')) { // Only for small chairs
+                         // Keep it short for chairs
+                    }
+                    
+                    tag.textContent = displayLabel + (item.isPaused ? ' (P)' : '');
                     tag.style.background = item.isPaused ? '#facc15' : (timeLeft === 'Expired' ? '#ef4444' : '#1e293b');
                     tag.style.color = item.isPaused ? '#1e293b' : 'white';
                 }
+            } else {
+                const el = document.querySelector(`[data-id="${item.id}"]`);
+                if (el) el.title = '';
             }
         });
     }
@@ -1147,23 +1180,36 @@
       }
       const item = items.find(i => i.id === itemId);
       if (!item) return;
+
+      if (typeof manualTransferSource !== 'undefined' && manualTransferSource) {
+          const status = (item.statuses && item.statuses[0]) || item.status || 'open';
+          if (status === 'open' || status === 'Available') {
+              confirmManualTransfer(item);
+          } else {
+              toast("Please select an available seat to transfer to.", "warning");
+          }
+          return;
+      }
+
       const status = item.status || 'open';
       showDetail(item.label || 'Seat', item.label || 'ID: ' + itemId, 'Now', status === 'open', item.id, item.image);
     }
 
     let currentSelectedElementId = null;
     let currentSelectedElementLabel = null;
+    let currentSelectedUserId = null;
     function showDetail(name, seatLabel, time, isAvailable = false, elementId, image) {
       currentSelectedElementId = elementId;
       currentSelectedElementLabel = seatLabel;
       
       const item = items.find(i => i.id === elementId);
+      currentSelectedUserId = item ? item.user_id : null;
       const status = (item && item.status) || (isAvailable ? 'open' : 'taken');
       const isReallyAvailable = status === 'open';
 
       // If occupied or idle, show user name if we have it
       if (!isReallyAvailable && item && item.userName) {
-          document.getElementById('detailName').textContent = item.userName;
+          document.getElementById('detailName').innerHTML = `<span style="font-size: 0.7rem; color: var(--text-sm); display:block; margin-bottom: 2px;">${seatLabel}</span>${item.userName}`;
           const timeLeft = formatTimeLeft(item.endTime, item.isPaused, item.remainingSeconds);
           const badge = document.getElementById('detailStatusBadge');
           if (item.isPaused) {
@@ -1171,12 +1217,12 @@
               badge.style.background = '#fef9c3';
               badge.style.color = '#854d0e';
           } else {
-              badge.textContent = `Taken (${timeLeft || 'Expired'})`;
+              badge.textContent = `Occupied (${timeLeft || 'Expired'})`;
               badge.style.background = '#fee2e2';
               badge.style.color = '#ef4444';
           }
       } else {
-          document.getElementById('detailName').textContent = name;
+          document.getElementById('detailName').innerHTML = `<span style="font-size: 0.7rem; color: var(--text-sm); display:block; margin-bottom: 2px;">Seat</span>${seatLabel}`;
           const badge = document.getElementById('detailStatusBadge');
           badge.textContent = isReallyAvailable ? 'Available' : 'Taken';
           badge.style.background = isReallyAvailable ? '#dcfce7' : '#fee2e2';
@@ -1184,7 +1230,7 @@
       }
 
       const detailImg = document.getElementById('detailImg');
-      detailImg.src = image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=400';
+      detailImg.src = image || '/images/seat_default.jpg';
 
       document.getElementById('activeCustCard').style.display = 'none';
       document.getElementById('sideDetailPanel').style.display = 'block';
@@ -1192,6 +1238,7 @@
       cancelAssignment();
       document.getElementById('btnAssign').style.display = isReallyAvailable ? 'flex' : 'none';
       document.getElementById('btnTransfer').style.display = isReallyAvailable ? 'none' : 'flex';
+      document.getElementById('btnEndSession').style.display = isReallyAvailable ? 'none' : 'flex';
     }
 
     async function changeSeatImage(event) {
@@ -1438,6 +1485,52 @@
       } catch(e) { console.error(e); }
     }
 
+    async function loadTodayReservations() {
+        const el = document.getElementById('todayResList');
+        try {
+            // 1. Fetch reservations
+            const res = await fetch('/api/reservations');
+            const data = await res.json();
+            if (!data.reservations) return;
+
+            // 2. Fetch active customers to avoid duplicates
+            const activeRes = await fetch('/api/active-customers');
+            const activeData = await activeRes.json();
+            const activeUserIds = (activeData.customers || []).map(c => c.id);
+
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+            
+            const filtered = data.reservations.filter(r => {
+                const rDate = new Date(r.start_time).toISOString().split('T')[0];
+                const rEnd = new Date(r.end_time);
+                
+                // Basic checks: Today, Confirmed, Not yet finished
+                if (rDate !== todayStr || r.status !== 'confirmed' || rEnd <= now) return false;
+
+                // Hide if user is already active/seated
+                if (activeUserIds.includes(r.user_id)) return false;
+
+                return true;
+            }).sort((a,b) => new Date(a.start_time) - new Date(b.start_time));
+
+            if (filtered.length > 0) {
+                el.innerHTML = filtered.map(r => `
+                    <div class="cust-row" onclick="highlightUserSeat('${r.seat_label}', '${r.first_name} ${r.last_name}')">
+                        <div style="flex:1">
+                            <div class="cust-row-name">${r.first_name} ${r.last_name}</div>
+                            <div class="cust-row-sub">
+                                <i class="fa-solid fa-clock" style="font-size:10px"></i> ${new Date(r.start_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} · ${r.seat_label || 'No Seat'}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                el.innerHTML = '<div style="text-align:center; padding:20px; font-size:11px; color:#94a3b8;">No upcoming reservations today</div>';
+            }
+        } catch(e) { console.error(e); }
+    }
+
     function highlightUserSeat(label, name, userId) {
         const item = items.find(i => i.label === label);
         if (item) {
@@ -1450,19 +1543,19 @@
     let manualTransferSource = null;
 
     function startManualTransfer() {
-        // This is called from the detail panel when an occupied seat is selected
         const item = items.find(i => i.id === currentSelectedElementId);
-        // We need the user's name. Currently showDetail doesn't store the full user object.
-        // Let's assume we can find them from the active customers list if needed, or just use the name from the title.
-        const name = document.getElementById('detailName').textContent;
+        let name = document.getElementById('detailName').textContent;
+        // Clean up the name string as it might contain HTML from the label
+        name = name.replace(/<[^>]*>?/gm, '').trim().split('\n').pop().trim();
         
         manualTransferSource = {
             elementId: currentSelectedElementId,
             label: item.label,
-            userName: name
+            userName: name,
+            userId: currentSelectedUserId
         };
         
-        toast(`Transferring ${name}. Select a new seat on the floor plan.`, "info");
+        showTransferBanner(`Transferring ${name}. Select a new seat.`);
         closeDetail();
     }
 
@@ -1474,7 +1567,18 @@
             userName: `${customer.first_name} ${customer.last_name}`,
             userId: customer.id
         };
-        toast(`Transferring ${manualTransferSource.userName}. Select a new seat on the floor plan.`, "info");
+        showTransferBanner(`Transferring ${manualTransferSource.userName}. Select a new seat.`);
+    }
+
+    function showTransferBanner(text) {
+        document.getElementById('transferBannerText').textContent = text;
+        document.getElementById('transferBanner').style.display = 'flex';
+    }
+
+    function cancelManualTransfer() {
+        manualTransferSource = null;
+        document.getElementById('transferBanner').style.display = 'none';
+        toast("Transfer cancelled.", "info");
     }
 
     // Update handleItemClick to handle manual transfer target selection
@@ -1508,18 +1612,22 @@
         }
 
         try {
-            // We need the userId. If we don't have it, we might need to fetch it or ensure it's passed.
-            // Let's check if we have it.
             let userId = manualTransferSource.userId;
             if (!userId) {
-                // Try to find in active customers if we only have the name
                 const res = await fetch('/api/active-customers');
                 const data = await res.json();
                 const cust = data.customers.find(c => c.seat_label === manualTransferSource.label);
                 if (cust) userId = cust.id;
             }
 
-            if (!userId) { toast("User session not found!", "error"); manualTransferSource = null; return; }
+            if (!userId) { 
+                toast("User session not found! Trying fallback search...", "warning");
+                // Last ditch effort: search by label in items
+                const item = items.find(i => i.label === manualTransferSource.label);
+                if (item && item.user_id) userId = item.user_id;
+            }
+
+            if (!userId) { toast("Transfer failed: Could not identify user.", "error"); manualTransferSource = null; return; }
 
             const res = await fetch('/api/transfer-requests/manual', {
                 method: 'POST',
@@ -1531,12 +1639,81 @@
                 })
             });
 
-            if ((await res.json()).success) {
+            const result = await res.json();
+            if (result.success) {
                 toast("Seat transferred successfully!", "success");
+                
+                // Optimistic UI Update: immediately update the local state to avoid delay
+                const sourceItem = items.find(i => i.id === manualTransferSource.elementId);
+                const destItem = items.find(i => i.id === targetItem.id);
+                if (sourceItem && destItem) {
+                    destItem.status = sourceItem.status;
+                    destItem.statuses = [sourceItem.status];
+                    destItem.userName = sourceItem.userName;
+                    destItem.user_id = sourceItem.user_id;
+                    destItem.endTime = sourceItem.endTime;
+                    destItem.isPaused = sourceItem.isPaused;
+                    destItem.remainingSeconds = sourceItem.remainingSeconds;
+                    
+                    sourceItem.status = 'open';
+                    sourceItem.statuses = ['open'];
+                    sourceItem.userName = null;
+                    sourceItem.user_id = null;
+                    sourceItem.endTime = null;
+                }
+
                 manualTransferSource = null;
-                loadData();
+                document.getElementById('transferBanner').style.display = 'none';
+                render(); // Re-render canvas immediately
+                loadData(); // Then sync with server in background
+            } else {
+                toast("Error: " + (result.error || "Transfer failed"), "error");
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error(e); toast("Connection error", "error"); }
+    }
+
+    async function endCustomerSession() {
+        if (!currentSelectedElementId) {
+            toast("No seat selected", "error");
+            return;
+        }
+
+        // Always show the confirmation first
+        if (!confirm("Are you sure you want to end this customer's session? This will release the seat immediately.")) return;
+
+        if (!currentSelectedUserId) {
+            toast("Error: Missing User ID. Please RESTART your Node.js server to apply backend fixes.", "error");
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/session/end', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    userId: currentSelectedUserId, 
+                    elementId: currentSelectedElementId 
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast("Session ended successfully", "success");
+                closeDetail();
+                
+                // Optimistic UI Update
+                const item = items.find(i => i.id === currentSelectedElementId);
+                if (item) {
+                    item.status = 'open';
+                    item.statuses = ['open'];
+                    item.userName = null;
+                    item.user_id = null;
+                }
+                render();
+                loadData();
+            } else {
+                toast("Error: " + (data.error || "Failed to end session"), "error");
+            }
+        } catch(e) { console.error(e); toast("Connection error", "error"); }
     }
 
     window.onload = init;

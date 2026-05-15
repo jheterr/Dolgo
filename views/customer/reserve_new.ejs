@@ -9,6 +9,7 @@
         flex-direction: column;
         background-color: #f4f6f9;
         min-height: 100vh;
+        font-family: 'Montserrat', sans-serif;
     }
 
     .page-title {
@@ -94,12 +95,14 @@
         width: 380px;
         background: white;
         padding: 32px;
-        border-radius: 20px;
+        border-radius: 24px;
         display: flex;
         flex-direction: column;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         border: 1px solid #e2e8f0;
         position: relative;
+        font-family: 'Montserrat', sans-serif;
+        min-height: 600px;
     }
 
     /* Map styling */
@@ -214,10 +217,10 @@
     /* Right panel details */
     .room-image {
         width: 100%;
-        height: 180px;
+        height: 130px;
         border-radius: 12px;
         object-fit: cover;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         background: #f1f5f9;
     }
 
@@ -245,7 +248,7 @@
         margin-bottom: 24px;
     }
 
-    .form-group { margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
     .form-label { font-weight: 800; font-size: 0.85rem; color: #1e293b; margin-bottom: 8px; display: block; }
     
     .form-input-native {
@@ -279,16 +282,16 @@
         border: none;
         width: 100%;
         padding: 16px;
-        border-radius: 12px;
+        border-radius: 14px;
         font-size: 1rem;
         font-weight: 700;
         cursor: pointer;
-        margin-top: auto;
         transition: 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
+        font-family: 'Poppins', sans-serif;
     }
     
     .btn-confirm-booking:hover { background: #059669; transform: translateY(-2px); }
@@ -391,7 +394,7 @@
                     <h2 class="seat-title" id="detailTitle">Select a Seat</h2>
                     <p class="seat-status" id="detailStatus">Available</p>
                     
-                    <div class="divider"></div>
+                    <div class="divider" style="margin: 16px 0;"></div>
                     
                     <div class="form-group">
                         <label class="form-label">Reservation Date</label>
@@ -413,9 +416,11 @@
                         </div>
                     </div>
                     
-                    <button id="btnBook" class="btn-confirm-booking" onclick="openPaymentModal()">
-                        <i class="fa-solid fa-calendar-check"></i> Confirm Reservation
-                    </button>
+                    <div style="margin-top: auto;">
+                        <button id="btnBook" class="btn-confirm-booking" onclick="openPaymentModal()">
+                            <i class="fa-solid fa-calendar-check"></i> Confirm Reservation
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -428,11 +433,22 @@
             
             <h2 style="font-size: 1.3rem; font-family: 'Poppins', sans-serif; font-weight: 800; color: #1e293b; align-self: flex-start; margin-bottom: 24px;">Confirm & Pay</h2>
             
-            <img src="/images/qr_code.png" alt="QR Code" style="width: 160px; height: 160px; margin-bottom: 12px; border-radius: 8px;">
-            
-            <p style="font-size: 0.75rem; font-weight: 600; color: #64748b; margin-bottom: 20px;">Please pay to confirm your booking.</p>
-            
-            <h3 style="color: #2563eb; font-size: 1.1rem; font-weight: 800; margin-bottom: 8px;">THE LAST MUSTER INC.</h3>
+            <!-- Payment Method Selection -->
+            <div style="display: flex; gap: 8px; margin-bottom: 24px; width: 100%; background: #f1f5f9; padding: 4px; border-radius: 12px;">
+                <button onclick="setPaymentMethod('gcash')" id="methodGcash" style="flex: 1; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; border: none; cursor: pointer; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); color: #2563eb;">GCash</button>
+                <button onclick="setPaymentMethod('cashier')" id="methodCashier" style="flex: 1; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; border: none; cursor: pointer; background: transparent; color: #64748b;">Pay at Counter</button>
+            </div>
+
+            <div id="gcashDetails" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                <img src="/images/qr_code.png" alt="QR Code" style="width: 160px; height: 160px; margin-bottom: 12px; border-radius: 8px;">
+                <p style="font-size: 0.75rem; font-weight: 600; color: #64748b; margin-bottom: 20px;">Please pay to confirm your booking.</p>
+                <h3 style="color: #2563eb; font-size: 1.1rem; font-weight: 800; margin-bottom: 8px;">THE LAST MUSTER INC.</h3>
+            </div>
+
+            <div id="cashierDetails" style="display: none; width: 100%; padding: 20px; background: #fef3c7; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+                <i class="fa-solid fa-cash-register" style="font-size: 2rem; color: #d97706; margin-bottom: 12px;"></i>
+                <p style="font-size: 0.85rem; font-weight: 700; color: #92400e;">You will pay at the cashier counter upon arrival.</p>
+            </div>
             
             <div id="modalSummary" style="font-size: 0.9rem; font-weight: 700; color: #1e293b; margin-bottom: 12px;">
                 Seat T1-S1 • 1 Hour
@@ -440,13 +456,14 @@
             
             <div id="modalPrice" style="font-size: 1.8rem; font-weight: 800; color: var(--orange); margin-bottom: 12px;">₱50.00</div>
             
-            <p style="font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 12px;">Upload Proof of Payment</p>
-            
-            <input type="file" id="paymentImageInput" style="display: none;" accept="image/*" onchange="handleImageUpload(this)">
-            <label for="paymentImageInput" class="upload-box">
-                <i class="fa-solid fa-upload" style="color: var(--orange); font-size: 1.2rem; margin-bottom: 8px;"></i>
-                <span id="uploadLabelText" style="color: var(--orange); font-size: 0.75rem; font-weight: 700;">Click to upload image</span>
-            </label>
+            <div id="uploadSection" style="width: 100%;">
+                <p style="font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 12px;">Upload Proof of Payment (Optional)</p>
+                <input type="file" id="paymentImageInput" style="display: none;" accept="image/*" onchange="handleImageUpload(this)">
+                <label for="paymentImageInput" class="upload-box">
+                    <i class="fa-solid fa-upload" style="color: var(--orange); font-size: 1.2rem; margin-bottom: 8px;"></i>
+                    <span id="uploadLabelText" style="color: var(--orange); font-size: 0.75rem; font-weight: 700;">Click to upload image</span>
+                </label>
+            </div>
             
             <div style="display: flex; gap: 16px; width: 100%;">
                 <button onclick="closePaymentModal()" style="flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; background: #e2e8f0; color: #475569; border: none; cursor: pointer;">Cancel</button>
@@ -463,15 +480,61 @@
     let currentFilter = 'all';
 
     async function loadLayout() {
+        const dateInput = document.getElementById('globalDatePicker');
+        const startInput = document.getElementById('timeFrom');
+        const endInput = document.getElementById('timeTo');
+        
+        if (!dateInput || !startInput || !endInput) return;
+        
+        const date = dateInput.value;
+        const start = startInput.value;
+        const end = endInput.value;
+
         try {
-            const res = await fetch('/api/layout');
-            const data = await res.json();
-            if (data && data.items) {
-                allItems = data.items;
-                renderCanvas();
+            // 1. Always fetch base layout first
+            const layoutRes = await fetch('/api/layout');
+            const layoutData = await layoutRes.json();
+            
+            if (layoutData && layoutData.items) {
+                // Initial baseline: if booking for a future time, ignore current "taken/idle" hub states
+                const isFuture = new Date(`${date} ${start}`) > new Date();
+                
+                allItems = layoutData.items.map(item => {
+                    if (isFuture && (item.status === 'taken' || item.status === 'idle')) {
+                        return { ...item, status: 'open', statuses: ['open'] };
+                    }
+                    return item;
+                });
+                
+                renderCanvas(); 
+                
+                // 2. Fetch future availability
+                if (date && start && end) {
+                    const availRes = await fetch(`/api/availability?date=${date}&startTime=${start}&endTime=${end}`);
+                    const availData = await availRes.json();
+                    
+                    if (availData && availData.busyElements) {
+                        const busyIds = availData.busyElements.map(b => b.element_id);
+                        
+                        allItems = allItems.map(item => {
+                            if (busyIds.includes(item.id)) {
+                                return { ...item, status: 'reserved', statuses: ['reserved'] };
+                            }
+                            return item;
+                        });
+                        
+                        renderCanvas(); 
+                    }
+                }
+                
+                // 3. Keep selection in sync
+                if (selectedItem) {
+                    const currentItem = allItems.find(i => i.id === selectedItem.id);
+                    if (currentItem) selectItem(currentItem);
+                }
             }
         } catch (e) {
-            console.error(e);
+            console.error('Layout Load Error:', e);
         }
     }
 
@@ -516,9 +579,15 @@
                 visual.style.border = '2px solid #1e293b';
             } else if (item.type === 'room') {
                 const status = item.statuses ? item.statuses[0] : 'open';
-                visual.style.background = status === 'open' ? '#22c55e' : getStatusColor(status);
-                visual.style.borderRadius = '8px';
-                visual.style.border = '2px solid #16a34a';
+                // Premium glass/gradient look for rooms
+                if (status === 'open') {
+                    visual.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    visual.style.boxShadow = 'inset 0 0 10px rgba(255,255,255,0.2)';
+                } else {
+                    visual.style.background = getStatusColor(status);
+                }
+                visual.style.borderRadius = '12px';
+                visual.style.border = '3px solid rgba(255,255,255,0.3)';
                 el.onclick = () => selectItem(item);
             } else {
                 visual.style.background = item.color;
@@ -531,8 +600,11 @@
                 const lbl = document.createElement('span');
                 lbl.className = 'item-label' + (['chair', 'chair-sq'].includes(item.type) ? '' : ' center');
                 const status = item.statuses ? item.statuses[0] : 'open';
-                const isDark = (status !== 'open' || item.type === 'room');
-                lbl.style.color = isDark ? '#fff' : '#1e293b';
+                
+                // Readability fix: white for room labels
+                lbl.style.color = (item.type === 'room' || status !== 'open') ? '#fff' : '#1e293b';
+                lbl.style.fontFamily = "'Poppins', sans-serif";
+                lbl.style.textShadow = item.type === 'room' ? '0 1px 3px rgba(0,0,0,0.3)' : 'none';
                 lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
                 el.appendChild(lbl);
             }
@@ -581,6 +653,13 @@
         document.getElementById('reservationDate').value = document.getElementById('globalDatePicker').value;
     }
 
+    function deselectItem() {
+        selectedItem = null;
+        document.getElementById('emptyDetails').style.display = 'flex';
+        document.getElementById('activeDetails').style.display = 'none';
+        renderCanvas();
+    }
+
     function openPaymentModal() {
         if (!selectedItem) return;
         
@@ -604,6 +683,38 @@
         document.getElementById('paymentModal').classList.remove('active');
     }
 
+    let currentPaymentMethod = 'gcash';
+    function setPaymentMethod(method) {
+        currentPaymentMethod = method;
+        const gDetails = document.getElementById('gcashDetails');
+        const cDetails = document.getElementById('cashierDetails');
+        const gBtn = document.getElementById('methodGcash');
+        const cBtn = document.getElementById('methodCashier');
+        const uploadSect = document.getElementById('uploadSection');
+        
+        if (method === 'gcash') {
+            gDetails.style.display = 'flex';
+            cDetails.style.display = 'none';
+            gBtn.style.background = 'white';
+            gBtn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+            gBtn.style.color = '#2563eb';
+            cBtn.style.background = 'transparent';
+            cBtn.style.boxShadow = 'none';
+            cBtn.style.color = '#64748b';
+            uploadSect.style.display = 'block';
+        } else {
+            gDetails.style.display = 'none';
+            cDetails.style.display = 'block';
+            cBtn.style.background = 'white';
+            cBtn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+            cBtn.style.color = '#d97706';
+            gBtn.style.background = 'transparent';
+            gBtn.style.boxShadow = 'none';
+            gBtn.style.color = '#64748b';
+            uploadSect.style.display = 'none';
+        }
+    }
+
     function handleImageUpload(input) {
         if (input.files && input.files[0]) {
             document.getElementById('uploadLabelText').innerText = input.files[0].name;
@@ -612,16 +723,30 @@
     }
 
     async function submitReservation() {
-        const btn = document.getElementById('btnFinalSubmit');
-        btn.disabled = true;
-        btn.innerText = 'Processing...';
+        const imageInput = document.getElementById('paymentImageInput');
+        let paymentImage = null;
 
+        if (imageInput.files && imageInput.files[0]) {
+            const reader = new FileReader();
+            reader.readAsDataURL(imageInput.files[0]);
+            reader.onload = async () => {
+                await sendReservation(reader.result);
+            };
+        } else {
+            await sendReservation(null);
+        }
+    }
+
+    async function sendReservation(base64Image) {
+        const btn = document.getElementById('btnFinalSubmit');
         const data = {
             elementId: selectedItem.id,
             date: document.getElementById('reservationDate').value,
             startTime: document.getElementById('timeFrom').value,
             endTime: document.getElementById('timeTo').value,
-            purpose: document.getElementById('meetingPurpose').value
+            purpose: document.getElementById('meetingPurpose').value,
+            paymentMethod: currentPaymentMethod,
+            paymentImage: base64Image
         };
 
         try {
@@ -658,10 +783,25 @@
         });
     });
 
-    // Global Date Sync
+    // Global Date Sync & Re-check Availability
     document.getElementById('globalDatePicker').addEventListener('change', (e) => {
         document.getElementById('reservationDate').value = e.target.value;
+        loadLayout();
     });
 
-    window.addEventListener('DOMContentLoaded', loadLayout);
+    document.getElementById('timeFrom').addEventListener('change', loadLayout);
+    document.getElementById('timeTo').addEventListener('change', loadLayout);
+
+    window.addEventListener('DOMContentLoaded', () => {
+        // Initialize times with present time
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        const nextH = String((now.getHours() + 1) % 24).padStart(2, '0');
+        
+        document.getElementById('timeFrom').value = `${hh}:${mm}`;
+        document.getElementById('timeTo').value = `${nextH}:${mm}`;
+        
+        loadLayout();
+    });
 </script>

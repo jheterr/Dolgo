@@ -64,7 +64,9 @@ router.get('/layout', async (req, res) => {
             SELECT fe.*, r.end_time, r.user_id, u.first_name, u.last_name, 
                    s.is_paused, s.remaining_seconds
             FROM floor_elements fe
-            LEFT JOIN reservations r ON fe.id = r.element_id AND r.status = 'confirmed'
+            LEFT JOIN reservations r ON fe.id = r.element_id 
+                AND r.status = 'confirmed' 
+                AND NOW() BETWEEN r.start_time AND r.end_time
             LEFT JOIN users u ON r.user_id = u.id
             LEFT JOIN (
                 SELECT s1.* FROM active_sessions s1
@@ -98,7 +100,8 @@ router.get('/layout', async (req, res) => {
                 endTime: e.end_time,
                 userName: e.first_name ? `${e.first_name} ${e.last_name}` : null,
                 isPaused: !!e.is_paused,
-                remainingSeconds: e.remaining_seconds || 0
+                remainingSeconds: e.remaining_seconds || 0,
+                user_id: e.user_id
             };
         });
 
@@ -190,6 +193,18 @@ router.post('/users/add', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
+// Get single user
+router.get('/users/:id', async (req, res) => {
+    try {
+        const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [req.params.id]);
+        if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
+        res.json({ user: rows[0] });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database error' });
     }
 });
 
@@ -348,6 +363,34 @@ router.post('/session/start', async (req, res) => {
     }
 });
 
+// Availability check for a specific time window
+router.get('/availability', async (req, res) => {
+    const { date, startTime, endTime } = req.query;
+    if (!date || !startTime || !endTime) {
+        return res.status(400).json({ error: 'Missing date, startTime, or endTime' });
+    }
+    try {
+        const start = `${date} ${startTime}:00`;
+        const end = `${date} ${endTime}:00`;
+
+        // Find all reservations that overlap with this window
+        // Overlap condition: (res.start < requested.end) AND (res.end > requested.start)
+        const [rows] = await db.query(`
+            SELECT element_id, status 
+            FROM reservations 
+            WHERE status NOT IN ('cancelled', 'completed')
+            AND (
+                (start_time < ? AND end_time > ?)
+            )
+        `, [end, start]);
+
+        res.json({ busyElements: rows });
+    } catch (error) {
+        console.error('Availability Check Error:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 // Get reservations
 router.get('/reservations', async (req, res) => {
     try {
@@ -364,6 +407,29 @@ router.get('/reservations', async (req, res) => {
     } catch (error) {
         console.error('Error fetching reservations:', error);
         res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Add manual reservation (Admin/Staff)
+router.post('/reservations/add', async (req, res) => {
+    const { userId, date, startTime, endTime, elementId } = req.body;
+    try {
+        const start = `${date} ${startTime}:00`;
+        const end = `${date} ${endTime}:00`;
+
+        // Calculate amount (Demo: 50 per hour)
+        const diffMs = new Date(end) - new Date(start);
+        const diffHrs = Math.max(1, diffMs / (1000 * 60 * 60));
+        const amount = diffHrs * 50;
+
+        await db.query(
+            'INSERT INTO reservations (user_id, element_id, start_time, end_time, amount, status, payment_method, payment_status) VALUES (?, ?, ?, ?, ?, "confirmed", "cashier", "unpaid")',
+            [userId, elementId, start, end, amount]
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Database error' });
     }
 });
 
@@ -458,8 +524,10 @@ router.post('/plan-upgrades/:id/status', async (req, res) => {
 router.post('/transfer-requests/manual', async (req, res) => {
     const { userId, currentElementId, newElementId } = req.body;
     try {
-        // 1. Update reservation
-        await db.query('UPDATE reservations SET element_id = ? WHERE user_id = ? AND status = "confirmed"', [newElementId, userId]);
+        console.log(`Transferring User: ${userId} from Seat: ${currentElementId} to Seat: ${newElementId}`);
+        // 1. Update reservation (Latest active one)
+        // Since active_sessions doesn't have element_id, we only update reservations
+        await db.query('UPDATE reservations SET element_id = ? WHERE user_id = ? AND status = "confirmed" ORDER BY start_time DESC LIMIT 1', [newElementId, userId]);
 
         // 2. Update floor elements status
         if (currentElementId) {
@@ -469,7 +537,43 @@ router.post('/transfer-requests/manual', async (req, res) => {
 
         res.json({ success: true });
     } catch (error) {
-        console.error(error);
+        console.error('Transfer Error:', error);
+        res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
+// End customer session manually
+router.post('/session/end', async (req, res) => {
+    const { userId, elementId } = req.body;
+    try {
+        console.log(`Ending session for User: ${userId} on Element: ${elementId}`);
+
+        // 1. Mark all currently confirmed reservations for this user as completed
+        await db.query('UPDATE reservations SET status = "completed" WHERE user_id = ? AND status = "confirmed"', [userId]);
+
+        // 2. Mark active session as completed
+        await db.query('UPDATE active_sessions SET status = "completed", end_time = NOW() WHERE user_id = ? AND status = "active"', [userId]);
+
+        // 3. Release the specific floor element
+        if (elementId) {
+            await db.query('UPDATE floor_elements SET status = "open" WHERE id = ?', [elementId]);
+        }
+
+        // 4. Safety check: Release any elements that might still be marked 'taken' for this user
+        // We'll look for any elements where this user had a recent reservation
+        await db.query(`
+            UPDATE floor_elements 
+            SET status = 'open' 
+            WHERE id IN (
+                SELECT element_id FROM (
+                    SELECT element_id FROM reservations WHERE user_id = ? AND status = 'completed'
+                ) as tmp
+            )
+        `, [userId]);
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('End Session Error:', error);
         res.status(500).json({ success: false, error: 'Database error' });
     }
 });
@@ -792,6 +896,129 @@ router.post('/messages', async (req, res) => {
 
 // Run auto-cleanup every minute in the background
 setInterval(autoCleanup, 60000);
+
+// Analytics and Reports
+router.get('/analytics', async (req, res) => {
+    try {
+        // 1. Total Stats Since Establishment
+        const [[statsSince]] = await db.query(`
+            SELECT 
+                (SELECT COUNT(DISTINCT user_id) FROM reservations) as totalCustomers,
+                (SELECT SUM(amount) FROM reservations WHERE payment_status = 'paid') as totalIncome,
+                (SELECT SUM(TIMESTAMPDIFF(HOUR, start_time, end_time)) FROM reservations WHERE status = 'completed') as totalHours
+        `);
+
+        // 2. Traffic and Income Data (Today/Daily/Weekly/Monthly)
+        // For simplicity, we'll return the last 30 days of data and let the frontend slice it
+        const [dailyStats] = await db.query(`
+            SELECT 
+                DATE(start_time) as date,
+                COUNT(*) as count,
+                SUM(amount) as income
+            FROM reservations
+            WHERE status = 'completed'
+            GROUP BY DATE(start_time)
+            ORDER BY DATE(start_time) DESC
+            LIMIT 30
+        `);
+
+        // 3. Customer Type Breakdown
+        const [[typeBreakdown]] = await db.query(`
+            SELECT 
+                SUM(IF(role = 'customer' AND type = 'member', 1, 0)) as members,
+                SUM(IF(role = 'customer' AND type = 'walkin', 1, 0)) as walkins,
+                SUM(IF(role = 'customer' AND type = 'member' AND status = 'active', 1, 0)) as premium -- Simplified logic for premium
+            FROM users
+        `);
+
+        // 4. Top Customers
+        const [topCustomers] = await db.query(`
+            SELECT u.first_name, u.last_name, u.type, SUM(TIMESTAMPDIFF(HOUR, r.start_time, r.end_time)) as total_hours
+            FROM users u
+            JOIN reservations r ON u.id = r.user_id
+            WHERE r.status = 'completed'
+            GROUP BY u.id
+            ORDER BY total_hours DESC
+            LIMIT 10
+        `);
+
+        // 5. Recent Transactions
+        const [transactions] = await db.query(`
+            SELECT r.*, u.first_name, u.last_name
+            FROM reservations r
+            JOIN users u ON r.user_id = u.id
+            ORDER BY r.start_time DESC
+            LIMIT 20
+        `);
+
+        // 6. Door Access History
+        const [doorLogs] = await db.query(`
+            SELECT l.*, u.first_name, u.last_name
+            FROM door_access_logs l
+            JOIN users u ON l.user_id = u.id
+            ORDER BY l.access_time DESC
+            LIMIT 20
+        `);
+
+        // 7. Income Logs Summary
+        const [incomeLogs] = await db.query(`
+            SELECT 
+                DATE(start_time) as period,
+                SUM(amount) as totalIncome,
+                COUNT(*) as transactions,
+                SUM(IF(payment_status = 'paid', amount, 0)) as paidAmount,
+                SUM(IF(payment_status = 'unpaid', amount, 0)) as unpaidAmount
+            FROM reservations
+            GROUP BY DATE(start_time)
+            ORDER BY DATE(start_time) DESC
+            LIMIT 30
+        `);
+
+        // 8. Hourly Stats for Today
+        const [hourlyStats] = await db.query(`
+            SELECT 
+                HOUR(start_time) as hour,
+                COUNT(*) as count,
+                SUM(amount) as income
+            FROM reservations
+            WHERE DATE(start_time) = CURDATE() AND status = 'completed'
+            GROUP BY HOUR(start_time)
+            ORDER BY HOUR(start_time)
+        `);
+
+        // 9. Weekly Customer Summary
+        const [[weeklySummary]] = await db.query(`
+            SELECT 
+                COUNT(DISTINCT IF(u.type = 'member', u.id, NULL)) as weeklyMembers,
+                COUNT(DISTINCT IF(u.type = 'walkin', u.id, NULL)) as weeklyWalkins,
+                COUNT(DISTINCT IF(u.type = 'member' AND u.status = 'active', u.id, NULL)) as weeklyPremium
+            FROM users u
+            JOIN reservations r ON u.id = r.user_id
+            WHERE YEARWEEK(r.start_time, 1) = YEARWEEK(CURDATE(), 1)
+        `);
+
+        // 10. Request Counts
+        const [[{ wifiCount }]] = await db.query("SELECT COUNT(*) as wifiCount FROM wifi_extension_requests WHERE status = 'approved'");
+        const [[{ planCount }]] = await db.query("SELECT COUNT(*) as planCount FROM plan_upgrade_requests WHERE status = 'approved'");
+
+        res.json({
+            statsSince,
+            dailyStats: dailyStats.reverse(),
+            typeBreakdown,
+            topCustomers,
+            transactions,
+            doorLogs,
+            incomeLogs,
+            hourlyStats,
+            weeklySummary,
+            wifiCount,
+            planCount
+        });
+    } catch (error) {
+        console.error('Analytics API Error:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
 
 module.exports = router;
 

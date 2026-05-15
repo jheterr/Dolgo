@@ -298,73 +298,85 @@
       margin-top: 8px;
     }
     
-    /* Seat Layout inside Modal */
+    /* Seat Layout inside Modal (Visual Floor Plan) */
     .modal-seat-layout {
       background: #f8fafc;
-      border-radius: 20px;
-      padding: 16px;
+      border-radius: 12px;
+      padding: 10px;
       margin: 12px 0;
+      height: 300px;
+      overflow: hidden;
+      position: relative;
+      border: 1.5px solid #e2e8f0;
     }
-    .modal-seat-layout h4 {
-      font-size: 0.9rem;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .modal-seat-map {
+      position: absolute;
+      width: 800px;
+      height: 450px;
+      transform-origin: 0 0;
+      cursor: crosshair;
     }
-    .modal-seat-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .modal-seat-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .modal-row-label {
-      width: 32px;
-      font-weight: 800;
-      background: #e2e8f0;
-      border-radius: 20px;
-      text-align: center;
-      padding: 4px 0;
-      font-size: 0.8rem;
-    }
-    .modal-seats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .modal-seat {
-      width: 50px;
-      height: 50px;
+    .modal-seat-layout .fp-item {
+      position: absolute;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border-radius: 12px;
-      font-size: 0.65rem;
-      font-weight: 600;
       cursor: pointer;
-      transition: 0.1s;
-      border: 2px solid;
     }
-    .modal-seat span:first-child { font-size: 0.7rem; font-weight: 800; }
-    .modal-seat.available { background: #dcfce7; border-color: #86efac; color: #166534; }
-    .modal-seat.occupied { background: #fee2e2; border-color: #fecaca; color: #991b1b; cursor: not-allowed; opacity: 0.7; }
-    .modal-seat.reserved { background: #fef9c3; border-color: #fde047; color: #854d0e; cursor: not-allowed; opacity: 0.7; }
-    .modal-seat.idle { background: #fed7aa; border-color: #fdba74; color: #9a3412; cursor: not-allowed; opacity: 0.7; }
-    .modal-seat.selected { background: #4f46e5; border-color: #4f46e5; color: white; }
+    .modal-seat-layout .item-visual {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .modal-seat-layout .chair-icon {
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+    }
+    .modal-seat-layout .item-label {
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8px;
+      font-weight: 700;
+      color: #475569;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .modal-seat-layout .item-label.center {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 9px;
+    }
+    .modal-seat-layout .fp-item.selected .item-visual {
+      box-shadow: 0 0 0 3px #4f46e5;
+      border-radius: 4px;
+      transform: scale(1.1);
+    }
+    .modal-seat-layout .fp-item.selected .item-visual.chair-icon {
+      box-shadow: none;
+      filter: drop-shadow(0 0 3px #4f46e5);
+    }
+    
     .legend {
       display: flex;
-      gap: 16px;
+      gap: 12px;
       flex-wrap: wrap;
       margin-top: 12px;
-      font-size: 0.65rem;
+      font-size: 0.7rem;
+      font-weight: 600;
     }
-    .legend span { display: inline-flex; align-items: center; gap: 4px; }
+    .legend-item { display: inline-flex; align-items: center; gap: 4px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
     /* Section Header with Filter and Search */
     .section-header-with-filter {
@@ -464,7 +476,10 @@
 
     <div class="page-header">
       <h1 class="page-title">Reservations & Walk-ins</h1>
-      <button class="btn-primary" style="padding: 10px 22px; border-radius: 40px;" onclick="openModal('walkinModal')"><i class="fa-solid fa-user-plus"></i> Add Customer</button>
+      <div style="display:flex; gap:12px;">
+        <button class="btn-primary" style="padding: 10px 22px; border-radius: 40px; background: #4A7C59;" onclick="openModal('reservationModal')"><i class="fa-solid fa-calendar-plus"></i> Add Reservation</button>
+        <button class="btn-primary" style="padding: 10px 22px; border-radius: 40px;" onclick="openModal('walkinModal')"><i class="fa-solid fa-user-plus"></i> Add Customer</button>
+      </div>
     </div>
     
     <div class="tabs-nav">
@@ -561,6 +576,45 @@
       </div>
     </div>
     
+    <!-- Add Reservation Modal -->
+    <div class="modal-overlay" id="reservationModal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title"><i class="fa-solid fa-calendar-plus"></i> Schedule New Reservation</div>
+          <button class="modal-close" onclick="closeModal('reservationModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group" style="position:relative;">
+            <label class="form-label">Search Customer *</label>
+            <input class="form-control" id="res-cust-search" type="text" placeholder="Search name or email..." oninput="searchUsersForRes()">
+            <div id="res-cust-results" style="display:none; position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #cbd5e1; border-radius:6px; z-index:10; max-height:150px; overflow-y:auto; box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>
+            <input type="hidden" id="res-cust-id">
+          </div>
+          <div class="form-group"><label class="form-label">Date *</label><input class="form-control" id="res-date" type="date"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Start Time *</label><input class="form-control" id="res-start" type="time"></div>
+            <div class="form-group"><label class="form-label">End Time *</label><input class="form-control" id="res-end" type="time"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Assign Seat * (Click on seat below)</label>
+            <div class="modal-seat-layout" id="viewportRes">
+              <div class="modal-seat-map" id="modalSeatMapRes"></div>
+            </div>
+            <input type="hidden" id="selectedSeatRes" value="">
+            <input type="hidden" id="selectedSeatIdRes" value="">
+            <div style="font-size:0.7rem; color:#4f46e5; margin-top:4px;" id="selectedSeatDisplayRes">No seat selected</div>
+            <div class="legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span>Available</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#d65c29"></span>Taken</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" onclick="closeModal('reservationModal')">Cancel</button>
+          <button class="btn-primary" onclick="submitReservation()"><i class="fa-solid fa-check"></i> Save Reservation</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Walk-in Modal with RFID SCAN button -->
     <div class="modal-overlay" id="walkinModal">
       <div class="modal">
@@ -590,10 +644,16 @@
           </div>
           <div class="form-group"><label class="form-label">Status</label><select class="form-control" id="wi-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
           <div class="form-group"><label class="form-label">Assign Seat * (Click on seat below)</label>
-            <div class="modal-seat-layout" id="modalSeatLayout"></div>
+            <div class="modal-seat-layout" id="viewportWalk">
+              <div class="modal-seat-map" id="modalSeatMapWalk"></div>
+            </div>
             <input type="hidden" id="selectedSeat" value="">
+            <input type="hidden" id="selectedSeatId" value="">
             <div style="font-size:0.7rem; color:#4f46e5; margin-top:4px;" id="selectedSeatDisplay">No seat selected</div>
-            <div class="legend"><span><span style="background:#dcfce7; width:14px; height:14px; display:inline-block; border-radius:4px;"></span> Available</span><span><span style="background:#fee2e2; width:14px; height:14px; display:inline-block; border-radius:4px;"></span> Occupied</span><span><span style="background:#fef9c3; width:14px; height:14px; display:inline-block; border-radius:4px;"></span> Reserved</span></div>
+            <div class="legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span>Available</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#d65c29"></span>Taken</div>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -612,17 +672,23 @@
   let reservations = [];
   let wifiRequests = [];
   let upgradeRequests = [];
+  let allUsers = [];
+  let floorLayout = [];
 
   async function loadAllData() {
     try {
-        const [res, wifi, up] = await Promise.all([
+        const [res, wifi, up, users, layout] = await Promise.all([
             fetch('/api/reservations').then(r => r.json()).catch(e => ({reservations:[]})),
             fetch('/api/wifi-extensions').then(r => r.json()).catch(e => ({requests:[]})),
-            fetch('/api/plan-upgrades').then(r => r.json()).catch(e => ({requests:[]}))
+            fetch('/api/plan-upgrades').then(r => r.json()).catch(e => ({requests:[]})),
+            fetch('/api/users?role=customer').then(r => r.json()).catch(e => ({users:[]})),
+            fetch('/api/layout').then(r => r.json()).catch(e => ({items:[]}))
         ]);
         reservations = (res && res.reservations) || [];
         wifiRequests = (wifi && wifi.requests) || [];
         upgradeRequests = (up && up.requests) || [];
+        allUsers = (users && users.users) || [];
+        floorLayout = (layout && layout.items) || [];
         
         renderReservations();
         renderWifi();
@@ -667,32 +733,152 @@
   }
 
   function renderModalSeatLayout() {
-    const container = document.getElementById('modalSeatLayout');
-    let html = '<div class="modal-seat-grid">';
-    for (let r of rows) {
-      html += `<div class="modal-seat-row"><div class="modal-row-label">${r}</div><div class="modal-seats">`;
-      for (let i = 1; i <= seatsPerRow; i++) {
-        const seatId = `${r}${i}`;
-        const status = getSeatStatus(seatId);
-        const isSelected = (selectedSeatForWalkin === seatId);
-        html += `<div class="modal-seat ${status} ${isSelected ? 'selected' : ''}" data-seat="${seatId}" data-status="${status}"><span>${seatId}</span><span>${status === 'available' ? 'Free' : (status === 'occupied' ? 'Occ' : 'Res')}</span></div>`;
-      }
-      html += `</div></div>`;
-    }
-    html += '</div>';
-    container.innerHTML = html;
-    
-    document.querySelectorAll('#modalSeatLayout .modal-seat').forEach(seatEl => {
-      if (seatEl.getAttribute('data-status') === 'available') {
-        seatEl.onclick = () => {
-          document.querySelectorAll('#modalSeatLayout .modal-seat').forEach(s => s.classList.remove('selected'));
-          seatEl.classList.add('selected');
-          selectedSeatForWalkin = seatEl.getAttribute('data-seat');
-          document.getElementById('selectedSeat').value = selectedSeatForWalkin;
-          document.getElementById('selectedSeatDisplay').innerHTML = `Selected seat: <strong>${selectedSeatForWalkin}</strong>`;
-        };
-      }
+    const containers = [
+      { map: document.getElementById('modalSeatMapWalk'), view: document.getElementById('viewportWalk'), prefix: '' },
+      { map: document.getElementById('modalSeatMapRes'), view: document.getElementById('viewportRes'), prefix: 'Res' }
+    ];
+
+    containers.forEach(c => {
+      if (!c.map) return;
+      c.map.innerHTML = '';
+      
+      floorLayout.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'fp-item';
+        el.style.left = item.x + 'px';
+        el.style.top = item.y + 'px';
+        el.style.width = item.w + 'px';
+        el.style.height = item.h + 'px';
+        el.style.zIndex = (item.type === 'chair' || item.type === 'chair-sq') ? 5 : item.type.startsWith('block') ? 2 : 3;
+
+        const visual = document.createElement('div');
+        visual.className = 'item-visual';
+        visual.style.transform = 'rotate(' + (item.rot || 0) + 'deg)';
+
+        const isSeat = (item.type === 'chair' || item.type === 'chair-sq');
+        const status = (item.statuses && item.statuses[0]) || 'open';
+
+        if (item.type === 'chair') {
+          visual.classList.add('chair-icon');
+          visual.style.webkitMaskImage = 'url(/images/chair.png)';
+          visual.style.maskImage = 'url(/images/chair.png)';
+          visual.style.backgroundColor = (status === 'taken') ? '#d65c29' : '#10b981';
+        } else if (item.type === 'chair-sq') {
+          visual.style.background = (status === 'taken') ? '#d65c29' : '#10b981';
+          visual.style.borderRadius = '4px';
+        } else if (item.type === 'round-table' || item.type === 'rect-table') {
+          visual.style.background = 'white';
+          visual.style.borderRadius = item.type === 'round-table' ? '50%' : '8px';
+          visual.style.border = '2px solid #1e293b';
+        } else if (item.type === 'room') {
+          const status = item.statuses ? item.statuses[0] : 'open';
+          if (status === 'open') {
+            visual.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            visual.style.boxShadow = 'inset 0 0 10px rgba(255,255,255,0.2)';
+          } else {
+            visual.style.background = '#e11d48';
+          }
+          visual.style.borderRadius = '12px';
+          visual.style.border = '3px solid rgba(255,255,255,0.3)';
+          el.onclick = () => selectSeat(item, c.prefix);
+        } else {
+          visual.style.background = item.color || '#cbd5e1';
+          visual.style.borderRadius = '4px';
+        }
+        el.appendChild(visual);
+
+        if (item.label || item.type === 'room') {
+          const lbl = document.createElement('span');
+          lbl.className = 'item-label' + (['chair', 'chair-sq'].includes(item.type) ? '' : ' center');
+          const status = item.statuses ? item.statuses[0] : 'open';
+          lbl.style.color = (item.type === 'room' || status !== 'open') ? '#fff' : '#475569';
+          lbl.style.fontFamily = "'Poppins', sans-serif";
+          lbl.style.textShadow = item.type === 'room' ? '0 1px 3px rgba(0,0,0,0.3)' : 'none';
+          lbl.textContent = item.label || (item.type === 'room' ? 'Room' : '');
+          el.appendChild(lbl);
+        }
+
+        if (isSeat) {
+          el.onclick = () => {
+            c.map.querySelectorAll('.fp-item').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('selectedSeat' + c.prefix).value = item.label;
+            document.getElementById('selectedSeatId' + c.prefix).value = item.id;
+            document.getElementById('selectedSeatDisplay' + c.prefix).innerHTML = `Selected: <strong>${item.label}</strong>`;
+            if(c.prefix === '') selectedSeatForWalkin = item.label; // For walkin logic compatibility
+          };
+        }
+
+        c.map.appendChild(el);
+      });
+
+      // Scale to fit modal
+      const vWidth = c.view.clientWidth || 450;
+      const vHeight = c.view.clientHeight || 300;
+      const scale = Math.min(vWidth / 800, vHeight / 450) * 0.95;
+      c.map.style.transform = `scale(${scale})`;
+      c.map.style.left = `${(vWidth - (800 * scale)) / 2}px`;
+      c.map.style.top = `${(vHeight - (450 * scale)) / 2}px`;
     });
+  }
+
+  function searchUsersForRes() {
+    const search = document.getElementById('res-cust-search').value.toLowerCase();
+    const results = document.getElementById('res-cust-results');
+    if (search.length < 2) { results.style.display = 'none'; return; }
+    
+    const filtered = allUsers.filter(u => 
+        u.first_name.toLowerCase().includes(search) || 
+        u.last_name.toLowerCase().includes(search) || 
+        u.email.toLowerCase().includes(search)
+    ).slice(0, 5);
+    
+    if (filtered.length === 0) {
+        results.innerHTML = '<div style="padding:8px; font-size:12px; color:#94a3b8;">No customers found.</div>';
+    } else {
+        results.innerHTML = filtered.map(u => `
+            <div style="padding:8px; font-size:12px; border-bottom:1px solid #f1f5f9; cursor:pointer;" onclick="selectUserForRes(${u.id}, '${u.first_name} ${u.last_name}')">
+                <strong>${u.first_name} ${u.last_name}</strong><br>
+                <span style="font-size:10px; color:#64748b;">${u.email}</span>
+            </div>
+        `).join('');
+    }
+    results.style.display = 'block';
+  }
+
+  function selectUserForRes(id, name) {
+    document.getElementById('res-cust-id').value = id;
+    document.getElementById('res-cust-search').value = name;
+    document.getElementById('res-cust-results').style.display = 'none';
+  }
+
+  async function submitReservation() {
+    const userId = document.getElementById('res-cust-id').value;
+    const date = document.getElementById('res-date').value;
+    const start = document.getElementById('res-start').value;
+    const end = document.getElementById('res-end').value;
+    const elementId = document.getElementById('selectedSeatIdRes').value;
+    
+    if (!userId || !date || !start || !end || !elementId) {
+        alert("Please fill all required fields and select a seat.");
+        return;
+    }
+    
+    try {
+        const res = await fetch('/api/reservations/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, date, startTime: start, endTime: end, elementId })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert("Reservation scheduled successfully!");
+            closeModal('reservationModal');
+            loadAllData();
+        } else {
+            alert("Error: " + data.error);
+        }
+    } catch(e) { console.error(e); }
   }
 
   function formatPHP(amount) { return '₱' + amount.toLocaleString(); }
@@ -829,11 +1015,12 @@
     if (type === 'reservation') { 
       item = reservations.find(r => r.id === id); 
       amount = item.amount; 
-      detailText = `${item.hours} hour(s)`;
+      const duration = Math.round((new Date(item.end_time) - new Date(item.start_time)) / (1000 * 60 * 60));
+      detailText = `${duration} hour(s)`;
     } else if (type === 'wifi') { 
       item = wifiRequests.find(w => w.id === id); 
       amount = item.fee; 
-      detailText = `${item.requested} hour(s) extension`;
+      detailText = `${item.requested_hours} hour(s) extension`;
     } else { 
       item = upgradeRequests.find(u => u.id === id); 
       amount = item.fee; 
@@ -851,12 +1038,21 @@
     document.getElementById('paymentConfirmBody').innerHTML = `
       <div class="payment-info-card">
         <div class="method-header"><i class="fa-solid fa-cash-register cashier-icon"></i><h3 style="margin:0;">Cashier Payment</h3></div>
-        <div class="customer-detail-row"><span class="customer-detail-label">Customer:</span><span>${escapeHtml(item.name)}</span></div>
+        <div class="customer-detail-row"><span class="customer-detail-label">Customer:</span><span>${escapeHtml(item.first_name)} ${escapeHtml(item.last_name || '')}</span></div>
         <div class="customer-detail-row"><span class="customer-detail-label">Email:</span><span>${escapeHtml(item.email)}</span></div>
-        <div class="customer-detail-row"><span class="customer-detail-label">Seat:</span><span>${item.seat}</span></div>
+        <div class="customer-detail-row"><span class="customer-detail-label">Seat:</span><span>${item.seat_label || 'N/A'}</span></div>
         <div class="customer-detail-row"><span class="customer-detail-label">Details:</span><span>${detailText}</span></div>
         <div class="customer-detail-row"><span class="customer-detail-label">Amount to Pay:</span><span class="payment-amount-large" style="margin:0;">${formatPHP(amount)}</span></div>
-        <div style="background:#fef3c7; padding:12px; border-radius:12px;"><i class="fa-solid fa-info-circle"></i> Customer selected Cashier payment.<br>Customer will pay at the counter.<br><strong>Click "Confirm Reservation" - Status will remain UNPAID until cashier collects payment.</strong></div>
+        
+        <div style="margin-top: 16px; margin-bottom: 16px;">
+          <span class="customer-detail-label" style="display:block; margin-bottom: 8px;">Uploaded Proof:</span>
+          ${item.payment_image ? 
+            `<img src="${item.payment_image}" style="width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer;" onclick="window.open(this.src)">` : 
+            `<div style="padding: 20px; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; color: #94a3b8; font-size: 0.85rem; text-align: center;"><i class="fa-solid fa-image-slash" style="display:block; font-size: 1.5rem; margin-bottom: 8px;"></i> No attachment uploaded</div>`
+          }
+        </div>
+
+        <div style="background:#fef3c7; padding:12px; border-radius:12px; font-size: 0.85rem;"><i class="fa-solid fa-info-circle"></i> Customer selected Cashier payment.<br>Customer will pay at the counter.<br><strong>Click "Confirm Reservation" - Status will remain UNPAID until cashier collects payment.</strong></div>
       </div>
     `;
     openModal('paymentConfirmModal');
@@ -867,11 +1063,12 @@
     if (type === 'reservation') { 
       item = reservations.find(r => r.id === id); 
       amount = item.amount; 
-      detailText = `${item.hours} hour(s)`;
+      const duration = Math.round((new Date(item.end_time) - new Date(item.start_time)) / (1000 * 60 * 60));
+      detailText = `${duration} hour(s)`;
     } else if (type === 'wifi') { 
       item = wifiRequests.find(w => w.id === id); 
       amount = item.fee; 
-      detailText = `${item.requested} hour(s) extension`;
+      detailText = `${item.requested_hours} hour(s) extension`;
     } else { 
       item = upgradeRequests.find(u => u.id === id); 
       amount = item.fee; 
@@ -889,12 +1086,21 @@
     document.getElementById('paymentConfirmBody').innerHTML = `
       <div class="payment-info-card">
         <div class="method-header"><i class="fa-solid fa-cash-register cashier-icon"></i><h3 style="margin:0;">Cashier Payment</h3></div>
-        <div class="customer-detail-row"><span class="customer-detail-label">Customer:</span><span>${escapeHtml(item.name)}</span></div>
+        <div class="customer-detail-row"><span class="customer-detail-label">Customer:</span><span>${escapeHtml(item.first_name)} ${escapeHtml(item.last_name || '')}</span></div>
         <div class="customer-detail-row"><span class="customer-detail-label">Email:</span><span>${escapeHtml(item.email)}</span></div>
-        <div class="customer-detail-row"><span class="customer-detail-label">Seat:</span><span>${item.seat}</span></div>
+        <div class="customer-detail-row"><span class="customer-detail-label">Seat:</span><span>${item.seat_label || 'N/A'}</span></div>
         <div class="customer-detail-row"><span class="customer-detail-label">Details:</span><span>${detailText}</span></div>
         <div class="customer-detail-row"><span class="customer-detail-label">Amount to Pay:</span><span class="payment-amount-large" style="margin:0;">${formatPHP(amount)}</span></div>
-        <div style="background:#fef3c7; padding:12px; border-radius:12px;"><i class="fa-solid fa-info-circle"></i> Customer selected Cashier payment.<br>Customer will pay at the counter.<br><strong>Click "Confirm Payment" to mark as PAID.</strong></div>
+
+        <div style="margin-top: 16px; margin-bottom: 16px;">
+          <span class="customer-detail-label" style="display:block; margin-bottom: 8px;">Uploaded Proof:</span>
+          ${item.payment_image ? 
+            `<img src="${item.payment_image}" style="width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer;" onclick="window.open(this.src)">` : 
+            `<div style="padding: 20px; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; color: #94a3b8; font-size: 0.85rem; text-align: center;"><i class="fa-solid fa-image-slash" style="display:block; font-size: 1.5rem; margin-bottom: 8px;"></i> No attachment uploaded</div>`
+          }
+        </div>
+
+        <div style="background:#fef3c7; padding:12px; border-radius:12px; font-size: 0.85rem;"><i class="fa-solid fa-info-circle"></i> Customer selected Cashier payment.<br>Customer will pay at the counter.<br><strong>Click "Confirm Payment" to mark as PAID.</strong></div>
       </div>
     `;
     openModal('paymentConfirmModal');
@@ -998,7 +1204,18 @@
   
   function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
   function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
-  function openModal(id) { document.getElementById(id).classList.add('open'); if(id === 'walkinModal') { renderModalSeatLayout(); updateMacFieldsUI(); selectedSeatForWalkin = null; document.getElementById('selectedSeatDisplay').innerHTML = "No seat selected"; document.getElementById('wi-rfid').value = ''; } }
+  function openModal(id) { 
+    document.getElementById(id).classList.add('open'); 
+    if(id === 'walkinModal' || id === 'reservationModal') { 
+      renderModalSeatLayout(); 
+      if(id === 'walkinModal') {
+        updateMacFieldsUI(); 
+        selectedSeatForWalkin = null; 
+        document.getElementById('selectedSeatDisplay').innerHTML = "No seat selected"; 
+        document.getElementById('wi-rfid').value = ''; 
+      }
+    } 
+  }
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
   function switchTab(event, tabId) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(tabId).classList.add('active'); event.currentTarget.classList.add('active'); }
 

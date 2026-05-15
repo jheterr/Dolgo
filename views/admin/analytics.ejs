@@ -433,18 +433,89 @@
       }
 
       @media(max-width:900px) {
-
-        .stat-grid-4,
-        .stat-grid-3,
-        .two-col-grid,
-        .three-col-grid {
+        .stat-grid-4, .stat-grid-3, .two-col-grid, .three-col-grid {
           grid-template-columns: 1fr;
         }
-
         .establishment-stats {
           gap: 20px;
         }
       }
+
+      @media print {
+        .sidebar, .mobile-menu-btn, .btn, .chart-controls, .search-wrapper, .mobile-overlay, .modal-overlay {
+          display: none !important;
+        }
+        .content {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100% !important;
+        }
+        .app {
+          display: block !important;
+        }
+        .chart-card, .summary-card, .an-card, .establishment-card, .income-overview-card {
+          box-shadow: none !important;
+          border: 1px solid #eee !important;
+          break-inside: avoid;
+        }
+      }
+
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(30, 42, 56, 0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+        padding: 20px;
+      }
+      .modal-overlay.show { display: flex; }
+      .modal-card {
+        background: #fff;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+        overflow: hidden;
+        animation: modalIn 0.3s ease-out;
+      }
+      @keyframes modalIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      .modal-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+      }
+      .modal-header h3 { font-size: 1.1rem; margin: 0; color: #1e293b; font-weight: 700; }
+      .modal-close { background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; transition: 0.2s; }
+      .modal-close:hover { color: #1e293b; }
+      .modal-body { padding: 24px; max-height: 70vh; overflow-y: auto; }
+      .modal-section { margin-bottom: 24px; }
+      .modal-section:last-child { margin-bottom: 0; }
+      .modal-section label.section-title { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+      .date-inputs { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
+      .date-inputs input { width: 100%; padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-family: inherit; font-size: 0.9rem; outline: none; }
+      .date-inputs input:focus { border-color: var(--orange); }
+      .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .checkbox-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: 0.2s; border: 1.5px solid transparent; }
+      .checkbox-item:hover { background: #f1f5f9; }
+      .checkbox-item input { width: 18px; height: 18px; accent-color: var(--orange); cursor: pointer; }
+      .checkbox-item span { font-size: 0.9rem; color: #1e293b; font-weight: 500; }
+      .modal-footer {
+        padding: 18px 24px;
+        background: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+      .modal-btn-cancel { padding: 10px 20px; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 8px; color: #64748b; font-weight: 600; cursor: pointer; transition: 0.2s; }
+      .modal-btn-cancel:hover { background: #f1f5f9; color: #1e293b; }
     </style>
 
     <div class="app">
@@ -754,10 +825,56 @@
             </div>
           </div>
 
-          <!-- Global Generate Report Button -->
-          <div style="display:flex;justify-content:flex-end;margin-top:16px;">
-            <button class="btn btn-primary" onclick="generateReport()" style="padding:12px 24px;"><i
-                class="fa-solid fa-file-arrow-down"></i> Generate Full Report</button>
+          <!-- Global Generate Report Buttons -->
+          <div style="display:flex;justify-content:flex-end;margin-top:16px;gap:12px;">
+            <button class="btn btn-secondary" onclick="openReportModal('csv')" style="padding:12px 24px; background: #8A8636; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-file-csv"></i> Export CSV
+            </button>
+            <button class="btn btn-primary" onclick="openReportModal('pdf')" style="padding:12px 24px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-file-pdf"></i> Export PDF
+            </button>
+          </div>
+
+          <!-- Report Config Modal -->
+          <div id="reportModal" class="modal-overlay">
+            <div class="modal-card">
+              <div class="modal-header">
+                <h3>Configure <span id="reportFormatType">CSV</span> Report</h3>
+                <button class="modal-close" onclick="closeReportModal()">&times;</button>
+              </div>
+              <div class="modal-body">
+                <div class="modal-section">
+                  <label class="section-title">Date Range</label>
+                  <div class="date-inputs">
+                    <input type="date" id="reportStartDate">
+                    <span style="color:#94a3b8; font-weight:600;">to</span>
+                    <input type="date" id="reportEndDate">
+                  </div>
+                </div>
+                <div class="modal-section">
+                  <label class="section-title">Include Data Sections</label>
+                  <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox" id="checkIncome" checked> <span>Income Logs</span></label>
+                    <label class="checkbox-item"><input type="checkbox" id="checkTrans" checked> <span>Transactions</span></label>
+                    <label class="checkbox-item"><input type="checkbox" id="checkActivity" checked> <span>Activity Logs</span></label>
+                    <label class="checkbox-item"><input type="checkbox" id="checkCustomers" checked> <span>Top Members</span></label>
+                  </div>
+                </div>
+                <div class="modal-section">
+                  <label class="section-title">Filter Keywords</label>
+                  <div class="search-wrapper" style="position:relative;">
+                    <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8;"></i>
+                    <input type="text" id="reportSearch" placeholder="Search customer, location, status..." class="search-input" style="padding-left:35px;">
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="modal-btn-cancel" onclick="closeReportModal()">Cancel</button>
+                <button class="btn btn-primary" id="finalExportBtn" onclick="executeExport()">
+                  Generate <span id="reportFormatBtn">CSV</span>
+                </button>
+              </div>
+            </div>
           </div>
 
         </main>
@@ -765,111 +882,8 @@
 
     <%- contentFor('script') %>
       <script>
-        // ======================== DATA MODELS ========================
-        const trafficData = {
-          today: [4, 7, 12, 18, 22, 28, 32, 27, 20, 15, 10, 7, 3],
-          week: [120, 145, 132, 160, 155, 142, 138],
-          month: [820, 940, 770, 1010, 880, 960, 740, 990, 860, 1100, 920, 850],
-          halfyear: [3450, 3780, 4120, 3980, 4350, 4670]
-        };
-        const trafficLabels = {
-          today: ['9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm'],
-          week: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          month: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'],
-          halfyear: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
-        };
-        const incomeData = {
-          today: [450, 680, 890, 1200, 1450, 1780, 2100, 1950, 1600, 1250, 980, 720, 450],
-          week: [12500, 14800, 13500, 16200, 15800, 14500, 13200],
-          month: [85000, 92000, 78000, 105000, 91000, 98000, 76000, 102000, 89000, 112000, 95000, 88000],
-          halfyear: [350000, 385000, 420000, 405000, 445000, 478000]
-        };
-
-        // Detailed income logs data for DAILY, WEEKLY, MONTHLY breakdown
-        const dailyIncomeLogs = [
-          { period: "April 27, 2026", totalIncome: 12500, transactions: 18, reservations: 5200, wifiExtensions: 1800, planUpgrades: 5500, walkIns: 1200, paymentMethods: "GCash: 8, Cashier: 10" },
-          { period: "April 26, 2026", totalIncome: 14800, transactions: 22, reservations: 6800, wifiExtensions: 2200, planUpgrades: 5800, walkIns: 1500, paymentMethods: "GCash: 12, Cashier: 10" },
-          { period: "April 25, 2026", totalIncome: 13500, transactions: 19, reservations: 6200, wifiExtensions: 1900, planUpgrades: 5400, walkIns: 1300, paymentMethods: "GCash: 10, Cashier: 9" },
-          { period: "April 24, 2026", totalIncome: 16200, transactions: 25, reservations: 7500, wifiExtensions: 2500, planUpgrades: 6200, walkIns: 1600, paymentMethods: "GCash: 14, Cashier: 11" },
-          { period: "April 23, 2026", totalIncome: 15800, transactions: 23, reservations: 7200, wifiExtensions: 2300, planUpgrades: 6300, walkIns: 1500, paymentMethods: "GCash: 13, Cashier: 10" },
-          { period: "April 22, 2026", totalIncome: 14500, transactions: 21, reservations: 6800, wifiExtensions: 2100, planUpgrades: 5600, walkIns: 1400, paymentMethods: "GCash: 11, Cashier: 10" },
-          { period: "April 21, 2026", totalIncome: 13200, transactions: 18, reservations: 5800, wifiExtensions: 1800, planUpgrades: 5600, walkIns: 1100, paymentMethods: "GCash: 9, Cashier: 9" }
-        ];
-
-        const weeklyIncomeLogs = [
-          { period: "Week 1 (Apr 1-7)", totalIncome: 125000, transactions: 42, reservations: 58000, wifiExtensions: 15000, planUpgrades: 52000, walkIns: 8000, paymentMethods: "GCash: 24, Cashier: 18" },
-          { period: "Week 2 (Apr 8-14)", totalIncome: 148000, transactions: 48, reservations: 68000, wifiExtensions: 18000, planUpgrades: 62000, walkIns: 10000, paymentMethods: "GCash: 28, Cashier: 20" },
-          { period: "Week 3 (Apr 15-21)", totalIncome: 135000, transactions: 39, reservations: 62000, wifiExtensions: 16000, planUpgrades: 57000, walkIns: 9000, paymentMethods: "GCash: 22, Cashier: 17" },
-          { period: "Week 4 (Apr 22-28)", totalIncome: 162000, transactions: 55, reservations: 75000, wifiExtensions: 22000, planUpgrades: 65000, walkIns: 12000, paymentMethods: "GCash: 32, Cashier: 23" }
-        ];
-
-        const monthlyIncomeLogs = [
-          { period: "April 2026", totalIncome: 405000, transactions: 145, reservations: 191000, wifiExtensions: 51000, planUpgrades: 163000, walkIns: 25000, paymentMethods: "GCash: 85, Cashier: 60" },
-          { period: "March 2026", totalIncome: 420000, transactions: 152, reservations: 198000, wifiExtensions: 52000, planUpgrades: 170000, walkIns: 28000, paymentMethods: "GCash: 88, Cashier: 64" },
-          { period: "February 2026", totalIncome: 385000, transactions: 138, reservations: 182000, wifiExtensions: 48000, planUpgrades: 155000, walkIns: 22000, paymentMethods: "GCash: 79, Cashier: 59" },
-          { period: "January 2026", totalIncome: 350000, transactions: 120, reservations: 165000, wifiExtensions: 45000, planUpgrades: 140000, walkIns: 18000, paymentMethods: "GCash: 68, Cashier: 52" }
-        ];
-
-        const topMembers = [
-          { rank: 1, name: "Monkey D. Luffy", hours: 28.5 },
-          { rank: 2, name: "Vivi Nefertari", hours: 24.2 },
-          { rank: 3, name: "Roronoa Zoro", hours: 22.0 },
-          { rank: 4, name: "Nami Catburglar", hours: 18.7 },
-          { rank: 5, name: "Tony Chopper", hours: 15.3 }
-        ];
-
-        const topWalkins = [
-          { rank: 1, name: "Brook", hours: 14.5 },
-          { rank: 2, name: "Tony Chopper", hours: 11.2 },
-          { rank: 3, name: "Jinbe", hours: 9.8 },
-          { rank: 4, name: "Vivi Nefertari", hours: 8.5 },
-          { rank: 5, name: "Usopp", hours: 6.2 }
-        ];
-
-        const transactionHistory = [
-          { date: "2026-04-27 09:30", customer: "Monkey D. Luffy", type: "Reservation", amount: 250, status: "Paid" },
-          { date: "2026-04-27 10:15", customer: "Brook", type: "Walk-in", amount: 150, status: "Paid" },
-          { date: "2026-04-27 11:00", customer: "Nami", type: "WiFi Extension", amount: 100, status: "Pending" },
-          { date: "2026-04-26 14:30", customer: "Sanji", type: "Plan Upgrade", amount: 1199, status: "Paid" },
-          { date: "2026-04-26 09:00", customer: "Vivi Nefertari", type: "Reservation", amount: 300, status: "Paid" },
-          { date: "2026-04-25 16:20", customer: "Jinbe", type: "WiFi Extension", amount: 50, status: "Pending" }
-        ];
-
-        const activityHistory = [
-          { timestamp: "2026-04-27 08:45", user: "Staff Zoro", action: "Door Unlock", details: "RFID access granted" },
-          { timestamp: "2026-04-27 09:30", user: "Admin", action: "Reservation Confirmed", details: "Luffy - Seat A3" },
-          { timestamp: "2026-04-27 10:00", user: "Staff Nami", action: "Walk-in Added", details: "Brook - Seat A7" },
-          { timestamp: "2026-04-27 11:15", user: "System", action: "WiFi Extension", details: "Nami requested 1hr extension" },
-          { timestamp: "2026-04-26 15:00", user: "Admin", action: "Plan Upgrade", details: "Sanji upgraded to Premium" },
-          { timestamp: "2026-04-26 09:30", user: "Staff Zoro", action: "Seat Transfer", details: "Chopper moved to C1" }
-        ];
-
-        // Since Establishment Data (January 2024)
-        let sinceEstablishment = {
-          totalCustomers: 1247,
-          totalIncome: 458920,
-          totalHoursConsumed: 3245
-        };
-
-        let customerStats = {
-          totalMembers: 42,
-          totalWalkins: 28,
-          totalPremium: 15,
-          weeklyMembers: 18,
-          weeklyWalkins: 12,
-          weeklyPremium: 6,
-          pendingCustomers: 8,
-          paidCustomers: 77
-        };
-
-        let transactionData = {
-          reservations: 12500,
-          wifiExtensions: 3450,
-          planUpgrades: 8380,
-          pendingPayments: 6548,
-          completedPayments: 17782
-        };
-
+        // ======================== GLOBAL STATE ========================
+        let rawData = null;
         let trafficChart = null;
         let incomeChart = null;
         let typeChart = null;
@@ -879,268 +893,467 @@
         let activitySort = { key: 'timestamp', dir: 'desc' };
         let logsSort = { key: 'period', dir: 'desc' };
 
-        function sortTransactions(key) {
-          if (transSort.key === key) transSort.dir = transSort.dir === 'asc' ? 'desc' : 'asc';
-          else { transSort.key = key; transSort.dir = 'asc'; }
+        // ======================== FETCH DATA ========================
+        async function loadAnalyticsData() {
+          try {
+            const res = await fetch('/api/analytics');
+            rawData = await res.json();
+            
+            // Initial render
+            updateDashboard();
+          } catch (error) {
+            console.error('Failed to load analytics:', error);
+          }
+        }
+
+        function updateDashboard() {
+          if (!rawData) return;
+
+          updateSinceEstablishment();
+          renderTypeChart();
+          renderTopCustomers();
           renderTransactionHistory();
-        }
-
-        function sortActivity(key) {
-          if (activitySort.key === key) activitySort.dir = activitySort.dir === 'asc' ? 'desc' : 'asc';
-          else { activitySort.key = key; activitySort.dir = 'asc'; }
           renderActivityHistory();
-        }
-
-        function sortLogs(key) {
-          if (logsSort.key === key) logsSort.dir = logsSort.dir === 'asc' ? 'desc' : 'asc';
-          else { logsSort.key = key; logsSort.dir = 'asc'; }
+          updateTrafficChart();
+          updateIncomeChart();
           renderIncomeLogs();
+          renderTransactionSummary();
         }
 
-        function universalSort(data, key, dir) {
-          return data.sort((a, b) => {
-            let valA = a[key];
-            let valB = b[key];
-            if (typeof valA === 'string') valA = valA.toLowerCase();
-            if (typeof valB === 'string') valB = valB.toLowerCase();
-            if (valA < valB) return dir === 'asc' ? -1 : 1;
-            if (valA > valB) return dir === 'asc' ? 1 : -1;
-            return 0;
-          });
+        // ======================== RENDER FUNCTIONS ========================
+        function formatPHP(amount) { 
+          return '₱' + (amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
         }
-
-        function formatPHP(amount) { return '₱' + amount.toLocaleString(); }
 
         function updateSinceEstablishment() {
-          document.getElementById('totalCustomersSince').textContent = sinceEstablishment.totalCustomers.toLocaleString();
-          document.getElementById('totalIncomeSince').innerHTML = formatPHP(sinceEstablishment.totalIncome);
-          document.getElementById('totalHoursConsumed').textContent = sinceEstablishment.totalHoursConsumed.toLocaleString();
+          const stats = rawData.statsSince;
+          document.getElementById('totalCustomersSince').textContent = (Number(stats.totalCustomers) || 0).toLocaleString();
+          document.getElementById('totalIncomeSince').innerHTML = formatPHP(Number(stats.totalIncome));
+          document.getElementById('totalHoursConsumed').textContent = (Number(stats.totalHours) || 0).toLocaleString();
         }
 
-        function calculateIncomeStats(period) {
-          const data = incomeData[period];
-          const total = data.reduce((a, b) => a + b, 0);
-          const avg = Math.round(total / data.length);
-          const projected = Math.round(total + (total * 0.12));
-          return { total, avg, projected };
-        }
+        function updateTrafficChart() {
+          const period = document.getElementById('trafficPeriodSelect').value;
+          let labels = [];
+          let dataset = [];
 
-        function updateIncomeOverview(period) {
-          const stats = calculateIncomeStats(period);
-          document.getElementById('incomeTotal').innerHTML = formatPHP(stats.total);
-          document.getElementById('incomeAvg').innerHTML = formatPHP(stats.avg);
-          document.getElementById('incomeProjected').innerHTML = formatPHP(stats.projected);
-        }
+          if (period === 'today') {
+            const hours = rawData.hourlyStats || [];
+            // Create 24h array
+            labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+            dataset = Array.from({length: 24}, () => 0);
+            hours.forEach(h => {
+              dataset[h.hour] = Number(h.count);
+            });
+          } else if (period === 'week') {
+            const last7 = rawData.dailyStats.slice(-7);
+            labels = last7.map(d => new Date(d.date).toLocaleDateString('en-US', { weekday: 'short' }));
+            dataset = last7.map(d => Number(d.count));
+          } else {
+            const stats = rawData.dailyStats;
+            labels = stats.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            dataset = stats.map(d => Number(d.count));
+          }
 
-        function updateStatsFromTraffic(period) {
-          const data = trafficData[period];
-          const peak = Math.max(...data);
-          const avg = Math.round(data.reduce((a, b) => a + b, 0) / data.length);
-          const total = data.reduce((a, b) => a + b, 0);
-          const low = Math.min(...data);
+          if (trafficChart) trafficChart.destroy();
+          const ctx = document.getElementById('trafficChart').getContext('2d');
+          trafficChart = new Chart(ctx, {
+            type: 'line',
+            data: { 
+              labels: labels, 
+              datasets: [{ 
+                label: 'Customers', 
+                data: dataset, 
+                borderColor: '#CF6322', 
+                backgroundColor: 'rgba(207,99,34,.12)', 
+                borderWidth: 2.5, 
+                fill: true, 
+                tension: 0.4, 
+                pointBackgroundColor: '#CF6322', 
+                pointRadius: 4 
+              }] 
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+          });
+
+          // Update Top Cards
+          const peak = Math.max(...dataset, 0);
+          const total = dataset.reduce((a, b) => a + Number(b), 0);
+          const avg = dataset.length ? Math.round(total / dataset.length) : 0;
+          const low = dataset.length ? Math.min(...dataset) : 0;
+
           document.getElementById('statPeak').textContent = peak;
           document.getElementById('statAvg').textContent = avg;
           document.getElementById('statTotal').textContent = total;
           document.getElementById('statLow').textContent = low;
         }
 
-        function updateTrafficChart() {
-          const period = document.getElementById('trafficPeriodSelect').value;
-          const dataset = trafficData[period];
-          const labels = trafficLabels[period];
-          if (trafficChart) trafficChart.destroy();
-          const ctx = document.getElementById('trafficChart').getContext('2d');
-          trafficChart = new Chart(ctx, {
-            type: 'line',
-            data: { labels: labels, datasets: [{ label: 'Customers', data: dataset, borderColor: '#CF6322', backgroundColor: 'rgba(207,99,34,.12)', borderWidth: 2.5, fill: true, tension: 0.4, pointBackgroundColor: '#CF6322', pointRadius: 4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-          });
-          updateStatsFromTraffic(period);
-        }
-
         function updateIncomeChart() {
           const period = document.getElementById('incomePeriodSelect').value;
-          const dataset = incomeData[period];
-          const labels = trafficLabels[period];
+          const stats = [...rawData.dailyStats];
+          let labels = [];
+          let dataset = [];
+
+          if (period === 'today') {
+            const hours = rawData.hourlyStats || [];
+            labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+            dataset = Array.from({length: 24}, () => 0);
+            hours.forEach(h => {
+              dataset[h.hour] = Number(h.income);
+            });
+          } else if (period === 'week') {
+            const last7 = stats.slice(-7);
+            labels = last7.map(d => new Date(d.date).toLocaleDateString('en-US', { weekday: 'short' }));
+            dataset = last7.map(d => Number(d.income || 0));
+          } else {
+            labels = stats.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            dataset = stats.map(d => Number(d.income || 0));
+          }
+
           if (incomeChart) incomeChart.destroy();
           const ctx = document.getElementById('incomeChart').getContext('2d');
           incomeChart = new Chart(ctx, {
             type: 'bar',
             data: { labels: labels, datasets: [{ label: 'Income (₱)', data: dataset, backgroundColor: '#8A8636', borderRadius: 6 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `₱${ctx.raw.toLocaleString()}` } } }, scales: { y: { beginAtZero: true, ticks: { callback: (val) => '₱' + val.toLocaleString() } } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => formatPHP(ctx.raw) } } }, scales: { y: { beginAtZero: true, ticks: { callback: (val) => '₱' + val.toLocaleString() } } } }
           });
-          updateIncomeOverview(period);
+
+          const total = dataset.reduce((a, b) => a + Number(b), 0);
+          const avg = dataset.length ? Math.round(total / dataset.length) : 0;
+          document.getElementById('incomeTotal').innerHTML = formatPHP(total);
+          document.getElementById('incomeAvg').innerHTML = formatPHP(avg);
+          document.getElementById('incomeProjected').innerHTML = formatPHP(total * 1.15); // Simple projection
         }
 
-        // Render Income Logs based on selected period (DAILY, WEEKLY, MONTHLY)
         function renderIncomeLogs() {
           const period = document.getElementById('incomeLogsPeriodSelect').value;
-          const q = document.getElementById('incomeLogSearch').value.toLowerCase();
-          let logsData = [];
+          const q = (document.getElementById('incomeLogSearch').value || "").toLowerCase();
+          let logs = [...rawData.incomeLogs];
 
-          if (period === 'daily') logsData = [...dailyIncomeLogs];
-          else if (period === 'week') logsData = [...weeklyIncomeLogs];
-          else logsData = [...monthlyIncomeLogs];
+          if (period === 'daily') logs = logs.slice(0, 1);
+          else if (period === 'week') logs = logs.slice(0, 7);
 
-          // Filter
-          logsData = logsData.filter(log =>
-            log.period.toLowerCase().includes(q) ||
-            log.paymentMethods.toLowerCase().includes(q)
-          );
-
-          // Sort
-          universalSort(logsData, logsSort.key, logsSort.dir);
+          if (q) {
+            logs = logs.filter(l => new Date(l.period).toDateString().toLowerCase().includes(q));
+          }
 
           const tbody = document.getElementById('incomeLogsBody');
-          tbody.innerHTML = logsData.map(log => `
-        <tr>
-          <td><strong>${log.period}</strong></td>
-          <td><span style="font-weight:800;color:#CF6322;">${formatPHP(log.totalIncome)}</span></td>
-          <td>${log.transactions} transactions</td>
-          <td>${formatPHP(log.reservations)}</td>
-          <td>${formatPHP(log.wifiExtensions)}</td>
-          <td>${formatPHP(log.planUpgrades)}</td>
-          <td>${formatPHP(log.walkIns)}</td>
-          <td><span style="font-size:11px;">${log.paymentMethods}</span></td>
-        </tr>
-      `).join('');
-        }
-
-        function renderTopCustomers() {
-          const memQ = document.getElementById('memberSearch').value.toLowerCase();
-          const walkQ = document.getElementById('walkinSearch').value.toLowerCase();
-
-          const membersContainer = document.getElementById('topMembersList');
-          const walkinsContainer = document.getElementById('topWalkinsList');
-
-          const filteredMembers = topMembers.filter(m => m.name.toLowerCase().includes(memQ));
-          const filteredWalkins = topWalkins.filter(w => w.name.toLowerCase().includes(walkQ));
-
-          const totalMemberHours = topMembers.reduce((sum, m) => sum + m.hours, 0);
-          const totalWalkinHours = topWalkins.reduce((sum, w) => sum + w.hours, 0);
-
-          membersContainer.innerHTML = filteredMembers.map(m => `<div class="top-customer-item"><div><span class="top-customer-name">${m.rank}. ${m.name}</span></div><div class="top-customer-hours">${m.hours} hrs</div></div>`).join('');
-          walkinsContainer.innerHTML = filteredWalkins.map(w => `<div class="top-customer-item"><div><span class="top-customer-name">${w.rank}. ${w.name}</span></div><div class="top-customer-hours">${w.hours} hrs</div></div>`).join('');
-
-          document.getElementById('totalMemberHours').textContent = totalMemberHours;
-          document.getElementById('totalWalkinHours').textContent = totalWalkinHours;
+          tbody.innerHTML = logs.map(log => `
+            <tr>
+              <td><strong>${new Date(log.period).toLocaleDateString()}</strong></td>
+              <td><span style="font-weight:800;color:#CF6322;">${formatPHP(Number(log.totalIncome))}</span></td>
+              <td>${log.transactions} transactions</td>
+              <td>${formatPHP(Number(log.paidAmount))} (Paid)</td>
+              <td>${formatPHP(Number(log.unpaidAmount))} (Unpaid)</td>
+              <td>-</td>
+              <td>-</td>
+              <td><span style="font-size:11px;">Detailed breakdown in report</span></td>
+            </tr>
+          `).join('');
         }
 
         function renderTypeChart() {
+          const b = rawData.typeBreakdown;
           if (typeChart) typeChart.destroy();
           const ctx = document.getElementById('typeChart').getContext('2d');
           typeChart = new Chart(ctx, {
             type: 'doughnut',
-            data: { labels: ['Members', 'Walk-ins', 'Premium'], datasets: [{ data: [customerStats.totalMembers, customerStats.totalWalkins, customerStats.totalPremium], backgroundColor: ['#CF6322', '#8A8636', '#4A7C59'], borderWidth: 0, hoverOffset: 8 }] },
+            data: { labels: ['Members', 'Walk-ins', 'Premium'], datasets: [{ data: [Number(b.members), Number(b.walkins), Number(b.premium)], backgroundColor: ['#CF6322', '#8A8636', '#4A7C59'], borderWidth: 0, hoverOffset: 8 }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
           });
-          document.getElementById('memberCount').textContent = customerStats.totalMembers;
-          document.getElementById('walkinCount').textContent = customerStats.totalWalkins;
-          document.getElementById('premiumCount').textContent = customerStats.totalPremium;
-          document.getElementById('totalCustomersCount').textContent = customerStats.totalMembers + customerStats.totalWalkins + customerStats.totalPremium;
+          document.getElementById('memberCount').textContent = Number(b.members);
+          document.getElementById('walkinCount').textContent = Number(b.walkins);
+          document.getElementById('premiumCount').textContent = Number(b.premium);
+          document.getElementById('totalCustomersCount').textContent = (Number(b.members) + Number(b.walkins));
+        }
+
+        function renderTopCustomers() {
+          const top = rawData.topCustomers;
+          const membersList = document.getElementById('topMembersList');
+          const walkinsList = document.getElementById('topWalkinsList');
+
+          const members = top.filter(u => u.type === 'member');
+          const walkins = top.filter(u => u.type === 'walkin');
+
+          membersList.innerHTML = members.map((u, i) => `
+            <div class="top-customer-item">
+              <div><span class="top-customer-name">${i+1}. ${u.first_name} ${u.last_name}</span></div>
+              <div class="top-customer-hours">${Number(u.total_hours)} hrs</div>
+            </div>
+          `).join('');
+
+          walkinsList.innerHTML = walkins.map((u, i) => `
+            <div class="top-customer-item">
+              <div><span class="top-customer-name">${i+1}. ${u.first_name} ${u.last_name}</span></div>
+              <div class="top-customer-hours">${Number(u.total_hours)} hrs</div>
+            </div>
+          `).join('');
+
+          document.getElementById('totalMemberHours').textContent = members.reduce((a, b) => a + Number(b.total_hours), 0);
+          document.getElementById('totalWalkinHours').textContent = walkins.reduce((a, b) => a + Number(b.total_hours), 0);
         }
 
         function renderTransactionHistory() {
-          const q = document.getElementById('transSearch').value.toLowerCase();
-          let data = [...transactionHistory];
+          const q = (document.getElementById('transSearch').value || "").toLowerCase();
+          let trans = [...rawData.transactions];
 
-          // Filter
-          data = data.filter(t => t.customer.toLowerCase().includes(q) || t.type.toLowerCase().includes(q));
+          if (q) {
+             trans = trans.filter(t => 
+                (t.first_name + " " + t.last_name).toLowerCase().includes(q) || 
+                t.payment_status.toLowerCase().includes(q)
+             );
+          }
 
-          // Sort
-          universalSort(data, transSort.key, transSort.dir);
+          trans.sort((a, b) => {
+             let valA, valB;
+             if (transSort.key === 'date') { valA = new Date(a.start_time); valB = new Date(b.start_time); }
+             else if (transSort.key === 'customer') { valA = (a.first_name + a.last_name).toLowerCase(); valB = (b.first_name + b.last_name).toLowerCase(); }
+             else if (transSort.key === 'amount') { valA = Number(a.amount); valB = Number(b.amount); }
+             else { valA = a[transSort.key]; valB = b[transSort.key]; }
+             
+             if (valA < valB) return transSort.dir === 'asc' ? -1 : 1;
+             if (valA > valB) return transSort.dir === 'asc' ? 1 : -1;
+             return 0;
+          });
 
           const tbody = document.getElementById('transactionHistoryBody');
-          tbody.innerHTML = data.map(t => `<tr><td>${t.date}</td><td>${t.customer}</td><td><span class="badge-transaction">${t.type}</span></td><td>${formatPHP(t.amount)}</td><td><span class="${t.status === 'Paid' ? 'badge-income' : 'pending-badge'}">${t.status}</span></td>`).join('');
+          tbody.innerHTML = trans.map(t => `
+            <tr>
+              <td>${new Date(t.start_time).toLocaleString()}</td>
+              <td>${t.first_name} ${t.last_name}</td>
+              <td><span class="badge-transaction">Reservation</span></td>
+              <td>${formatPHP(Number(t.amount))}</td>
+              <td><span class="${t.payment_status === 'paid' ? 'badge-income' : 'pending-badge'}">${t.payment_status}</span></td>
+            </tr>
+          `).join('');
         }
 
         function renderActivityHistory() {
-          const q = document.getElementById('activitySearch').value.toLowerCase();
-          let data = [...activityHistory];
+          const q = (document.getElementById('activitySearch').value || "").toLowerCase();
+          let logs = [...rawData.doorLogs];
 
-          // Filter
-          data = data.filter(a => a.user.toLowerCase().includes(q) || a.action.toLowerCase().includes(q) || a.details.toLowerCase().includes(q));
+          if (q) {
+             logs = logs.filter(l => 
+                (l.first_name + " " + l.last_name).toLowerCase().includes(q) || 
+                l.door_name.toLowerCase().includes(q) ||
+                l.status.toLowerCase().includes(q)
+             );
+          }
 
-          // Sort
-          universalSort(data, activitySort.key, activitySort.dir);
+          logs.sort((a, b) => {
+             let valA, valB;
+             if (activitySort.key === 'timestamp') { valA = new Date(a.access_time); valB = new Date(b.access_time); }
+             else if (activitySort.key === 'user') { valA = (a.first_name + a.last_name).toLowerCase(); valB = (b.first_name + b.last_name).toLowerCase(); }
+             else { valA = a[activitySort.key]; valB = b[activitySort.key]; }
+             
+             if (valA < valB) return activitySort.dir === 'asc' ? -1 : 1;
+             if (valA > valB) return activitySort.dir === 'asc' ? 1 : -1;
+             return 0;
+          });
 
           const tbody = document.getElementById('activityHistoryBody');
-          tbody.innerHTML = data.map(a => `<tr><td>${a.timestamp}</td><td>${a.user}</td><td><span class="badge-activity">${a.action}</span></td><td>${a.details}</td>`).join('');
+          tbody.innerHTML = logs.map(l => `
+            <tr>
+              <td>${new Date(l.access_time).toLocaleString()}</td>
+              <td>${l.first_name} ${l.last_name}</td>
+              <td><span class="badge-activity">${l.door_name}</span></td>
+              <td>${l.method} Access - ${l.status}</td>
+            </tr>
+          `).join('');
         }
 
         function renderTransactionSummary() {
-          const totalRevenue = transactionData.reservations + transactionData.wifiExtensions + transactionData.planUpgrades;
-          const lossAmount = transactionData.pendingPayments;
-          const pendingPercent = ((transactionData.pendingPayments / totalRevenue) * 100).toFixed(1);
-          document.getElementById('revenueReservations').innerHTML = formatPHP(transactionData.reservations);
-          document.getElementById('revenueWifi').innerHTML = formatPHP(transactionData.wifiExtensions);
-          document.getElementById('revenueUpgrades').innerHTML = formatPHP(transactionData.planUpgrades);
-          document.getElementById('totalRevenue').innerHTML = formatPHP(totalRevenue);
-          document.getElementById('lossAmount').innerHTML = formatPHP(lossAmount);
-          document.getElementById('pendingPayments').innerHTML = formatPHP(transactionData.pendingPayments);
-          document.getElementById('completedPayments').innerHTML = formatPHP(transactionData.completedPayments);
-          document.getElementById('pendingPercent').innerHTML = `${pendingPercent}% of total revenue`;
-          document.getElementById('pendingCustomers').textContent = customerStats.pendingCustomers;
-          document.getElementById('paidCustomers').textContent = customerStats.paidCustomers;
-          document.getElementById('weeklyMembers').textContent = customerStats.weeklyMembers;
-          document.getElementById('weeklyWalkins').textContent = customerStats.weeklyWalkins;
-          document.getElementById('weeklyPremium').textContent = customerStats.weeklyPremium;
-          document.getElementById('weeklyTotal').textContent = customerStats.weeklyMembers + customerStats.weeklyWalkins + customerStats.weeklyPremium;
+          const stats = rawData.incomeLogs[0] || {};
+          const wifiRev = (rawData.wifiCount || 0) * 50; 
+          const planRev = (rawData.planCount || 0) * 1000;
+          const resRev = Number(stats.totalIncome) || 0;
+
+          document.getElementById('revenueReservations').innerHTML = formatPHP(resRev);
+          if(document.getElementById('revenueWifi')) document.getElementById('revenueWifi').innerHTML = formatPHP(wifiRev);
+          if(document.getElementById('revenueUpgrades')) document.getElementById('revenueUpgrades').innerHTML = formatPHP(planRev);
+          
+          const totalRev = resRev + wifiRev + planRev;
+          document.getElementById('totalRevenue').innerHTML = formatPHP(totalRev);
+          document.getElementById('completedPayments').innerHTML = formatPHP(Number(stats.paidAmount) + wifiRev + planRev);
+          document.getElementById('lossAmount').innerHTML = formatPHP(Number(stats.unpaidAmount));
+          document.getElementById('pendingPayments').innerHTML = formatPHP(Number(stats.unpaidAmount));
+          
+          const total = totalRev || 1;
+          const percent = ((Number(stats.unpaidAmount) / total) * 100).toFixed(1);
+          document.getElementById('pendingPercent').innerHTML = `${percent}% of daily revenue`;
+
+          const ws = rawData.weeklySummary || {};
+          document.getElementById('weeklyMembers').textContent = ws.weeklyMembers || 0;
+          document.getElementById('weeklyWalkins').textContent = ws.weeklyWalkins || 0;
+          document.getElementById('weeklyPremium').textContent = ws.weeklyPremium || 0;
+          document.getElementById('weeklyTotal').textContent = (ws.weeklyMembers || 0) + (ws.weeklyWalkins || 0) + (ws.weeklyPremium || 0);
         }
 
-        function generateReport() {
-          const trafficPeriod = document.getElementById('trafficPeriodSelect').value;
-          const trafficPeriodName = document.getElementById('trafficPeriodSelect').options[document.getElementById('trafficPeriodSelect').selectedIndex].text;
-          const incomePeriod = document.getElementById('incomePeriodSelect').value;
-          const incomePeriodName = document.getElementById('incomePeriodSelect').options[document.getElementById('incomePeriodSelect').selectedIndex].text;
-          const trafficDataPoint = trafficData[trafficPeriod];
-          const incomeDataPoint = incomeData[incomePeriod];
-          const totalTraffic = trafficDataPoint.reduce((a, b) => a + b, 0);
-          const totalIncomeVal = incomeDataPoint.reduce((a, b) => a + b, 0);
-          const totalRevenue = transactionData.reservations + transactionData.wifiExtensions + transactionData.planUpgrades;
-          const lossAmount = transactionData.pendingPayments;
-          let reportContent = `THE LAST MUSTER - ANALYTICS REPORT\n=====================================\nGenerated: ${new Date().toLocaleString()}\n\n`;
-          reportContent += `🏢 SINCE ESTABLISHMENT (January 2024)\n- Total Customers: ${sinceEstablishment.totalCustomers.toLocaleString()}\n- Total Income: ${formatPHP(sinceEstablishment.totalIncome)}\n- Total Hours Consumed: ${sinceEstablishment.totalHoursConsumed.toLocaleString()}\n\n`;
-          reportContent += `📊 CUSTOMER TRAFFIC (${trafficPeriodName})\n- Total Customers: ${totalTraffic}\n- Peak: ${Math.max(...trafficDataPoint)}\n- Average: ${Math.round(totalTraffic / trafficDataPoint.length)}\n- Low: ${Math.min(...trafficDataPoint)}\n\n`;
-          reportContent += `💰 INCOME (${incomePeriodName})\n- Total Income: ${formatPHP(totalIncomeVal)}\n- Average per Day: ${formatPHP(Math.round(totalIncomeVal / incomeDataPoint.length))}\n- Projected Monthly: ${formatPHP(Math.round(totalIncomeVal + (totalIncomeVal * 0.12)))}\n\n`;
-          reportContent += `👥 CUSTOMER TYPE BREAKDOWN\n- Members: ${customerStats.totalMembers}\n- Walk-ins: ${customerStats.totalWalkins}\n- Premium: ${customerStats.totalPremium}\n- Total Active Customers: ${customerStats.totalMembers + customerStats.totalWalkins + customerStats.totalPremium}\n\n`;
-          reportContent += `🏆 TOP MEMBERS BY HOURS\n${topMembers.map(m => `  ${m.rank}. ${m.name} - ${m.hours} hours`).join('\n')}\n\n`;
-          reportContent += `🏆 TOP WALK-INS BY HOURS\n${topWalkins.map(w => `  ${w.rank}. ${w.name} - ${w.hours} hours`).join('\n')}\n\n`;
-          reportContent += `💰 FINANCIAL SUMMARY\n- Total Revenue: ${formatPHP(totalRevenue)}\n- Loss (Pending/Unpaid): ${formatPHP(lossAmount)}\n- Net Profit: ${formatPHP(totalRevenue - lossAmount)}\n\n`;
-          reportContent += `💰 TRANSACTION SUMMARY\n- Reservations: ${formatPHP(transactionData.reservations)}\n- WiFi Extensions: ${formatPHP(transactionData.wifiExtensions)}\n- Plan Upgrades: ${formatPHP(transactionData.planUpgrades)}\n- Total Revenue: ${formatPHP(totalRevenue)}\n- Pending Payments: ${formatPHP(transactionData.pendingPayments)} (${((transactionData.pendingPayments / totalRevenue) * 100).toFixed(1)}%)\n- Completed Payments: ${formatPHP(transactionData.completedPayments)}\n- Pending Customers: ${customerStats.pendingCustomers}\n- Paid Customers: ${customerStats.paidCustomers}\n\n`;
-          reportContent += `📅 WEEKLY SUMMARY\n- Members: ${customerStats.weeklyMembers}\n- Walk-ins: ${customerStats.weeklyWalkins}\n- Premium: ${customerStats.weeklyPremium}\n- Total: ${customerStats.weeklyMembers + customerStats.weeklyWalkins + customerStats.weeklyPremium}\n\n`;
-          reportContent += `📋 RECENT TRANSACTIONS\n${transactionHistory.map(t => `- ${t.date} | ${t.customer} | ${t.type} | ${formatPHP(t.amount)} | ${t.status}`).join('\n')}\n\n`;
-          reportContent += `📋 ACTIVITY HISTORY\n${activityHistory.map(a => `- ${a.timestamp} | ${a.user} | ${a.action} | ${a.details}`).join('\n')}`;
-          const blob = new Blob([reportContent], { type: 'text/plain' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `cramberryfi_report_${Date.now()}.txt`;
-          document.body.appendChild(a); a.click(); document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          alert('Full report generated and downloaded!');
-        }
-
-
+        // Sidebar and Init
         function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
         function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
 
         function init() {
-          // Set Chart.js Defaults
           Chart.defaults.font.family = "'Montserrat', sans-serif";
           Chart.defaults.color = "#1E2A38";
-          Chart.defaults.plugins.tooltip.titleFont = { family: "'Poppins', sans-serif", weight: '700' };
-          Chart.defaults.plugins.tooltip.bodyFont = { family: "'Montserrat', sans-serif" };
+          loadAnalyticsData();
+        }
 
-          updateSinceEstablishment();
-          renderTopCustomers();
-          renderTypeChart();
+        init();
+
+        function sortTransactions(k) {
+          if (transSort.key === k) transSort.dir = transSort.dir === 'asc' ? 'desc' : 'asc';
+          else { transSort.key = k; transSort.dir = 'asc'; }
           renderTransactionHistory();
+        }
+
+        function sortActivity(k) {
+          if (activitySort.key === k) activitySort.dir = activitySort.dir === 'asc' ? 'desc' : 'asc';
+          else { activitySort.key = k; activitySort.dir = 'asc'; }
           renderActivityHistory();
-          renderTransactionSummary();
-          updateTrafficChart();
-          updateIncomeChart();
+        }
+
+        function sortLogs(k) {
+          if (logsSort.key === k) logsSort.dir = logsSort.dir === 'asc' ? 'desc' : 'asc';
+          else { logsSort.key = k; logsSort.dir = 'asc'; }
           renderIncomeLogs();
         }
-        init();
+
+        // Report Modal Logic
+        let currentExportFormat = 'csv';
+
+        function openReportModal(format) {
+          currentExportFormat = format;
+          document.getElementById('reportFormatType').textContent = format.toUpperCase();
+          document.getElementById('reportFormatBtn').textContent = format.toUpperCase();
+          
+          const now = new Date();
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(now.getDate() - 30);
+          
+          document.getElementById('reportStartDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+          document.getElementById('reportEndDate').value = now.toISOString().split('T')[0];
+          
+          document.getElementById('reportModal').classList.add('show');
+        }
+
+        function closeReportModal() {
+          document.getElementById('reportModal').classList.remove('show');
+        }
+
+        function executeExport() {
+          const start = new Date(document.getElementById('reportStartDate').value);
+          const end = new Date(document.getElementById('reportEndDate').value);
+          const q = document.getElementById('reportSearch').value.toLowerCase();
+          
+          const includeIncome = document.getElementById('checkIncome').checked;
+          const includeTrans = document.getElementById('checkTrans').checked;
+          const includeActivity = document.getElementById('checkActivity').checked;
+          const includeCustomers = document.getElementById('checkCustomers').checked;
+
+          if (currentExportFormat === 'csv') {
+            generateCSVReport({ start, end, q, includeIncome, includeTrans, includeActivity, includeCustomers });
+          } else {
+            generatePDFReport({ start, end, q, includeIncome, includeTrans, includeActivity, includeCustomers });
+          }
+          
+          closeReportModal();
+        }
+
+        function generateCSVReport(filters) {
+          let csv = "THE LAST MUSTER - ANALYTICS REPORT\n";
+          csv += `Generated: ${new Date().toLocaleString()}\n`;
+          csv += `Range: ${filters.start.toLocaleDateString()} to ${filters.end.toLocaleDateString()}\n\n`;
+          
+          if (filters.includeIncome) {
+            csv += "INCOME LOGS\n";
+            csv += "Date,Total Income,Paid,Unpaid,Transactions\n";
+            rawData.incomeLogs.filter(l => {
+              const d = new Date(l.period);
+              return d >= filters.start && d <= filters.end;
+            }).forEach(log => {
+               csv += `"${new Date(log.period).toLocaleDateString()}",${log.totalIncome || 0},${log.paidAmount || 0},${log.unpaidAmount || 0},${log.transactions}\n`;
+            });
+            csv += "\n";
+          }
+          
+          if (filters.includeTrans) {
+            csv += "TRANSACTION HISTORY\n";
+            csv += "Date,Customer,Type,Amount,Status\n";
+            rawData.transactions.filter(t => {
+              const d = new Date(t.start_time);
+              const matchQ = !filters.q || (t.first_name + " " + t.last_name).toLowerCase().includes(filters.q) || t.payment_status.toLowerCase().includes(filters.q);
+              return d >= filters.start && d <= filters.end && matchQ;
+            }).forEach(t => {
+               csv += `"${new Date(t.start_time).toLocaleString()}","${t.first_name} ${t.last_name}","Reservation",${t.amount},${t.payment_status}\n`;
+            });
+            csv += "\n";
+          }
+
+          if (filters.includeActivity) {
+            csv += "ACTIVITY LOGS\n";
+            csv += "Timestamp,User,Location,Status\n";
+            rawData.doorLogs.filter(l => {
+              const d = new Date(l.access_time);
+              const matchQ = !filters.q || (l.first_name + " " + l.last_name).toLowerCase().includes(filters.q) || l.door_name.toLowerCase().includes(filters.q);
+              return d >= filters.start && d <= filters.end && matchQ;
+            }).forEach(l => {
+               csv += `"${new Date(l.access_time).toLocaleString()}","${l.first_name} ${l.last_name}","${l.door_name}","${l.status}"\n`;
+            });
+          }
+
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `TheLastMuster_Report_${new Date().toISOString().split('T')[0]}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+
+        function generatePDFReport(filters) {
+          const originalContent = {
+             trans: [...rawData.transactions],
+             activity: [...rawData.doorLogs],
+             income: [...rawData.incomeLogs]
+          };
+
+          rawData.transactions = originalContent.trans.filter(t => {
+            const d = new Date(t.start_time);
+            const matchQ = !filters.q || (t.first_name + " " + t.last_name).toLowerCase().includes(filters.q);
+            return d >= filters.start && d <= filters.end && matchQ;
+          });
+          
+          rawData.doorLogs = originalContent.activity.filter(l => {
+            const d = new Date(l.access_time);
+            const matchQ = !filters.q || (l.first_name + " " + l.last_name).toLowerCase().includes(filters.q);
+            return d >= filters.start && d <= filters.end && matchQ;
+          });
+
+          renderTransactionHistory();
+          renderActivityHistory();
+          
+          document.querySelector('.income-overview-card').style.display = filters.includeIncome ? '' : 'none';
+          document.querySelector('.an-card:nth-of-type(1)').style.display = filters.includeTrans ? '' : 'none';
+          document.querySelector('.an-card:nth-of-type(2)').style.display = filters.includeActivity ? '' : 'none';
+          document.querySelector('.stat-grid-3').style.display = filters.includeTopCustomers ? '' : 'none';
+
+          const originalTitle = document.title;
+          document.title = "The Last Muster - Analytics Report " + new Date().toLocaleDateString();
+          
+          setTimeout(() => {
+            window.print();
+            
+            rawData.transactions = originalContent.trans;
+            rawData.doorLogs = originalContent.activity;
+            renderTransactionHistory();
+            renderActivityHistory();
+            document.querySelector('.income-overview-card').style.display = '';
+            document.querySelector('.an-card:nth-of-type(1)').style.display = '';
+            document.querySelector('.an-card:nth-of-type(2)').style.display = '';
+            document.querySelector('.stat-grid-3').style.display = '';
+            document.title = originalTitle;
+          }, 500);
+        }
       </script>

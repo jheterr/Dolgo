@@ -1,35 +1,8 @@
-﻿-- MariaDB dump 10.19  Distrib 10.4.32-MariaDB, for Win64 (AMD64)
---
--- Host: localhost    Database: dolgo_db
--- ------------------------------------------------------
--- Server version	10.4.32-MariaDB
+-- Dolgo DB Export
+-- Generated: 5/15/2026, 2:10:12 PM
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Current Database: `dolgo_db`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `dolgo_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
-
-USE `dolgo_db`;
-
---
 -- Table structure for table `active_sessions`
---
-
 DROP TABLE IF EXISTS `active_sessions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `active_sessions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -39,56 +12,623 @@ CREATE TABLE `active_sessions` (
   `mac_address` varchar(17) DEFAULT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `is_paused` tinyint(1) DEFAULT 0,
+  `remaining_seconds` int(11) DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `active_sessions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
 -- Dumping data for table `active_sessions`
---
+INSERT INTO `active_sessions` (`id`, `user_id`, `start_time`, `end_time`, `status`, `mac_address`, `ip_address`, `created_at`, `is_paused`, `remaining_seconds`) VALUES (6, 14, '2026-05-15 05:50:31', '2026-05-15 06:50:31', 'active', NULL, NULL, '2026-05-15 05:50:31', 0, 0);
 
-LOCK TABLES `active_sessions` WRITE;
-/*!40000 ALTER TABLE `active_sessions` DISABLE KEYS */;
-/*!40000 ALTER TABLE `active_sessions` ENABLE KEYS */;
-UNLOCK TABLES;
+-- Table structure for table `broadcasts`
+DROP TABLE IF EXISTS `broadcasts`;
+CREATE TABLE `broadcasts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `audience` varchar(50) DEFAULT NULL,
+  `recipients` text DEFAULT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `body` text DEFAULT NULL,
+  `sender_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `sender_id` (`sender_id`),
+  CONSTRAINT `broadcasts_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
+-- Dumping data for table `broadcasts`
+
 -- Table structure for table `door_access_logs`
---
-
 DROP TABLE IF EXISTS `door_access_logs`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `door_access_logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `door_name` varchar(50) NOT NULL,
+  `method` varchar(50) DEFAULT 'RFID',
   `access_time` timestamp NOT NULL DEFAULT current_timestamp(),
-  `status` enum('granted','denied') NOT NULL,
+  `status` enum('granted','denied','unlocked','locked') NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `door_access_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB AUTO_INCREMENT=593 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
 -- Dumping data for table `door_access_logs`
---
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (21, 14, 'Main Entrance', 'RFID', '2026-05-15 12:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (22, 33, 'Main Entrance', 'RFID', '2026-05-14 16:44:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (23, 27, 'Main Entrance', 'RFID', '2026-05-15 10:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (24, 37, 'Main Entrance', 'RFID', '2026-05-15 03:04:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (25, 20, 'Main Entrance', 'RFID', '2026-05-15 09:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (26, 38, 'Main Entrance', 'RFID', '2026-05-14 20:08:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (27, 21, 'Main Entrance', 'RFID', '2026-05-15 06:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (28, 31, 'Main Entrance', 'RFID', '2026-05-14 18:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (29, 21, 'Main Entrance', 'RFID', '2026-05-14 20:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (30, 30, 'Main Entrance', 'RFID', '2026-05-15 01:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (31, 19, 'Main Entrance', 'RFID', '2026-05-15 08:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (32, 31, 'Main Entrance', 'RFID', '2026-05-14 20:33:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (33, 38, 'Main Entrance', 'RFID', '2026-05-15 15:11:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (34, 20, 'Main Entrance', 'RFID', '2026-05-15 01:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (35, 35, 'Main Entrance', 'RFID', '2026-05-14 04:57:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (36, 28, 'Main Entrance', 'RFID', '2026-05-14 01:36:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (37, 36, 'Main Entrance', 'RFID', '2026-05-14 08:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (38, 28, 'Main Entrance', 'RFID', '2026-05-13 22:46:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (39, 36, 'Main Entrance', 'RFID', '2026-05-13 17:51:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (40, 22, 'Main Entrance', 'RFID', '2026-05-14 12:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (41, 17, 'Main Entrance', 'RFID', '2026-05-14 08:04:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (42, 37, 'Main Entrance', 'RFID', '2026-05-14 14:46:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (43, 36, 'Main Entrance', 'RFID', '2026-05-14 09:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (44, 34, 'Main Entrance', 'RFID', '2026-05-13 20:47:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (45, 33, 'Main Entrance', 'RFID', '2026-05-13 22:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (46, 28, 'Main Entrance', 'RFID', '2026-05-13 19:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (47, 16, 'Main Entrance', 'RFID', '2026-05-14 07:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (48, 36, 'Main Entrance', 'RFID', '2026-05-14 02:49:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (49, 34, 'Main Entrance', 'RFID', '2026-05-14 07:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (50, 14, 'Main Entrance', 'RFID', '2026-05-14 13:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (51, 20, 'Main Entrance', 'RFID', '2026-05-14 15:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (52, 38, 'Main Entrance', 'RFID', '2026-05-14 00:50:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (53, 19, 'Main Entrance', 'RFID', '2026-05-14 03:12:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (54, 17, 'Main Entrance', 'RFID', '2026-05-14 10:15:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (55, 35, 'Main Entrance', 'RFID', '2026-05-14 04:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (56, 19, 'Main Entrance', 'RFID', '2026-05-13 21:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (57, 19, 'Main Entrance', 'RFID', '2026-05-14 09:04:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (58, 28, 'Main Entrance', 'RFID', '2026-05-14 02:31:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (59, 20, 'Main Entrance', 'RFID', '2026-05-14 15:10:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (60, 31, 'Main Entrance', 'RFID', '2026-05-14 10:46:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (61, 14, 'Main Entrance', 'RFID', '2026-05-12 17:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (62, 20, 'Main Entrance', 'RFID', '2026-05-13 01:24:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (63, 25, 'Main Entrance', 'RFID', '2026-05-13 07:33:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (64, 37, 'Main Entrance', 'RFID', '2026-05-13 01:36:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (65, 24, 'Main Entrance', 'RFID', '2026-05-12 20:59:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (66, 16, 'Main Entrance', 'RFID', '2026-05-13 10:50:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (67, 15, 'Main Entrance', 'RFID', '2026-05-13 06:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (68, 17, 'Main Entrance', 'RFID', '2026-05-12 23:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (69, 33, 'Main Entrance', 'RFID', '2026-05-13 02:44:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (70, 36, 'Main Entrance', 'RFID', '2026-05-12 22:04:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (71, 36, 'Main Entrance', 'RFID', '2026-05-13 01:17:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (72, 25, 'Main Entrance', 'RFID', '2026-05-13 15:10:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (73, 32, 'Main Entrance', 'RFID', '2026-05-13 11:30:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (74, 14, 'Main Entrance', 'RFID', '2026-05-13 07:36:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (75, 35, 'Main Entrance', 'RFID', '2026-05-12 18:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (76, 18, 'Main Entrance', 'RFID', '2026-05-12 21:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (77, 15, 'Main Entrance', 'RFID', '2026-05-13 09:34:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (78, 29, 'Main Entrance', 'RFID', '2026-05-12 21:33:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (79, 36, 'Main Entrance', 'RFID', '2026-05-13 14:43:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (80, 20, 'Main Entrance', 'RFID', '2026-05-13 12:52:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (81, 23, 'Main Entrance', 'RFID', '2026-05-13 07:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (82, 29, 'Main Entrance', 'RFID', '2026-05-13 10:27:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (83, 16, 'Main Entrance', 'RFID', '2026-05-12 23:19:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (84, 25, 'Main Entrance', 'RFID', '2026-05-13 15:51:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (85, 27, 'Main Entrance', 'RFID', '2026-05-13 03:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (86, 28, 'Main Entrance', 'RFID', '2026-05-13 00:45:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (87, 31, 'Main Entrance', 'RFID', '2026-05-12 17:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (88, 15, 'Main Entrance', 'RFID', '2026-05-13 02:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (89, 37, 'Main Entrance', 'RFID', '2026-05-11 23:03:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (90, 28, 'Main Entrance', 'RFID', '2026-05-12 03:38:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (91, 20, 'Main Entrance', 'RFID', '2026-05-11 21:25:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (92, 15, 'Main Entrance', 'RFID', '2026-05-11 16:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (93, 18, 'Main Entrance', 'RFID', '2026-05-12 04:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (94, 37, 'Main Entrance', 'RFID', '2026-05-12 14:06:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (95, 28, 'Main Entrance', 'RFID', '2026-05-11 19:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (96, 21, 'Main Entrance', 'RFID', '2026-05-12 14:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (97, 37, 'Main Entrance', 'RFID', '2026-05-11 20:10:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (98, 21, 'Main Entrance', 'RFID', '2026-05-12 06:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (99, 27, 'Main Entrance', 'RFID', '2026-05-12 04:12:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (100, 34, 'Main Entrance', 'RFID', '2026-05-12 13:10:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (101, 29, 'Main Entrance', 'RFID', '2026-05-10 16:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (102, 34, 'Main Entrance', 'RFID', '2026-05-10 20:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (103, 25, 'Main Entrance', 'RFID', '2026-05-11 04:42:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (104, 31, 'Main Entrance', 'RFID', '2026-05-10 20:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (105, 38, 'Main Entrance', 'RFID', '2026-05-11 07:01:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (106, 37, 'Main Entrance', 'RFID', '2026-05-11 10:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (107, 19, 'Main Entrance', 'RFID', '2026-05-11 00:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (108, 17, 'Main Entrance', 'RFID', '2026-05-11 02:40:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (109, 36, 'Main Entrance', 'RFID', '2026-05-11 06:49:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (110, 34, 'Main Entrance', 'RFID', '2026-05-11 11:27:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (111, 15, 'Main Entrance', 'RFID', '2026-05-10 16:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (112, 14, 'Main Entrance', 'RFID', '2026-05-11 02:30:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (113, 33, 'Main Entrance', 'RFID', '2026-05-11 06:15:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (114, 28, 'Main Entrance', 'RFID', '2026-05-11 12:19:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (115, 35, 'Main Entrance', 'RFID', '2026-05-11 13:12:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (116, 14, 'Main Entrance', 'RFID', '2026-05-11 04:03:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (117, 28, 'Main Entrance', 'RFID', '2026-05-10 19:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (118, 34, 'Main Entrance', 'RFID', '2026-05-11 09:30:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (119, 19, 'Main Entrance', 'RFID', '2026-05-10 22:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (120, 17, 'Main Entrance', 'RFID', '2026-05-11 09:10:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (121, 21, 'Main Entrance', 'RFID', '2026-05-10 09:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (122, 29, 'Main Entrance', 'RFID', '2026-05-09 22:27:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (123, 31, 'Main Entrance', 'RFID', '2026-05-10 07:55:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (124, 14, 'Main Entrance', 'RFID', '2026-05-09 20:26:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (125, 28, 'Main Entrance', 'RFID', '2026-05-09 22:47:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (126, 34, 'Main Entrance', 'RFID', '2026-05-09 19:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (127, 29, 'Main Entrance', 'RFID', '2026-05-10 03:30:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (128, 37, 'Main Entrance', 'RFID', '2026-05-10 10:20:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (129, 14, 'Main Entrance', 'RFID', '2026-05-09 23:03:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (130, 38, 'Main Entrance', 'RFID', '2026-05-10 07:04:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (131, 32, 'Main Entrance', 'RFID', '2026-05-09 10:19:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (132, 19, 'Main Entrance', 'RFID', '2026-05-09 14:52:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (133, 34, 'Main Entrance', 'RFID', '2026-05-09 11:27:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (134, 23, 'Main Entrance', 'RFID', '2026-05-09 15:42:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (135, 19, 'Main Entrance', 'RFID', '2026-05-09 13:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (136, 36, 'Main Entrance', 'RFID', '2026-05-08 22:47:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (137, 36, 'Main Entrance', 'RFID', '2026-05-09 14:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (138, 15, 'Main Entrance', 'RFID', '2026-05-08 21:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (139, 37, 'Main Entrance', 'RFID', '2026-05-09 14:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (140, 36, 'Main Entrance', 'RFID', '2026-05-09 12:27:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (141, 15, 'Main Entrance', 'RFID', '2026-05-08 18:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (142, 32, 'Main Entrance', 'RFID', '2026-05-09 14:43:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (143, 36, 'Main Entrance', 'RFID', '2026-05-07 21:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (144, 27, 'Main Entrance', 'RFID', '2026-05-08 12:44:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (145, 37, 'Main Entrance', 'RFID', '2026-05-08 04:44:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (146, 34, 'Main Entrance', 'RFID', '2026-05-08 14:25:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (147, 20, 'Main Entrance', 'RFID', '2026-05-08 11:26:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (148, 25, 'Main Entrance', 'RFID', '2026-05-08 05:30:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (149, 14, 'Main Entrance', 'RFID', '2026-05-08 06:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (150, 21, 'Main Entrance', 'RFID', '2026-05-08 15:30:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (151, 28, 'Main Entrance', 'RFID', '2026-05-08 07:25:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (152, 16, 'Main Entrance', 'RFID', '2026-05-07 22:05:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (153, 38, 'Main Entrance', 'RFID', '2026-05-07 23:03:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (154, 24, 'Main Entrance', 'RFID', '2026-05-07 19:06:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (155, 33, 'Main Entrance', 'RFID', '2026-05-08 07:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (156, 16, 'Main Entrance', 'RFID', '2026-05-08 00:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (157, 15, 'Main Entrance', 'RFID', '2026-05-07 16:44:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (158, 19, 'Main Entrance', 'RFID', '2026-05-08 01:33:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (159, 20, 'Main Entrance', 'RFID', '2026-05-08 09:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (160, 38, 'Main Entrance', 'RFID', '2026-05-06 23:52:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (161, 26, 'Main Entrance', 'RFID', '2026-05-06 21:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (162, 16, 'Main Entrance', 'RFID', '2026-05-06 18:10:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (163, 25, 'Main Entrance', 'RFID', '2026-05-06 19:08:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (164, 23, 'Main Entrance', 'RFID', '2026-05-07 13:08:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (165, 31, 'Main Entrance', 'RFID', '2026-05-07 06:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (166, 29, 'Main Entrance', 'RFID', '2026-05-07 14:10:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (167, 26, 'Main Entrance', 'RFID', '2026-05-07 00:11:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (168, 22, 'Main Entrance', 'RFID', '2026-05-06 23:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (169, 19, 'Main Entrance', 'RFID', '2026-05-07 03:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (170, 15, 'Main Entrance', 'RFID', '2026-05-07 10:03:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (171, 22, 'Main Entrance', 'RFID', '2026-05-06 20:25:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (172, 19, 'Main Entrance', 'RFID', '2026-05-06 22:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (173, 23, 'Main Entrance', 'RFID', '2026-05-07 14:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (174, 23, 'Main Entrance', 'RFID', '2026-05-07 06:03:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (175, 31, 'Main Entrance', 'RFID', '2026-05-07 05:59:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (176, 17, 'Main Entrance', 'RFID', '2026-05-06 16:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (177, 19, 'Main Entrance', 'RFID', '2026-05-07 10:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (178, 23, 'Main Entrance', 'RFID', '2026-05-05 17:37:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (179, 18, 'Main Entrance', 'RFID', '2026-05-06 02:12:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (180, 29, 'Main Entrance', 'RFID', '2026-05-05 17:42:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (181, 30, 'Main Entrance', 'RFID', '2026-05-05 21:53:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (182, 23, 'Main Entrance', 'RFID', '2026-05-06 11:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (183, 23, 'Main Entrance', 'RFID', '2026-05-05 22:44:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (184, 25, 'Main Entrance', 'RFID', '2026-05-06 11:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (185, 32, 'Main Entrance', 'RFID', '2026-05-05 22:17:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (186, 25, 'Main Entrance', 'RFID', '2026-05-06 04:15:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (187, 30, 'Main Entrance', 'RFID', '2026-05-05 16:12:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (188, 17, 'Main Entrance', 'RFID', '2026-05-06 06:34:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (189, 28, 'Main Entrance', 'RFID', '2026-05-06 12:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (190, 29, 'Main Entrance', 'RFID', '2026-05-06 11:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (191, 37, 'Main Entrance', 'RFID', '2026-05-06 15:01:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (192, 35, 'Main Entrance', 'RFID', '2026-05-05 19:57:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (193, 17, 'Main Entrance', 'RFID', '2026-05-05 16:59:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (194, 34, 'Main Entrance', 'RFID', '2026-05-05 21:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (195, 21, 'Main Entrance', 'RFID', '2026-05-06 10:37:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (196, 16, 'Main Entrance', 'RFID', '2026-05-06 11:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (197, 36, 'Main Entrance', 'RFID', '2026-05-05 16:01:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (198, 30, 'Main Entrance', 'RFID', '2026-05-06 09:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (199, 34, 'Main Entrance', 'RFID', '2026-05-06 14:01:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (200, 14, 'Main Entrance', 'RFID', '2026-05-05 06:33:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (201, 30, 'Main Entrance', 'RFID', '2026-05-05 04:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (202, 19, 'Main Entrance', 'RFID', '2026-05-04 20:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (203, 18, 'Main Entrance', 'RFID', '2026-05-05 12:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (204, 16, 'Main Entrance', 'RFID', '2026-05-04 19:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (205, 27, 'Main Entrance', 'RFID', '2026-05-04 17:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (206, 16, 'Main Entrance', 'RFID', '2026-05-05 15:12:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (207, 33, 'Main Entrance', 'RFID', '2026-05-05 04:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (208, 32, 'Main Entrance', 'RFID', '2026-05-05 07:45:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (209, 25, 'Main Entrance', 'RFID', '2026-05-05 05:03:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (210, 36, 'Main Entrance', 'RFID', '2026-05-05 07:25:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (211, 17, 'Main Entrance', 'RFID', '2026-05-05 01:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (212, 32, 'Main Entrance', 'RFID', '2026-05-04 19:26:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (213, 22, 'Main Entrance', 'RFID', '2026-05-05 03:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (214, 20, 'Main Entrance', 'RFID', '2026-05-04 11:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (215, 36, 'Main Entrance', 'RFID', '2026-05-04 14:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (216, 25, 'Main Entrance', 'RFID', '2026-05-04 02:24:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (217, 34, 'Main Entrance', 'RFID', '2026-05-04 10:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (218, 20, 'Main Entrance', 'RFID', '2026-05-03 23:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (219, 38, 'Main Entrance', 'RFID', '2026-05-03 17:57:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (220, 31, 'Main Entrance', 'RFID', '2026-05-04 06:12:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (221, 37, 'Main Entrance', 'RFID', '2026-05-03 17:05:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (222, 24, 'Main Entrance', 'RFID', '2026-05-04 13:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (223, 17, 'Main Entrance', 'RFID', '2026-05-04 00:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (224, 14, 'Main Entrance', 'RFID', '2026-05-04 08:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (225, 24, 'Main Entrance', 'RFID', '2026-05-03 21:22:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (226, 28, 'Main Entrance', 'RFID', '2026-05-04 03:49:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (227, 18, 'Main Entrance', 'RFID', '2026-05-04 06:20:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (228, 22, 'Main Entrance', 'RFID', '2026-05-03 20:36:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (229, 36, 'Main Entrance', 'RFID', '2026-05-03 20:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (230, 32, 'Main Entrance', 'RFID', '2026-05-03 23:42:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (231, 25, 'Main Entrance', 'RFID', '2026-05-03 18:27:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (232, 22, 'Main Entrance', 'RFID', '2026-05-03 20:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (233, 14, 'Main Entrance', 'RFID', '2026-05-03 21:34:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (234, 27, 'Main Entrance', 'RFID', '2026-05-04 02:03:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (235, 34, 'Main Entrance', 'RFID', '2026-05-03 16:43:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (236, 18, 'Main Entrance', 'RFID', '2026-05-03 00:26:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (237, 20, 'Main Entrance', 'RFID', '2026-05-03 08:34:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (238, 17, 'Main Entrance', 'RFID', '2026-05-02 22:00:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (239, 33, 'Main Entrance', 'RFID', '2026-05-03 05:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (240, 27, 'Main Entrance', 'RFID', '2026-05-03 01:00:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (241, 19, 'Main Entrance', 'RFID', '2026-05-03 02:15:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (242, 37, 'Main Entrance', 'RFID', '2026-05-02 23:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (243, 19, 'Main Entrance', 'RFID', '2026-05-03 04:55:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (244, 18, 'Main Entrance', 'RFID', '2026-05-03 12:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (245, 16, 'Main Entrance', 'RFID', '2026-05-03 04:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (246, 15, 'Main Entrance', 'RFID', '2026-05-02 19:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (247, 37, 'Main Entrance', 'RFID', '2026-05-02 16:06:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (248, 37, 'Main Entrance', 'RFID', '2026-05-03 02:38:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (249, 32, 'Main Entrance', 'RFID', '2026-05-03 14:01:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (250, 22, 'Main Entrance', 'RFID', '2026-05-03 08:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (251, 20, 'Main Entrance', 'RFID', '2026-05-03 11:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (252, 23, 'Main Entrance', 'RFID', '2026-05-03 04:45:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (253, 14, 'Main Entrance', 'RFID', '2026-05-03 07:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (254, 36, 'Main Entrance', 'RFID', '2026-05-03 09:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (255, 17, 'Main Entrance', 'RFID', '2026-05-02 16:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (256, 25, 'Main Entrance', 'RFID', '2026-05-03 07:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (257, 21, 'Main Entrance', 'RFID', '2026-05-03 08:53:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (258, 23, 'Main Entrance', 'RFID', '2026-05-03 07:01:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (259, 31, 'Main Entrance', 'RFID', '2026-05-03 01:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (260, 32, 'Main Entrance', 'RFID', '2026-05-03 02:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (261, 31, 'Main Entrance', 'RFID', '2026-05-03 05:10:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (262, 23, 'Main Entrance', 'RFID', '2026-05-03 07:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (263, 16, 'Main Entrance', 'RFID', '2026-05-02 01:37:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (264, 15, 'Main Entrance', 'RFID', '2026-05-02 11:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (265, 19, 'Main Entrance', 'RFID', '2026-05-02 01:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (266, 17, 'Main Entrance', 'RFID', '2026-05-01 22:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (267, 29, 'Main Entrance', 'RFID', '2026-05-01 22:47:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (268, 31, 'Main Entrance', 'RFID', '2026-05-02 05:55:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (269, 34, 'Main Entrance', 'RFID', '2026-05-02 13:08:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (270, 36, 'Main Entrance', 'RFID', '2026-05-01 22:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (271, 34, 'Main Entrance', 'RFID', '2026-05-02 02:12:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (272, 37, 'Main Entrance', 'RFID', '2026-05-02 01:51:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (273, 23, 'Main Entrance', 'RFID', '2026-05-02 03:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (274, 29, 'Main Entrance', 'RFID', '2026-05-02 11:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (275, 24, 'Main Entrance', 'RFID', '2026-05-01 19:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (276, 26, 'Main Entrance', 'RFID', '2026-05-02 15:36:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (277, 23, 'Main Entrance', 'RFID', '2026-05-02 07:27:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (278, 36, 'Main Entrance', 'RFID', '2026-05-02 06:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (279, 14, 'Main Entrance', 'RFID', '2026-05-01 19:06:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (280, 19, 'Main Entrance', 'RFID', '2026-05-02 09:04:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (281, 30, 'Main Entrance', 'RFID', '2026-05-02 03:10:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (282, 33, 'Main Entrance', 'RFID', '2026-05-01 23:06:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (283, 30, 'Main Entrance', 'RFID', '2026-05-02 07:05:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (284, 38, 'Main Entrance', 'RFID', '2026-05-01 23:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (285, 34, 'Main Entrance', 'RFID', '2026-05-02 15:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (286, 36, 'Main Entrance', 'RFID', '2026-05-02 05:33:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (287, 34, 'Main Entrance', 'RFID', '2026-05-02 05:40:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (288, 29, 'Main Entrance', 'RFID', '2026-04-30 21:08:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (289, 24, 'Main Entrance', 'RFID', '2026-05-01 01:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (290, 19, 'Main Entrance', 'RFID', '2026-05-01 00:55:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (291, 25, 'Main Entrance', 'RFID', '2026-05-01 10:33:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (292, 36, 'Main Entrance', 'RFID', '2026-05-01 00:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (293, 35, 'Main Entrance', 'RFID', '2026-05-01 03:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (294, 36, 'Main Entrance', 'RFID', '2026-05-01 14:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (295, 14, 'Main Entrance', 'RFID', '2026-05-01 06:57:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (296, 36, 'Main Entrance', 'RFID', '2026-05-01 06:11:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (297, 14, 'Main Entrance', 'RFID', '2026-05-01 12:25:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (298, 27, 'Main Entrance', 'RFID', '2026-04-30 20:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (299, 19, 'Main Entrance', 'RFID', '2026-05-01 12:14:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (300, 32, 'Main Entrance', 'RFID', '2026-05-01 02:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (301, 28, 'Main Entrance', 'RFID', '2026-05-01 06:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (302, 32, 'Main Entrance', 'RFID', '2026-05-01 10:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (303, 16, 'Main Entrance', 'RFID', '2026-04-30 23:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (304, 30, 'Main Entrance', 'RFID', '2026-04-30 19:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (305, 14, 'Main Entrance', 'RFID', '2026-04-30 16:31:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (306, 37, 'Main Entrance', 'RFID', '2026-04-30 00:20:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (307, 28, 'Main Entrance', 'RFID', '2026-04-30 13:43:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (308, 16, 'Main Entrance', 'RFID', '2026-04-30 03:14:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (309, 35, 'Main Entrance', 'RFID', '2026-04-30 09:30:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (310, 26, 'Main Entrance', 'RFID', '2026-04-29 19:26:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (311, 18, 'Main Entrance', 'RFID', '2026-04-29 23:36:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (312, 36, 'Main Entrance', 'RFID', '2026-04-30 01:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (313, 37, 'Main Entrance', 'RFID', '2026-04-30 15:46:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (314, 29, 'Main Entrance', 'RFID', '2026-04-29 20:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (315, 19, 'Main Entrance', 'RFID', '2026-04-30 10:42:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (316, 21, 'Main Entrance', 'RFID', '2026-04-30 06:33:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (317, 32, 'Main Entrance', 'RFID', '2026-04-30 12:38:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (318, 27, 'Main Entrance', 'RFID', '2026-04-30 15:34:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (319, 18, 'Main Entrance', 'RFID', '2026-04-29 22:19:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (320, 37, 'Main Entrance', 'RFID', '2026-04-29 23:55:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (321, 15, 'Main Entrance', 'RFID', '2026-04-29 23:38:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (322, 34, 'Main Entrance', 'RFID', '2026-04-30 10:55:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (323, 35, 'Main Entrance', 'RFID', '2026-04-29 16:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (324, 20, 'Main Entrance', 'RFID', '2026-04-29 19:10:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (325, 16, 'Main Entrance', 'RFID', '2026-04-28 17:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (326, 23, 'Main Entrance', 'RFID', '2026-04-29 02:25:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (327, 21, 'Main Entrance', 'RFID', '2026-04-29 04:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (328, 24, 'Main Entrance', 'RFID', '2026-04-29 13:44:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (329, 20, 'Main Entrance', 'RFID', '2026-04-29 08:05:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (330, 19, 'Main Entrance', 'RFID', '2026-04-29 14:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (331, 30, 'Main Entrance', 'RFID', '2026-04-29 09:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (332, 28, 'Main Entrance', 'RFID', '2026-04-29 00:22:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (333, 38, 'Main Entrance', 'RFID', '2026-04-29 02:30:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (334, 29, 'Main Entrance', 'RFID', '2026-04-29 01:11:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (335, 34, 'Main Entrance', 'RFID', '2026-04-28 18:36:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (336, 15, 'Main Entrance', 'RFID', '2026-04-29 10:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (337, 18, 'Main Entrance', 'RFID', '2026-04-29 15:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (338, 27, 'Main Entrance', 'RFID', '2026-04-28 22:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (339, 23, 'Main Entrance', 'RFID', '2026-04-29 00:25:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (340, 16, 'Main Entrance', 'RFID', '2026-04-29 05:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (341, 32, 'Main Entrance', 'RFID', '2026-04-28 21:45:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (342, 37, 'Main Entrance', 'RFID', '2026-04-28 23:45:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (343, 32, 'Main Entrance', 'RFID', '2026-04-29 06:40:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (344, 18, 'Main Entrance', 'RFID', '2026-04-29 03:50:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (345, 21, 'Main Entrance', 'RFID', '2026-04-29 04:46:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (346, 16, 'Main Entrance', 'RFID', '2026-04-28 16:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (347, 26, 'Main Entrance', 'RFID', '2026-04-28 13:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (348, 33, 'Main Entrance', 'RFID', '2026-04-27 22:52:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (349, 19, 'Main Entrance', 'RFID', '2026-04-28 14:08:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (350, 38, 'Main Entrance', 'RFID', '2026-04-28 04:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (351, 21, 'Main Entrance', 'RFID', '2026-04-28 09:57:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (352, 27, 'Main Entrance', 'RFID', '2026-04-28 00:08:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (353, 29, 'Main Entrance', 'RFID', '2026-04-28 08:37:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (354, 36, 'Main Entrance', 'RFID', '2026-04-27 18:30:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (355, 36, 'Main Entrance', 'RFID', '2026-04-27 20:40:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (356, 38, 'Main Entrance', 'RFID', '2026-04-28 13:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (357, 23, 'Main Entrance', 'RFID', '2026-04-27 18:05:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (358, 32, 'Main Entrance', 'RFID', '2026-04-27 20:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (359, 31, 'Main Entrance', 'RFID', '2026-04-27 19:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (360, 23, 'Main Entrance', 'RFID', '2026-04-28 07:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (361, 26, 'Main Entrance', 'RFID', '2026-04-27 19:53:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (362, 18, 'Main Entrance', 'RFID', '2026-04-28 09:36:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (363, 29, 'Main Entrance', 'RFID', '2026-04-27 04:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (364, 36, 'Main Entrance', 'RFID', '2026-04-26 21:34:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (365, 34, 'Main Entrance', 'RFID', '2026-04-27 11:14:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (366, 18, 'Main Entrance', 'RFID', '2026-04-26 23:22:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (367, 15, 'Main Entrance', 'RFID', '2026-04-26 22:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (368, 17, 'Main Entrance', 'RFID', '2026-04-27 12:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (369, 25, 'Main Entrance', 'RFID', '2026-04-26 17:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (370, 34, 'Main Entrance', 'RFID', '2026-04-27 11:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (371, 33, 'Main Entrance', 'RFID', '2026-04-27 12:22:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (372, 20, 'Main Entrance', 'RFID', '2026-04-26 21:40:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (373, 29, 'Main Entrance', 'RFID', '2026-04-26 21:31:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (374, 23, 'Main Entrance', 'RFID', '2026-04-26 21:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (375, 20, 'Main Entrance', 'RFID', '2026-04-27 11:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (376, 20, 'Main Entrance', 'RFID', '2026-04-27 08:51:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (377, 14, 'Main Entrance', 'RFID', '2026-04-26 23:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (378, 33, 'Main Entrance', 'RFID', '2026-04-26 19:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (379, 36, 'Main Entrance', 'RFID', '2026-04-27 11:24:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (380, 30, 'Main Entrance', 'RFID', '2026-04-25 19:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (381, 35, 'Main Entrance', 'RFID', '2026-04-25 23:37:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (382, 19, 'Main Entrance', 'RFID', '2026-04-26 01:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (383, 37, 'Main Entrance', 'RFID', '2026-04-25 16:34:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (384, 29, 'Main Entrance', 'RFID', '2026-04-25 23:40:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (385, 35, 'Main Entrance', 'RFID', '2026-04-25 18:00:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (386, 30, 'Main Entrance', 'RFID', '2026-04-25 18:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (387, 27, 'Main Entrance', 'RFID', '2026-04-26 08:11:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (388, 24, 'Main Entrance', 'RFID', '2026-04-26 00:05:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (389, 17, 'Main Entrance', 'RFID', '2026-04-26 12:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (390, 14, 'Main Entrance', 'RFID', '2026-04-26 05:50:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (391, 27, 'Main Entrance', 'RFID', '2026-04-26 06:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (392, 37, 'Main Entrance', 'RFID', '2026-04-25 23:59:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (393, 36, 'Main Entrance', 'RFID', '2026-04-25 23:11:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (394, 35, 'Main Entrance', 'RFID', '2026-04-25 16:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (395, 38, 'Main Entrance', 'RFID', '2026-04-26 03:47:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (396, 23, 'Main Entrance', 'RFID', '2026-04-26 10:46:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (397, 14, 'Main Entrance', 'RFID', '2026-04-25 22:22:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (398, 34, 'Main Entrance', 'RFID', '2026-04-25 16:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (399, 17, 'Main Entrance', 'RFID', '2026-04-26 09:20:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (400, 29, 'Main Entrance', 'RFID', '2026-04-26 09:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (401, 25, 'Main Entrance', 'RFID', '2026-04-25 23:14:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (402, 37, 'Main Entrance', 'RFID', '2026-04-26 01:42:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (403, 35, 'Main Entrance', 'RFID', '2026-04-26 01:49:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (404, 17, 'Main Entrance', 'RFID', '2026-04-26 14:49:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (405, 21, 'Main Entrance', 'RFID', '2026-04-26 00:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (406, 26, 'Main Entrance', 'RFID', '2026-04-25 15:14:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (407, 36, 'Main Entrance', 'RFID', '2026-04-24 20:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (408, 20, 'Main Entrance', 'RFID', '2026-04-24 22:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (409, 27, 'Main Entrance', 'RFID', '2026-04-25 02:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (410, 36, 'Main Entrance', 'RFID', '2026-04-24 21:04:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (411, 33, 'Main Entrance', 'RFID', '2026-04-25 08:37:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (412, 34, 'Main Entrance', 'RFID', '2026-04-25 07:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (413, 24, 'Main Entrance', 'RFID', '2026-04-25 07:01:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (414, 31, 'Main Entrance', 'RFID', '2026-04-25 15:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (415, 27, 'Main Entrance', 'RFID', '2026-04-24 19:50:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (416, 32, 'Main Entrance', 'RFID', '2026-04-25 14:22:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (417, 26, 'Main Entrance', 'RFID', '2026-04-24 22:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (418, 22, 'Main Entrance', 'RFID', '2026-04-25 08:31:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (419, 21, 'Main Entrance', 'RFID', '2026-04-25 07:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (420, 24, 'Main Entrance', 'RFID', '2026-04-25 02:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (421, 36, 'Main Entrance', 'RFID', '2026-04-25 12:04:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (422, 38, 'Main Entrance', 'RFID', '2026-04-25 07:19:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (423, 18, 'Main Entrance', 'RFID', '2026-04-25 08:46:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (424, 17, 'Main Entrance', 'RFID', '2026-04-25 09:52:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (425, 37, 'Main Entrance', 'RFID', '2026-04-25 02:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (426, 19, 'Main Entrance', 'RFID', '2026-04-25 08:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (427, 14, 'Main Entrance', 'RFID', '2026-04-25 00:40:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (428, 16, 'Main Entrance', 'RFID', '2026-04-25 14:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (429, 29, 'Main Entrance', 'RFID', '2026-04-24 18:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (430, 36, 'Main Entrance', 'RFID', '2026-04-24 19:27:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (431, 22, 'Main Entrance', 'RFID', '2026-04-24 02:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (432, 37, 'Main Entrance', 'RFID', '2026-04-24 07:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (433, 38, 'Main Entrance', 'RFID', '2026-04-24 03:34:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (434, 27, 'Main Entrance', 'RFID', '2026-04-24 06:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (435, 33, 'Main Entrance', 'RFID', '2026-04-24 15:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (436, 35, 'Main Entrance', 'RFID', '2026-04-24 12:38:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (437, 38, 'Main Entrance', 'RFID', '2026-04-24 09:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (438, 29, 'Main Entrance', 'RFID', '2026-04-23 16:19:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (439, 20, 'Main Entrance', 'RFID', '2026-04-24 04:44:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (440, 28, 'Main Entrance', 'RFID', '2026-04-24 04:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (441, 33, 'Main Entrance', 'RFID', '2026-04-23 17:26:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (442, 20, 'Main Entrance', 'RFID', '2026-04-24 05:53:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (443, 33, 'Main Entrance', 'RFID', '2026-04-23 17:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (444, 24, 'Main Entrance', 'RFID', '2026-04-23 20:45:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (445, 21, 'Main Entrance', 'RFID', '2026-04-23 17:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (446, 22, 'Main Entrance', 'RFID', '2026-04-24 10:55:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (447, 33, 'Main Entrance', 'RFID', '2026-04-24 01:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (448, 37, 'Main Entrance', 'RFID', '2026-04-24 07:11:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (449, 30, 'Main Entrance', 'RFID', '2026-04-23 19:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (450, 15, 'Main Entrance', 'RFID', '2026-04-24 04:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (451, 35, 'Main Entrance', 'RFID', '2026-04-24 14:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (452, 17, 'Main Entrance', 'RFID', '2026-04-24 13:49:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (453, 19, 'Main Entrance', 'RFID', '2026-04-24 00:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (454, 19, 'Main Entrance', 'RFID', '2026-04-24 05:46:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (455, 21, 'Main Entrance', 'RFID', '2026-04-24 04:31:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (456, 32, 'Main Entrance', 'RFID', '2026-04-24 01:52:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (457, 34, 'Main Entrance', 'RFID', '2026-04-24 07:45:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (458, 29, 'Main Entrance', 'RFID', '2026-04-24 15:27:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (459, 16, 'Main Entrance', 'RFID', '2026-04-23 09:47:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (460, 18, 'Main Entrance', 'RFID', '2026-04-22 17:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (461, 18, 'Main Entrance', 'RFID', '2026-04-23 04:52:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (462, 18, 'Main Entrance', 'RFID', '2026-04-23 14:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (463, 19, 'Main Entrance', 'RFID', '2026-04-23 03:20:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (464, 18, 'Main Entrance', 'RFID', '2026-04-23 04:59:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (465, 17, 'Main Entrance', 'RFID', '2026-04-23 13:38:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (466, 25, 'Main Entrance', 'RFID', '2026-04-22 16:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (467, 32, 'Main Entrance', 'RFID', '2026-04-22 21:31:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (468, 25, 'Main Entrance', 'RFID', '2026-04-23 00:15:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (469, 17, 'Main Entrance', 'RFID', '2026-04-23 10:06:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (470, 21, 'Main Entrance', 'RFID', '2026-04-23 03:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (471, 16, 'Main Entrance', 'RFID', '2026-04-23 03:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (472, 25, 'Main Entrance', 'RFID', '2026-04-23 00:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (473, 30, 'Main Entrance', 'RFID', '2026-04-22 19:42:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (474, 24, 'Main Entrance', 'RFID', '2026-04-23 15:31:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (475, 33, 'Main Entrance', 'RFID', '2026-04-22 16:22:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (476, 23, 'Main Entrance', 'RFID', '2026-04-23 15:35:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (477, 25, 'Main Entrance', 'RFID', '2026-04-22 20:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (478, 33, 'Main Entrance', 'RFID', '2026-04-22 21:00:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (479, 28, 'Main Entrance', 'RFID', '2026-04-23 01:33:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (480, 26, 'Main Entrance', 'RFID', '2026-04-23 00:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (481, 27, 'Main Entrance', 'RFID', '2026-04-23 10:01:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (482, 32, 'Main Entrance', 'RFID', '2026-04-23 13:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (483, 16, 'Main Entrance', 'RFID', '2026-04-23 03:01:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (484, 20, 'Main Entrance', 'RFID', '2026-04-23 08:19:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (485, 20, 'Main Entrance', 'RFID', '2026-04-22 18:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (486, 19, 'Main Entrance', 'RFID', '2026-04-22 20:47:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (487, 29, 'Main Entrance', 'RFID', '2026-04-23 11:38:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (488, 24, 'Main Entrance', 'RFID', '2026-04-22 00:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (489, 17, 'Main Entrance', 'RFID', '2026-04-22 01:19:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (490, 18, 'Main Entrance', 'RFID', '2026-04-22 00:15:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (491, 24, 'Main Entrance', 'RFID', '2026-04-21 22:08:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (492, 20, 'Main Entrance', 'RFID', '2026-04-22 04:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (493, 26, 'Main Entrance', 'RFID', '2026-04-21 19:12:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (494, 35, 'Main Entrance', 'RFID', '2026-04-21 23:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (495, 33, 'Main Entrance', 'RFID', '2026-04-22 07:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (496, 29, 'Main Entrance', 'RFID', '2026-04-21 20:52:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (497, 25, 'Main Entrance', 'RFID', '2026-04-21 16:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (498, 31, 'Main Entrance', 'RFID', '2026-04-21 11:57:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (499, 32, 'Main Entrance', 'RFID', '2026-04-21 12:52:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (500, 25, 'Main Entrance', 'RFID', '2026-04-21 09:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (501, 22, 'Main Entrance', 'RFID', '2026-04-21 01:51:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (502, 26, 'Main Entrance', 'RFID', '2026-04-20 20:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (503, 31, 'Main Entrance', 'RFID', '2026-04-20 20:44:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (504, 33, 'Main Entrance', 'RFID', '2026-04-21 08:11:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (505, 28, 'Main Entrance', 'RFID', '2026-04-20 17:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (506, 22, 'Main Entrance', 'RFID', '2026-04-20 16:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (507, 26, 'Main Entrance', 'RFID', '2026-04-21 03:33:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (508, 26, 'Main Entrance', 'RFID', '2026-04-20 17:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (509, 31, 'Main Entrance', 'RFID', '2026-04-21 01:29:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (510, 23, 'Main Entrance', 'RFID', '2026-04-20 12:58:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (511, 24, 'Main Entrance', 'RFID', '2026-04-20 01:20:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (512, 37, 'Main Entrance', 'RFID', '2026-04-20 00:03:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (513, 15, 'Main Entrance', 'RFID', '2026-04-19 16:27:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (514, 33, 'Main Entrance', 'RFID', '2026-04-20 14:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (515, 20, 'Main Entrance', 'RFID', '2026-04-19 20:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (516, 25, 'Main Entrance', 'RFID', '2026-04-19 18:44:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (517, 17, 'Main Entrance', 'RFID', '2026-04-19 18:30:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (518, 27, 'Main Entrance', 'RFID', '2026-04-20 09:28:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (519, 37, 'Main Entrance', 'RFID', '2026-04-19 22:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (520, 17, 'Main Entrance', 'RFID', '2026-04-19 18:01:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (521, 33, 'Main Entrance', 'RFID', '2026-04-20 01:46:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (522, 23, 'Main Entrance', 'RFID', '2026-04-19 18:06:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (523, 26, 'Main Entrance', 'RFID', '2026-04-19 23:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (524, 36, 'Main Entrance', 'RFID', '2026-04-20 13:21:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (525, 29, 'Main Entrance', 'RFID', '2026-04-20 04:14:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (526, 32, 'Main Entrance', 'RFID', '2026-04-20 14:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (527, 15, 'Main Entrance', 'RFID', '2026-04-20 10:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (528, 17, 'Main Entrance', 'RFID', '2026-04-20 00:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (529, 31, 'Main Entrance', 'RFID', '2026-04-19 11:44:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (530, 25, 'Main Entrance', 'RFID', '2026-04-18 22:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (531, 14, 'Main Entrance', 'RFID', '2026-04-18 23:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (532, 23, 'Main Entrance', 'RFID', '2026-04-19 00:52:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (533, 37, 'Main Entrance', 'RFID', '2026-04-19 01:18:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (534, 14, 'Main Entrance', 'RFID', '2026-04-18 20:06:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (535, 23, 'Main Entrance', 'RFID', '2026-04-19 08:51:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (536, 32, 'Main Entrance', 'RFID', '2026-04-18 19:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (537, 30, 'Main Entrance', 'RFID', '2026-04-18 20:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (538, 21, 'Main Entrance', 'RFID', '2026-04-18 20:06:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (539, 24, 'Main Entrance', 'RFID', '2026-04-19 13:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (540, 31, 'Main Entrance', 'RFID', '2026-04-19 02:10:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (541, 27, 'Main Entrance', 'RFID', '2026-04-19 03:39:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (542, 21, 'Main Entrance', 'RFID', '2026-04-19 14:41:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (543, 24, 'Main Entrance', 'RFID', '2026-04-18 23:12:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (544, 30, 'Main Entrance', 'RFID', '2026-04-18 07:00:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (545, 38, 'Main Entrance', 'RFID', '2026-04-18 12:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (546, 22, 'Main Entrance', 'RFID', '2026-04-18 10:36:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (547, 35, 'Main Entrance', 'RFID', '2026-04-17 18:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (548, 28, 'Main Entrance', 'RFID', '2026-04-18 01:00:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (549, 18, 'Main Entrance', 'RFID', '2026-04-18 02:34:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (550, 21, 'Main Entrance', 'RFID', '2026-04-17 22:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (551, 30, 'Main Entrance', 'RFID', '2026-04-18 14:54:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (552, 26, 'Main Entrance', 'RFID', '2026-04-18 14:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (553, 37, 'Main Entrance', 'RFID', '2026-04-18 13:48:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (554, 19, 'Main Entrance', 'RFID', '2026-04-18 06:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (555, 36, 'Main Entrance', 'RFID', '2026-04-18 03:03:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (556, 19, 'Main Entrance', 'RFID', '2026-04-17 07:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (557, 28, 'Main Entrance', 'RFID', '2026-04-17 13:36:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (558, 21, 'Main Entrance', 'RFID', '2026-04-17 08:57:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (559, 24, 'Main Entrance', 'RFID', '2026-04-17 03:07:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (560, 21, 'Main Entrance', 'RFID', '2026-04-17 15:09:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (561, 38, 'Main Entrance', 'RFID', '2026-04-16 20:51:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (562, 21, 'Main Entrance', 'RFID', '2026-04-17 00:45:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (563, 17, 'Main Entrance', 'RFID', '2026-04-17 06:45:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (564, 29, 'Main Entrance', 'RFID', '2026-04-16 17:59:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (565, 25, 'Main Entrance', 'RFID', '2026-04-17 00:16:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (566, 14, 'Main Entrance', 'RFID', '2026-04-17 02:40:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (567, 17, 'Main Entrance', 'RFID', '2026-04-17 15:08:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (568, 17, 'Main Entrance', 'RFID', '2026-04-16 16:32:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (569, 34, 'Main Entrance', 'RFID', '2026-04-17 02:25:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (570, 15, 'Main Entrance', 'RFID', '2026-04-16 20:49:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (571, 15, 'Main Entrance', 'RFID', '2026-04-17 00:37:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (572, 22, 'Main Entrance', 'RFID', '2026-04-16 17:20:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (573, 28, 'Main Entrance', 'RFID', '2026-04-16 21:23:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (574, 26, 'Main Entrance', 'RFID', '2026-04-16 00:13:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (575, 37, 'Main Entrance', 'RFID', '2026-04-16 06:42:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (576, 14, 'Main Entrance', 'RFID', '2026-04-15 21:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (577, 32, 'Main Entrance', 'RFID', '2026-04-16 00:53:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (578, 14, 'Main Entrance', 'RFID', '2026-04-16 09:02:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (579, 17, 'Main Entrance', 'RFID', '2026-04-16 07:24:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (580, 31, 'Main Entrance', 'RFID', '2026-04-15 17:59:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (581, 24, 'Main Entrance', 'RFID', '2026-04-15 16:46:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (582, 38, 'Main Entrance', 'RFID', '2026-04-16 09:19:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (583, 23, 'Main Entrance', 'RFID', '2026-04-15 20:04:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (584, 36, 'Main Entrance', 'RFID', '2026-04-16 02:43:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (585, 15, 'Main Entrance', 'RFID', '2026-04-15 23:37:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (586, 22, 'Main Entrance', 'RFID', '2026-04-16 11:40:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (587, 14, 'Main Entrance', 'RFID', '2026-04-16 04:37:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (588, 29, 'Main Entrance', 'RFID', '2026-04-16 00:52:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (589, 37, 'Main Entrance', 'RFID', '2026-04-16 11:06:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (590, 19, 'Main Entrance', 'RFID', '2026-04-16 07:31:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (591, 38, 'Main Entrance', 'RFID', '2026-04-15 23:56:37', 'granted');
+INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (592, 22, 'Main Entrance', 'RFID', '2026-04-16 08:51:37', 'granted');
 
-LOCK TABLES `door_access_logs` WRITE;
-/*!40000 ALTER TABLE `door_access_logs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `door_access_logs` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `event_attendees`
---
-
 DROP TABLE IF EXISTS `event_attendees`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `event_attendees` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `event_id` int(11) NOT NULL,
@@ -100,30 +640,19 @@ CREATE TABLE `event_attendees` (
   CONSTRAINT `event_attendees_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
   CONSTRAINT `event_attendees_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Dumping data for table `event_attendees`
---
 
-LOCK TABLES `event_attendees` WRITE;
-/*!40000 ALTER TABLE `event_attendees` DISABLE KEYS */;
-/*!40000 ALTER TABLE `event_attendees` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `events`
---
-
 DROP TABLE IF EXISTS `events`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `events` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(100) NOT NULL,
   `description` text DEFAULT NULL,
   `event_date` datetime NOT NULL,
   `location` varchar(100) DEFAULT NULL,
+  `image` longtext DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT 0.00,
   `max_attendees` int(11) DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -131,24 +660,11 @@ CREATE TABLE `events` (
   KEY `created_by` (`created_by`),
   CONSTRAINT `events_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Dumping data for table `events`
---
 
-LOCK TABLES `events` WRITE;
-/*!40000 ALTER TABLE `events` DISABLE KEYS */;
-/*!40000 ALTER TABLE `events` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `floor_elements`
---
-
 DROP TABLE IF EXISTS `floor_elements`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `floor_elements` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `floor_plan_id` int(11) NOT NULL,
@@ -162,29 +678,57 @@ CREATE TABLE `floor_elements` (
   `color` varchar(20) DEFAULT NULL,
   `capacity` int(11) DEFAULT 1,
   `status` enum('open','taken','reserved','maintenance') DEFAULT 'open',
+  `image` longtext DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `floor_plan_id` (`floor_plan_id`),
   CONSTRAINT `floor_elements_ibfk_1` FOREIGN KEY (`floor_plan_id`) REFERENCES `floor_plans` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=315 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Dumping data for table `floor_elements`
---
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (274, 8, 'block-gray', 'Wall', 0, 0, 600, 45, 0, '#cbd5e1', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (275, 8, 'block-gray', 'Wall', 0, 0, 12, 450, 0, '#cbd5e1', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (276, 8, 'block-yellow', 'Counter', 29, 55, 300, 95, 0, '#fde68a', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (277, 8, 'room', 'Meeting Room', 414, 49, 180, 95, 0, '#22c55e', 8, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (278, 8, 'round-table', 'T1', 96, 344, 50, 50, 0, '#fdba74', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (279, 8, 'chair', 'T1-1', 58, 310, 40, 40, -45, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (280, 8, 'chair', 'T1-3', 100, 395, 40, 40, 180, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (281, 8, 'round-table', 'T2', 237, 347, 50, 50, 0, '#fdba74', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (282, 8, 'chair', 'T1-2', 142, 308, 40, 40, 30, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (283, 8, 'chair', 'T2-1', 204, 313, 40, 40, -30, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (284, 8, 'chair', 'T2-2', 282, 316, 40, 40, 30, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (285, 8, 'chair', 'T2-3', 240, 399, 40, 40, 180, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (286, 8, 'chair', 'T3-8', 410, 396, 40, 40, 180, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (287, 8, 'chair', 'T3-7', 465, 352, 40, 40, 90, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (288, 8, 'rect-table', 'C4', 675, 313, 90, 40, 0, '#fdba74', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (289, 8, 'rect-table', 'C2', 674, 135, 90, 40, 0, '#fdba74', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (290, 8, 'rect-table', 'C3', 673, 225, 90, 40, 0, '#fdba74', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (291, 8, 'rect-table', 'C5', 675, 402, 90, 40, 0, '#fdba74', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (292, 8, 'chair-sq', 'C5-1', 676, 358, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (293, 8, 'chair-sq', 'C5-2', 723, 358, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (294, 8, 'chair-sq', 'C4-1', 675, 270, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (295, 8, 'chair-sq', 'C4-2', 719, 269, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (296, 8, 'chair-sq', 'C3-1', 676, 182, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (297, 8, 'chair-sq', 'C3-2', 719, 181, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (298, 8, 'chair-sq', 'C2-1', 676, 91, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (299, 8, 'chair-sq', 'C2-2', 721, 89, 40, 40, 0, '#faecd4', 1, 'taken', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (300, 8, 'rect-table', 'C1', 680, 46, 80, 40, 0, '#fdba74', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (301, 8, 'chair-sq', 'C1-1', 677, 5, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (302, 8, 'chair-sq', 'C1-2', 720, 3, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (303, 8, 'rect-table', 'T3', 412, 274, 40, 120, 0, '#fdba74', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (304, 8, 'chair', 'T3-6', 464, 310, 40, 40, 90, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (305, 8, 'chair', 'TE-5', 464, 274, 40, 40, 90, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (306, 8, 'chair', 'T3-4', 413, 224, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (307, 8, 'chair-sq', 'T3-1', 365, 273, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (308, 8, 'chair-sq', 'T3-2', 365, 312, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (309, 8, 'chair-sq', 'T3-3', 365, 352, 40, 40, 0, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (310, 8, 'block-gray', NULL, 333, 198, 10, 250, 0, '#b0b8c0', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (311, 8, 'round-table', 'T4', 544, 354, 50, 50, 0, '#fdba74', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (312, 8, 'chair', 'T4-1', 510, 321, 40, 40, -30, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (313, 8, 'chair', 'T4-2', 584, 321, 40, 40, 30, '#faecd4', 1, 'open', NULL);
+INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (314, 8, 'chair', 'T4-3', 548, 404, 40, 40, 180, '#faecd4', 1, 'open', NULL);
 
-LOCK TABLES `floor_elements` WRITE;
-/*!40000 ALTER TABLE `floor_elements` DISABLE KEYS */;
-INSERT INTO `floor_elements` VALUES (274,8,'block-gray','Wall',0,0,600,45,0,'#cbd5e1',1,'open'),(275,8,'block-gray','Wall',0,0,12,450,0,'#cbd5e1',1,'open'),(276,8,'block-yellow','Counter',29,55,300,95,0,'#fde68a',1,'open'),(277,8,'room','Meeting Room',414,49,180,95,0,'#22c55e',8,'open'),(278,8,'round-table','T1',96,344,50,50,0,'#fdba74',1,'open'),(279,8,'chair','T1-1',58,310,40,40,-45,'#faecd4',1,'open'),(280,8,'chair','T1-3',100,395,40,40,180,'#faecd4',1,'open'),(281,8,'round-table','T2',237,347,50,50,0,'#fdba74',1,'open'),(282,8,'chair','T1-2',142,308,40,40,30,'#faecd4',1,'open'),(283,8,'chair','T2-1',204,313,40,40,-30,'#faecd4',1,'open'),(284,8,'chair','T2-2',282,316,40,40,30,'#faecd4',1,'open'),(285,8,'chair','T2-3',240,399,40,40,180,'#faecd4',1,'open'),(286,8,'chair','T3-8',410,396,40,40,180,'#faecd4',1,'open'),(287,8,'chair','T3-7',465,352,40,40,90,'#faecd4',1,'open'),(288,8,'rect-table','C4',675,313,90,40,0,'#fdba74',1,'open'),(289,8,'rect-table','C2',674,135,90,40,0,'#fdba74',1,'open'),(290,8,'rect-table','C3',673,225,90,40,0,'#fdba74',1,'open'),(291,8,'rect-table','C5',675,402,90,40,0,'#fdba74',1,'open'),(292,8,'chair-sq','C5-1',676,358,40,40,0,'#faecd4',1,'open'),(293,8,'chair-sq','C5-2',723,358,40,40,0,'#faecd4',1,'open'),(294,8,'chair-sq','C4-1',675,270,40,40,0,'#faecd4',1,'open'),(295,8,'chair-sq','C4-2',719,269,40,40,0,'#faecd4',1,'open'),(296,8,'chair-sq','C3-1',676,182,40,40,0,'#faecd4',1,'open'),(297,8,'chair-sq','C3-2',719,181,40,40,0,'#faecd4',1,'open'),(298,8,'chair-sq','C2-1',676,91,40,40,0,'#faecd4',1,'open'),(299,8,'chair-sq','C2-2',721,89,40,40,0,'#faecd4',1,'open'),(300,8,'rect-table','C1',680,46,80,40,0,'#fdba74',1,'open'),(301,8,'chair-sq','C1-1',677,5,40,40,0,'#faecd4',1,'open'),(302,8,'chair-sq','C1-2',720,3,40,40,0,'#faecd4',1,'open'),(303,8,'rect-table','T3',412,274,40,120,0,'#fdba74',1,'open'),(304,8,'chair','T3-6',464,310,40,40,90,'#faecd4',1,'open'),(305,8,'chair','TE-5',464,274,40,40,90,'#faecd4',1,'open'),(306,8,'chair','T3-4',413,224,40,40,0,'#faecd4',1,'open'),(307,8,'chair-sq','T3-1',365,273,40,40,0,'#faecd4',1,'open'),(308,8,'chair-sq','T3-2',365,312,40,40,0,'#faecd4',1,'open'),(309,8,'chair-sq','T3-3',365,352,40,40,0,'#faecd4',1,'open'),(310,8,'block-gray',NULL,333,198,10,250,0,'#b0b8c0',1,'open'),(311,8,'round-table','T4',544,354,50,50,0,'#fdba74',1,'open'),(312,8,'chair','T4-1',510,321,40,40,-30,'#faecd4',1,'open'),(313,8,'chair','T4-2',584,321,40,40,30,'#faecd4',1,'open'),(314,8,'chair','T4-3',548,404,40,40,180,'#faecd4',1,'open');
-/*!40000 ALTER TABLE `floor_elements` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `floor_plans`
---
-
 DROP TABLE IF EXISTS `floor_plans`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `floor_plans` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
@@ -194,25 +738,12 @@ CREATE TABLE `floor_plans` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Dumping data for table `floor_plans`
---
+INSERT INTO `floor_plans` (`id`, `name`, `width`, `height`, `is_active`, `created_at`) VALUES (8, 'Main Floor', 800, 450, 1, '2026-05-10 17:02:06');
 
-LOCK TABLES `floor_plans` WRITE;
-/*!40000 ALTER TABLE `floor_plans` DISABLE KEYS */;
-INSERT INTO `floor_plans` VALUES (8,'Main Floor',800,450,1,'2026-05-10 17:02:06');
-/*!40000 ALTER TABLE `floor_plans` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `membership_plans`
---
-
 DROP TABLE IF EXISTS `membership_plans`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `membership_plans` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
@@ -222,24 +753,11 @@ CREATE TABLE `membership_plans` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Dumping data for table `membership_plans`
---
 
-LOCK TABLES `membership_plans` WRITE;
-/*!40000 ALTER TABLE `membership_plans` DISABLE KEYS */;
-/*!40000 ALTER TABLE `membership_plans` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `messages`
---
-
 DROP TABLE IF EXISTS `messages`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `messages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sender_id` int(11) NOT NULL,
@@ -253,24 +771,11 @@ CREATE TABLE `messages` (
   CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Dumping data for table `messages`
---
 
-LOCK TABLES `messages` WRITE;
-/*!40000 ALTER TABLE `messages` DISABLE KEYS */;
-/*!40000 ALTER TABLE `messages` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `notifications`
---
-
 DROP TABLE IF EXISTS `notifications`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `notifications` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -281,31 +786,43 @@ CREATE TABLE `notifications` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
 -- Dumping data for table `notifications`
---
 
-LOCK TABLES `notifications` WRITE;
-/*!40000 ALTER TABLE `notifications` DISABLE KEYS */;
-/*!40000 ALTER TABLE `notifications` ENABLE KEYS */;
-UNLOCK TABLES;
+-- Table structure for table `plan_upgrade_requests`
+DROP TABLE IF EXISTS `plan_upgrade_requests`;
+CREATE TABLE `plan_upgrade_requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `current_plan_id` int(11) DEFAULT NULL,
+  `requested_plan_id` int(11) NOT NULL,
+  `status` enum('pending','approved','declined') DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `current_plan_id` (`current_plan_id`),
+  KEY `requested_plan_id` (`requested_plan_id`),
+  CONSTRAINT `plan_upgrade_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `plan_upgrade_requests_ibfk_2` FOREIGN KEY (`current_plan_id`) REFERENCES `membership_plans` (`id`),
+  CONSTRAINT `plan_upgrade_requests_ibfk_3` FOREIGN KEY (`requested_plan_id`) REFERENCES `membership_plans` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
+-- Dumping data for table `plan_upgrade_requests`
+
 -- Table structure for table `reservations`
---
-
 DROP TABLE IF EXISTS `reservations`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `reservations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `element_id` int(11) NOT NULL,
   `start_time` datetime NOT NULL,
   `end_time` datetime NOT NULL,
+  `amount` decimal(10,2) DEFAULT 0.00,
+  `payment_method` enum('cashier','gcash') DEFAULT 'cashier',
+  `payment_status` enum('unpaid','paid') DEFAULT 'unpaid',
+  `reference_number` varchar(100) DEFAULT NULL,
+  `proof_image` longtext DEFAULT NULL,
   `status` enum('pending','confirmed','completed','cancelled') DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
@@ -313,50 +830,605 @@ CREATE TABLE `reservations` (
   KEY `element_id` (`element_id`),
   CONSTRAINT `reservations_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `reservations_ibfk_2` FOREIGN KEY (`element_id`) REFERENCES `floor_elements` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB AUTO_INCREMENT=567 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
 -- Dumping data for table `reservations`
---
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (7, 27, 295, '2026-05-15 04:00:00', '2026-05-15 07:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (8, 16, 287, '2026-05-15 05:00:00', '2026-05-15 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (9, 37, 279, '2026-05-15 06:00:00', '2026-05-15 07:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (10, 33, 301, '2026-05-15 02:00:00', '2026-05-15 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (11, 33, 287, '2026-05-15 04:00:00', '2026-05-15 08:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (12, 31, 297, '2026-05-15 08:00:00', '2026-05-15 09:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (13, 25, 298, '2026-05-14 08:00:00', '2026-05-14 12:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (14, 32, 301, '2026-05-14 11:00:00', '2026-05-14 13:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (15, 17, 281, '2026-05-14 07:00:00', '2026-05-14 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (16, 35, 298, '2026-05-14 10:00:00', '2026-05-14 11:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (17, 14, 276, '2026-05-14 05:00:00', '2026-05-14 06:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (18, 36, 279, '2026-05-14 00:00:00', '2026-05-14 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (19, 30, 305, '2026-05-14 03:00:00', '2026-05-14 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (20, 36, 292, '2026-05-14 09:00:00', '2026-05-14 12:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (21, 38, 288, '2026-05-14 02:00:00', '2026-05-14 05:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (22, 17, 277, '2026-05-14 03:00:00', '2026-05-14 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (23, 29, 285, '2026-05-14 08:00:00', '2026-05-14 09:00:00', '50.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (24, 17, 290, '2026-05-14 04:00:00', '2026-05-14 05:00:00', '50.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (25, 34, 307, '2026-05-13 06:00:00', '2026-05-13 10:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (26, 18, 287, '2026-05-13 03:00:00', '2026-05-13 04:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (27, 24, 306, '2026-05-13 03:00:00', '2026-05-13 04:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (28, 37, 305, '2026-05-13 03:00:00', '2026-05-13 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (29, 20, 313, '2026-05-13 09:00:00', '2026-05-13 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (30, 16, 303, '2026-05-13 02:00:00', '2026-05-13 06:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (31, 26, 281, '2026-05-13 09:00:00', '2026-05-13 10:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (32, 38, 307, '2026-05-13 03:00:00', '2026-05-13 04:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (33, 14, 306, '2026-05-13 06:00:00', '2026-05-13 08:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (34, 25, 275, '2026-05-13 11:00:00', '2026-05-13 15:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (35, 23, 280, '2026-05-13 00:00:00', '2026-05-13 03:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (36, 21, 299, '2026-05-12 06:00:00', '2026-05-12 08:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (37, 16, 291, '2026-05-12 06:00:00', '2026-05-12 09:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (38, 22, 284, '2026-05-12 07:00:00', '2026-05-12 09:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (39, 19, 300, '2026-05-12 10:00:00', '2026-05-12 12:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (40, 21, 293, '2026-05-12 07:00:00', '2026-05-12 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (41, 21, 314, '2026-05-12 00:00:00', '2026-05-12 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (42, 35, 306, '2026-05-12 01:00:00', '2026-05-12 05:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (43, 17, 287, '2026-05-12 03:00:00', '2026-05-12 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (44, 29, 311, '2026-05-12 08:00:00', '2026-05-12 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (45, 38, 291, '2026-05-12 01:00:00', '2026-05-12 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (46, 32, 276, '2026-05-12 03:00:00', '2026-05-12 04:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (47, 27, 292, '2026-05-12 05:00:00', '2026-05-12 07:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (48, 24, 274, '2026-05-12 07:00:00', '2026-05-12 08:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (49, 22, 282, '2026-05-12 00:00:00', '2026-05-12 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (50, 21, 296, '2026-05-11 11:00:00', '2026-05-11 13:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (51, 35, 287, '2026-05-11 07:00:00', '2026-05-11 10:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (52, 37, 286, '2026-05-11 02:00:00', '2026-05-11 03:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (53, 28, 290, '2026-05-11 03:00:00', '2026-05-11 04:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (54, 30, 290, '2026-05-11 05:00:00', '2026-05-11 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (55, 36, 305, '2026-05-11 00:00:00', '2026-05-11 04:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (56, 15, 305, '2026-05-11 10:00:00', '2026-05-11 13:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (57, 31, 278, '2026-05-10 07:00:00', '2026-05-10 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (58, 24, 292, '2026-05-10 09:00:00', '2026-05-10 11:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (59, 36, 304, '2026-05-10 02:00:00', '2026-05-10 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (60, 14, 287, '2026-05-10 11:00:00', '2026-05-10 15:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (61, 17, 293, '2026-05-10 02:00:00', '2026-05-10 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (62, 30, 290, '2026-05-10 06:00:00', '2026-05-10 08:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (63, 27, 278, '2026-05-10 05:00:00', '2026-05-10 09:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (64, 27, 314, '2026-05-10 05:00:00', '2026-05-10 07:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (65, 16, 282, '2026-05-10 07:00:00', '2026-05-10 10:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (66, 28, 313, '2026-05-10 09:00:00', '2026-05-10 12:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (67, 30, 300, '2026-05-09 06:00:00', '2026-05-09 07:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (68, 22, 277, '2026-05-09 00:00:00', '2026-05-09 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (69, 21, 274, '2026-05-09 05:00:00', '2026-05-09 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (70, 17, 309, '2026-05-09 11:00:00', '2026-05-09 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (71, 31, 302, '2026-05-09 10:00:00', '2026-05-09 13:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (72, 27, 288, '2026-05-09 11:00:00', '2026-05-09 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (73, 26, 299, '2026-05-09 06:00:00', '2026-05-09 09:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (74, 34, 284, '2026-05-09 02:00:00', '2026-05-09 03:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (75, 24, 304, '2026-05-08 03:00:00', '2026-05-08 07:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (76, 30, 275, '2026-05-08 06:00:00', '2026-05-08 10:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (77, 36, 281, '2026-05-08 06:00:00', '2026-05-08 09:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (78, 31, 314, '2026-05-08 04:00:00', '2026-05-08 06:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (79, 20, 309, '2026-05-08 02:00:00', '2026-05-08 06:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (80, 35, 308, '2026-05-08 06:00:00', '2026-05-08 10:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (81, 26, 314, '2026-05-08 11:00:00', '2026-05-08 13:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (82, 15, 313, '2026-05-08 07:00:00', '2026-05-08 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (83, 33, 282, '2026-05-08 10:00:00', '2026-05-08 12:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (84, 32, 285, '2026-05-08 00:00:00', '2026-05-08 02:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (85, 27, 292, '2026-05-08 07:00:00', '2026-05-08 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (86, 36, 285, '2026-05-08 03:00:00', '2026-05-08 04:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (87, 18, 294, '2026-05-07 08:00:00', '2026-05-07 11:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (88, 14, 285, '2026-05-07 08:00:00', '2026-05-07 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (89, 24, 281, '2026-05-07 08:00:00', '2026-05-07 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (90, 31, 295, '2026-05-07 05:00:00', '2026-05-07 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (91, 20, 305, '2026-05-07 06:00:00', '2026-05-07 07:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (92, 37, 302, '2026-05-07 06:00:00', '2026-05-07 08:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (93, 25, 313, '2026-05-06 11:00:00', '2026-05-06 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (94, 33, 297, '2026-05-06 00:00:00', '2026-05-06 02:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (95, 32, 287, '2026-05-06 01:00:00', '2026-05-06 05:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (96, 33, 275, '2026-05-06 07:00:00', '2026-05-06 10:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (97, 25, 282, '2026-05-06 03:00:00', '2026-05-06 07:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (98, 31, 311, '2026-05-06 08:00:00', '2026-05-06 10:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (99, 36, 276, '2026-05-05 05:00:00', '2026-05-05 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (100, 17, 303, '2026-05-05 03:00:00', '2026-05-05 07:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (101, 23, 288, '2026-05-05 10:00:00', '2026-05-05 13:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (102, 29, 307, '2026-05-05 04:00:00', '2026-05-05 08:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (103, 18, 284, '2026-05-05 00:00:00', '2026-05-05 03:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (104, 31, 292, '2026-05-05 04:00:00', '2026-05-05 08:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (105, 17, 313, '2026-05-05 07:00:00', '2026-05-05 11:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (106, 26, 278, '2026-05-05 02:00:00', '2026-05-05 03:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (107, 37, 290, '2026-05-05 03:00:00', '2026-05-05 04:00:00', '50.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (108, 24, 286, '2026-05-04 11:00:00', '2026-05-04 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (109, 25, 285, '2026-05-04 03:00:00', '2026-05-04 07:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (110, 38, 306, '2026-05-04 08:00:00', '2026-05-04 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (111, 23, 281, '2026-05-04 11:00:00', '2026-05-04 13:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (112, 35, 294, '2026-05-04 01:00:00', '2026-05-04 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (113, 35, 289, '2026-05-04 06:00:00', '2026-05-04 08:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (114, 17, 297, '2026-05-04 02:00:00', '2026-05-04 06:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (115, 36, 281, '2026-05-04 07:00:00', '2026-05-04 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (116, 14, 274, '2026-05-03 08:00:00', '2026-05-03 10:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (117, 16, 299, '2026-05-03 00:00:00', '2026-05-03 03:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (118, 29, 307, '2026-05-03 09:00:00', '2026-05-03 10:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (119, 29, 287, '2026-05-03 08:00:00', '2026-05-03 10:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (120, 19, 295, '2026-05-03 04:00:00', '2026-05-03 08:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (121, 29, 275, '2026-05-03 00:00:00', '2026-05-03 03:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (122, 17, 275, '2026-05-03 03:00:00', '2026-05-03 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (123, 17, 293, '2026-05-02 04:00:00', '2026-05-02 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (124, 18, 295, '2026-05-02 02:00:00', '2026-05-02 06:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (125, 15, 289, '2026-05-02 11:00:00', '2026-05-02 13:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (126, 14, 278, '2026-05-02 04:00:00', '2026-05-02 08:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (127, 18, 307, '2026-05-02 08:00:00', '2026-05-02 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (128, 20, 304, '2026-05-02 09:00:00', '2026-05-02 12:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (129, 16, 281, '2026-05-02 01:00:00', '2026-05-02 02:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (130, 21, 283, '2026-05-02 11:00:00', '2026-05-02 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (131, 29, 284, '2026-05-02 02:00:00', '2026-05-02 05:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (132, 27, 286, '2026-05-01 03:00:00', '2026-05-01 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (133, 19, 286, '2026-05-01 09:00:00', '2026-05-01 13:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (134, 22, 311, '2026-05-01 01:00:00', '2026-05-01 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (135, 30, 302, '2026-05-01 01:00:00', '2026-05-01 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (136, 29, 305, '2026-05-01 04:00:00', '2026-05-01 06:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (137, 28, 297, '2026-05-01 02:00:00', '2026-05-01 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (138, 38, 286, '2026-04-30 05:00:00', '2026-04-30 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (139, 32, 274, '2026-04-30 00:00:00', '2026-04-30 04:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (140, 36, 275, '2026-04-30 04:00:00', '2026-04-30 07:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (141, 36, 305, '2026-04-30 09:00:00', '2026-04-30 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (142, 19, 310, '2026-04-30 08:00:00', '2026-04-30 09:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (143, 15, 308, '2026-04-29 06:00:00', '2026-04-29 07:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (144, 38, 285, '2026-04-29 01:00:00', '2026-04-29 02:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (145, 30, 285, '2026-04-29 04:00:00', '2026-04-29 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (146, 20, 281, '2026-04-29 07:00:00', '2026-04-29 10:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (147, 20, 275, '2026-04-29 03:00:00', '2026-04-29 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (148, 28, 276, '2026-04-29 11:00:00', '2026-04-29 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (149, 17, 292, '2026-04-29 05:00:00', '2026-04-29 08:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (150, 28, 302, '2026-04-29 09:00:00', '2026-04-29 11:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (151, 14, 276, '2026-04-29 07:00:00', '2026-04-29 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (152, 14, 291, '2026-04-29 00:00:00', '2026-04-29 04:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (153, 26, 304, '2026-04-29 11:00:00', '2026-04-29 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (154, 30, 311, '2026-04-29 01:00:00', '2026-04-29 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (155, 35, 276, '2026-04-28 02:00:00', '2026-04-28 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (156, 31, 292, '2026-04-28 03:00:00', '2026-04-28 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (157, 37, 302, '2026-04-28 11:00:00', '2026-04-28 13:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (158, 30, 311, '2026-04-28 03:00:00', '2026-04-28 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (159, 36, 297, '2026-04-28 01:00:00', '2026-04-28 02:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (160, 24, 294, '2026-04-28 08:00:00', '2026-04-28 11:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (161, 35, 279, '2026-04-28 05:00:00', '2026-04-28 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (162, 15, 298, '2026-04-28 04:00:00', '2026-04-28 08:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (163, 38, 293, '2026-04-28 07:00:00', '2026-04-28 10:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (164, 33, 311, '2026-04-28 07:00:00', '2026-04-28 10:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (165, 38, 314, '2026-04-28 09:00:00', '2026-04-28 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (166, 36, 289, '2026-04-28 06:00:00', '2026-04-28 10:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (167, 32, 297, '2026-04-28 09:00:00', '2026-04-28 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (168, 21, 311, '2026-04-28 05:00:00', '2026-04-28 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (169, 15, 298, '2026-04-28 02:00:00', '2026-04-28 03:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (170, 29, 307, '2026-04-27 01:00:00', '2026-04-27 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (171, 29, 287, '2026-04-27 11:00:00', '2026-04-27 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (172, 17, 280, '2026-04-27 08:00:00', '2026-04-27 10:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (173, 31, 300, '2026-04-27 05:00:00', '2026-04-27 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (174, 35, 309, '2026-04-27 04:00:00', '2026-04-27 07:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (175, 15, 311, '2026-04-27 06:00:00', '2026-04-27 09:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (176, 29, 276, '2026-04-27 09:00:00', '2026-04-27 10:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (177, 37, 302, '2026-04-27 03:00:00', '2026-04-27 06:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (178, 18, 302, '2026-04-27 07:00:00', '2026-04-27 08:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (179, 19, 297, '2026-04-27 02:00:00', '2026-04-27 03:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (180, 30, 274, '2026-04-26 07:00:00', '2026-04-26 09:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (181, 24, 294, '2026-04-26 10:00:00', '2026-04-26 14:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (182, 35, 279, '2026-04-26 10:00:00', '2026-04-26 14:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (183, 27, 289, '2026-04-26 00:00:00', '2026-04-26 03:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (184, 24, 296, '2026-04-26 01:00:00', '2026-04-26 03:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (185, 33, 281, '2026-04-26 08:00:00', '2026-04-26 10:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (186, 18, 312, '2026-04-26 04:00:00', '2026-04-26 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (187, 28, 297, '2026-04-26 11:00:00', '2026-04-26 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (188, 32, 300, '2026-04-26 09:00:00', '2026-04-26 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (189, 27, 286, '2026-04-26 08:00:00', '2026-04-26 09:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (190, 33, 293, '2026-04-25 08:00:00', '2026-04-25 10:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (191, 15, 306, '2026-04-25 10:00:00', '2026-04-25 12:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (192, 28, 287, '2026-04-25 06:00:00', '2026-04-25 07:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (193, 17, 306, '2026-04-25 09:00:00', '2026-04-25 12:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (194, 14, 294, '2026-04-25 03:00:00', '2026-04-25 04:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (195, 27, 276, '2026-04-25 10:00:00', '2026-04-25 13:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (196, 20, 275, '2026-04-25 01:00:00', '2026-04-25 02:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (197, 17, 306, '2026-04-25 03:00:00', '2026-04-25 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (198, 17, 307, '2026-04-25 10:00:00', '2026-04-25 11:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (199, 26, 308, '2026-04-24 10:00:00', '2026-04-24 13:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (200, 19, 291, '2026-04-24 09:00:00', '2026-04-24 10:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (201, 22, 307, '2026-04-24 10:00:00', '2026-04-24 11:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (202, 35, 277, '2026-04-24 04:00:00', '2026-04-24 06:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (203, 37, 280, '2026-04-24 02:00:00', '2026-04-24 05:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (204, 16, 277, '2026-04-24 04:00:00', '2026-04-24 08:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (205, 27, 293, '2026-04-24 11:00:00', '2026-04-24 12:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (206, 34, 285, '2026-04-24 06:00:00', '2026-04-24 07:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (207, 33, 305, '2026-04-24 07:00:00', '2026-04-24 10:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (208, 15, 297, '2026-04-24 00:00:00', '2026-04-24 04:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (209, 25, 288, '2026-04-24 01:00:00', '2026-04-24 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (210, 14, 291, '2026-04-24 05:00:00', '2026-04-24 06:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (211, 23, 304, '2026-04-24 03:00:00', '2026-04-24 04:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (212, 37, 305, '2026-04-24 11:00:00', '2026-04-24 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (213, 19, 308, '2026-04-23 04:00:00', '2026-04-23 07:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (214, 34, 297, '2026-04-23 09:00:00', '2026-04-23 11:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (215, 22, 299, '2026-04-23 02:00:00', '2026-04-23 05:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (216, 15, 307, '2026-04-23 11:00:00', '2026-04-23 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (217, 15, 279, '2026-04-23 07:00:00', '2026-04-23 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (218, 16, 295, '2026-04-23 11:00:00', '2026-04-23 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (219, 18, 287, '2026-04-23 08:00:00', '2026-04-23 09:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (220, 22, 284, '2026-04-22 01:00:00', '2026-04-22 05:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (221, 19, 298, '2026-04-22 07:00:00', '2026-04-22 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (222, 23, 292, '2026-04-22 08:00:00', '2026-04-22 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (223, 18, 274, '2026-04-22 02:00:00', '2026-04-22 06:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (224, 19, 312, '2026-04-22 03:00:00', '2026-04-22 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (225, 30, 284, '2026-04-22 02:00:00', '2026-04-22 05:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (226, 36, 310, '2026-04-22 05:00:00', '2026-04-22 07:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (227, 14, 299, '2026-04-21 01:00:00', '2026-04-21 04:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (228, 21, 295, '2026-04-21 05:00:00', '2026-04-21 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (229, 36, 301, '2026-04-21 00:00:00', '2026-04-21 01:00:00', '50.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (230, 19, 300, '2026-04-21 07:00:00', '2026-04-21 10:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (231, 22, 296, '2026-04-21 07:00:00', '2026-04-21 09:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (232, 27, 278, '2026-04-20 04:00:00', '2026-04-20 07:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (233, 35, 310, '2026-04-20 00:00:00', '2026-04-20 04:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (234, 17, 307, '2026-04-20 02:00:00', '2026-04-20 06:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (235, 21, 293, '2026-04-20 09:00:00', '2026-04-20 11:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (236, 20, 306, '2026-04-20 00:00:00', '2026-04-20 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (237, 24, 291, '2026-04-20 01:00:00', '2026-04-20 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (238, 26, 309, '2026-04-19 11:00:00', '2026-04-19 14:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (239, 22, 304, '2026-04-19 02:00:00', '2026-04-19 05:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (240, 30, 289, '2026-04-19 11:00:00', '2026-04-19 13:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (241, 37, 312, '2026-04-19 03:00:00', '2026-04-19 07:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (242, 16, 284, '2026-04-19 04:00:00', '2026-04-19 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (243, 27, 276, '2026-04-19 09:00:00', '2026-04-19 10:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (244, 25, 286, '2026-04-18 08:00:00', '2026-04-18 11:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (245, 28, 298, '2026-04-18 07:00:00', '2026-04-18 10:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (246, 27, 307, '2026-04-18 02:00:00', '2026-04-18 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (247, 34, 292, '2026-04-18 11:00:00', '2026-04-18 12:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (248, 29, 281, '2026-04-18 01:00:00', '2026-04-18 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (249, 29, 282, '2026-04-18 03:00:00', '2026-04-18 07:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (250, 26, 288, '2026-04-18 00:00:00', '2026-04-18 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (251, 21, 295, '2026-04-18 11:00:00', '2026-04-18 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (252, 26, 313, '2026-04-18 10:00:00', '2026-04-18 12:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (253, 17, 307, '2026-04-18 02:00:00', '2026-04-18 05:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (254, 15, 275, '2026-04-17 05:00:00', '2026-04-17 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (255, 33, 278, '2026-04-17 03:00:00', '2026-04-17 07:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (256, 29, 276, '2026-04-17 03:00:00', '2026-04-17 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (257, 22, 305, '2026-04-17 04:00:00', '2026-04-17 07:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (258, 29, 304, '2026-04-17 03:00:00', '2026-04-17 04:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (259, 26, 314, '2026-04-17 05:00:00', '2026-04-17 07:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (260, 31, 305, '2026-04-16 09:00:00', '2026-04-16 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (261, 34, 283, '2026-04-16 00:00:00', '2026-04-16 01:00:00', '50.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (262, 29, 278, '2026-04-16 01:00:00', '2026-04-16 05:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (263, 31, 308, '2026-04-16 07:00:00', '2026-04-16 09:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (264, 29, 280, '2026-04-16 05:00:00', '2026-04-16 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:39');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (265, 29, 275, '2026-05-15 09:00:00', '2026-05-15 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (266, 25, 296, '2026-05-15 00:00:00', '2026-05-15 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (267, 23, 274, '2026-05-15 07:00:00', '2026-05-15 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (268, 30, 302, '2026-05-15 02:00:00', '2026-05-15 05:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (269, 14, 305, '2026-05-15 01:00:00', '2026-05-15 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (270, 30, 307, '2026-05-15 11:00:00', '2026-05-15 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (271, 21, 275, '2026-05-15 11:00:00', '2026-05-15 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (272, 17, 302, '2026-05-15 05:00:00', '2026-05-15 07:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (273, 15, 313, '2026-05-15 07:00:00', '2026-05-15 09:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (274, 27, 277, '2026-05-14 06:00:00', '2026-05-14 08:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (275, 38, 299, '2026-05-14 06:00:00', '2026-05-14 08:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (276, 26, 275, '2026-05-14 11:00:00', '2026-05-14 12:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (277, 23, 281, '2026-05-14 01:00:00', '2026-05-14 02:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (278, 23, 312, '2026-05-14 06:00:00', '2026-05-14 07:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (279, 29, 296, '2026-05-14 01:00:00', '2026-05-14 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (280, 15, 300, '2026-05-14 05:00:00', '2026-05-14 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (281, 30, 310, '2026-05-14 08:00:00', '2026-05-14 10:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (282, 16, 285, '2026-05-14 04:00:00', '2026-05-14 07:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (283, 33, 300, '2026-05-13 11:00:00', '2026-05-13 13:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (284, 27, 311, '2026-05-13 04:00:00', '2026-05-13 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (285, 18, 274, '2026-05-13 10:00:00', '2026-05-13 11:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (286, 15, 285, '2026-05-13 00:00:00', '2026-05-13 02:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (287, 37, 292, '2026-05-13 01:00:00', '2026-05-13 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (288, 33, 276, '2026-05-13 10:00:00', '2026-05-13 11:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (289, 14, 284, '2026-05-13 05:00:00', '2026-05-13 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (290, 30, 286, '2026-05-13 05:00:00', '2026-05-13 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (291, 36, 300, '2026-05-13 06:00:00', '2026-05-13 08:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (292, 33, 303, '2026-05-13 11:00:00', '2026-05-13 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:36');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (293, 16, 282, '2026-05-13 05:00:00', '2026-05-13 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (294, 22, 279, '2026-05-13 03:00:00', '2026-05-13 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (295, 16, 300, '2026-05-13 09:00:00', '2026-05-13 12:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (296, 37, 293, '2026-05-12 03:00:00', '2026-05-12 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (297, 33, 295, '2026-05-12 02:00:00', '2026-05-12 03:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (298, 38, 314, '2026-05-12 07:00:00', '2026-05-12 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (299, 14, 287, '2026-05-12 01:00:00', '2026-05-12 02:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (300, 32, 313, '2026-05-12 04:00:00', '2026-05-12 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (301, 29, 295, '2026-05-12 11:00:00', '2026-05-12 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (302, 21, 278, '2026-05-12 09:00:00', '2026-05-12 11:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (303, 20, 303, '2026-05-12 03:00:00', '2026-05-12 07:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (304, 26, 279, '2026-05-12 07:00:00', '2026-05-12 08:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (305, 36, 310, '2026-05-12 03:00:00', '2026-05-12 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (306, 20, 296, '2026-05-12 07:00:00', '2026-05-12 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (307, 22, 314, '2026-05-12 01:00:00', '2026-05-12 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (308, 20, 295, '2026-05-12 10:00:00', '2026-05-12 14:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (309, 31, 297, '2026-05-12 08:00:00', '2026-05-12 11:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (310, 19, 289, '2026-05-12 06:00:00', '2026-05-12 10:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (311, 17, 302, '2026-05-11 08:00:00', '2026-05-11 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (312, 15, 314, '2026-05-11 04:00:00', '2026-05-11 06:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (313, 38, 302, '2026-05-11 08:00:00', '2026-05-11 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (314, 36, 292, '2026-05-11 00:00:00', '2026-05-11 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (315, 20, 303, '2026-05-11 04:00:00', '2026-05-11 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (316, 22, 298, '2026-05-11 01:00:00', '2026-05-11 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (317, 27, 308, '2026-05-11 07:00:00', '2026-05-11 08:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (318, 28, 301, '2026-05-11 05:00:00', '2026-05-11 06:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (319, 14, 278, '2026-05-11 01:00:00', '2026-05-11 05:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (320, 15, 299, '2026-05-11 05:00:00', '2026-05-11 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (321, 38, 291, '2026-05-11 01:00:00', '2026-05-11 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (322, 21, 309, '2026-05-11 01:00:00', '2026-05-11 02:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (323, 25, 285, '2026-05-10 10:00:00', '2026-05-10 11:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (324, 14, 312, '2026-05-10 11:00:00', '2026-05-10 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (325, 16, 303, '2026-05-10 04:00:00', '2026-05-10 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (326, 14, 302, '2026-05-10 04:00:00', '2026-05-10 08:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (327, 26, 308, '2026-05-10 03:00:00', '2026-05-10 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (328, 33, 295, '2026-05-10 08:00:00', '2026-05-10 09:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (329, 18, 313, '2026-05-10 02:00:00', '2026-05-10 06:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (330, 20, 290, '2026-05-10 01:00:00', '2026-05-10 02:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (331, 36, 303, '2026-05-10 07:00:00', '2026-05-10 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (332, 29, 310, '2026-05-10 03:00:00', '2026-05-10 07:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (333, 16, 300, '2026-05-10 04:00:00', '2026-05-10 08:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (334, 17, 290, '2026-05-09 09:00:00', '2026-05-09 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (335, 35, 288, '2026-05-09 11:00:00', '2026-05-09 13:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (336, 16, 294, '2026-05-09 00:00:00', '2026-05-09 04:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (337, 16, 306, '2026-05-09 05:00:00', '2026-05-09 09:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (338, 37, 312, '2026-05-09 04:00:00', '2026-05-09 06:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (339, 18, 292, '2026-05-09 03:00:00', '2026-05-09 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (340, 18, 307, '2026-05-09 05:00:00', '2026-05-09 06:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (341, 38, 286, '2026-05-09 07:00:00', '2026-05-09 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (342, 15, 280, '2026-05-09 00:00:00', '2026-05-09 02:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (343, 32, 286, '2026-05-08 08:00:00', '2026-05-08 09:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (344, 29, 310, '2026-05-08 09:00:00', '2026-05-08 12:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (345, 25, 289, '2026-05-08 01:00:00', '2026-05-08 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (346, 33, 279, '2026-05-08 01:00:00', '2026-05-08 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (347, 20, 303, '2026-05-08 03:00:00', '2026-05-08 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (348, 20, 291, '2026-05-08 04:00:00', '2026-05-08 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (349, 25, 291, '2026-05-08 04:00:00', '2026-05-08 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (350, 34, 302, '2026-05-08 02:00:00', '2026-05-08 05:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (351, 32, 284, '2026-05-08 08:00:00', '2026-05-08 11:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (352, 20, 275, '2026-05-08 11:00:00', '2026-05-08 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (353, 25, 292, '2026-05-08 00:00:00', '2026-05-08 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (354, 36, 274, '2026-05-08 06:00:00', '2026-05-08 09:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (355, 22, 276, '2026-05-08 00:00:00', '2026-05-08 03:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (356, 14, 292, '2026-05-07 03:00:00', '2026-05-07 07:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (357, 14, 300, '2026-05-07 03:00:00', '2026-05-07 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (358, 30, 277, '2026-05-07 06:00:00', '2026-05-07 10:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (359, 34, 296, '2026-05-07 00:00:00', '2026-05-07 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (360, 34, 280, '2026-05-07 04:00:00', '2026-05-07 06:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (361, 14, 308, '2026-05-07 05:00:00', '2026-05-07 06:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (362, 38, 309, '2026-05-07 05:00:00', '2026-05-07 07:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (363, 37, 291, '2026-05-07 01:00:00', '2026-05-07 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (364, 15, 306, '2026-05-07 02:00:00', '2026-05-07 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (365, 24, 286, '2026-05-07 00:00:00', '2026-05-07 02:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (366, 24, 298, '2026-05-07 01:00:00', '2026-05-07 02:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (367, 23, 304, '2026-05-07 11:00:00', '2026-05-07 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (368, 18, 306, '2026-05-07 09:00:00', '2026-05-07 12:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (369, 38, 298, '2026-05-07 00:00:00', '2026-05-07 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (370, 31, 281, '2026-05-06 10:00:00', '2026-05-06 11:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (371, 26, 314, '2026-05-06 05:00:00', '2026-05-06 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (372, 26, 306, '2026-05-06 03:00:00', '2026-05-06 05:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (373, 18, 309, '2026-05-06 07:00:00', '2026-05-06 10:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (374, 26, 280, '2026-05-06 00:00:00', '2026-05-06 02:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (375, 35, 302, '2026-05-06 07:00:00', '2026-05-06 09:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (376, 16, 305, '2026-05-06 00:00:00', '2026-05-06 02:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (377, 32, 290, '2026-05-06 07:00:00', '2026-05-06 09:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (378, 15, 297, '2026-05-06 04:00:00', '2026-05-06 07:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (379, 20, 280, '2026-05-05 05:00:00', '2026-05-05 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (380, 18, 291, '2026-05-05 05:00:00', '2026-05-05 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (381, 33, 307, '2026-05-05 11:00:00', '2026-05-05 14:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (382, 38, 281, '2026-05-05 07:00:00', '2026-05-05 10:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (383, 15, 280, '2026-05-05 02:00:00', '2026-05-05 06:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (384, 35, 289, '2026-05-05 10:00:00', '2026-05-05 11:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (385, 31, 304, '2026-05-05 01:00:00', '2026-05-05 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (386, 31, 282, '2026-05-04 05:00:00', '2026-05-04 07:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (387, 38, 312, '2026-05-04 10:00:00', '2026-05-04 13:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (388, 16, 302, '2026-05-04 08:00:00', '2026-05-04 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (389, 31, 283, '2026-05-04 11:00:00', '2026-05-04 12:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (390, 20, 297, '2026-05-04 01:00:00', '2026-05-04 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (391, 26, 286, '2026-05-04 05:00:00', '2026-05-04 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (392, 36, 302, '2026-05-03 05:00:00', '2026-05-03 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (393, 26, 300, '2026-05-03 08:00:00', '2026-05-03 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (394, 18, 280, '2026-05-03 04:00:00', '2026-05-03 05:00:00', '50.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (395, 16, 300, '2026-05-03 05:00:00', '2026-05-03 06:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (396, 22, 285, '2026-05-03 00:00:00', '2026-05-03 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (397, 36, 303, '2026-05-03 02:00:00', '2026-05-03 05:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (398, 26, 312, '2026-05-03 02:00:00', '2026-05-03 05:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (399, 34, 301, '2026-05-03 02:00:00', '2026-05-03 05:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (400, 34, 283, '2026-05-02 10:00:00', '2026-05-02 13:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (401, 32, 309, '2026-05-02 07:00:00', '2026-05-02 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (402, 31, 279, '2026-05-02 06:00:00', '2026-05-02 07:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (403, 35, 280, '2026-05-02 08:00:00', '2026-05-02 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (404, 14, 291, '2026-05-02 02:00:00', '2026-05-02 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (405, 32, 302, '2026-05-02 07:00:00', '2026-05-02 09:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (406, 34, 298, '2026-05-02 09:00:00', '2026-05-02 11:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (407, 26, 281, '2026-05-02 02:00:00', '2026-05-02 06:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (408, 25, 311, '2026-05-02 09:00:00', '2026-05-02 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (409, 31, 280, '2026-05-02 11:00:00', '2026-05-02 12:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (410, 32, 278, '2026-05-02 09:00:00', '2026-05-02 11:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (411, 21, 280, '2026-05-02 08:00:00', '2026-05-02 11:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (412, 26, 280, '2026-05-02 08:00:00', '2026-05-02 12:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (413, 26, 306, '2026-05-01 03:00:00', '2026-05-01 07:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (414, 28, 307, '2026-05-01 08:00:00', '2026-05-01 09:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (415, 26, 312, '2026-05-01 02:00:00', '2026-05-01 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (416, 16, 279, '2026-05-01 07:00:00', '2026-05-01 08:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (417, 29, 303, '2026-05-01 07:00:00', '2026-05-01 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (418, 36, 289, '2026-05-01 11:00:00', '2026-05-01 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (419, 31, 308, '2026-05-01 04:00:00', '2026-05-01 07:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (420, 14, 286, '2026-05-01 03:00:00', '2026-05-01 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (421, 34, 282, '2026-04-30 04:00:00', '2026-04-30 07:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (422, 26, 290, '2026-04-30 04:00:00', '2026-04-30 08:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (423, 23, 298, '2026-04-30 09:00:00', '2026-04-30 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (424, 30, 281, '2026-04-30 05:00:00', '2026-04-30 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (425, 18, 292, '2026-04-30 00:00:00', '2026-04-30 03:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (426, 30, 302, '2026-04-30 05:00:00', '2026-04-30 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (427, 23, 297, '2026-04-30 04:00:00', '2026-04-30 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (428, 22, 302, '2026-04-30 10:00:00', '2026-04-30 14:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (429, 22, 284, '2026-04-30 02:00:00', '2026-04-30 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (430, 14, 312, '2026-04-30 04:00:00', '2026-04-30 06:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (431, 17, 300, '2026-04-30 10:00:00', '2026-04-30 13:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (432, 22, 299, '2026-04-30 04:00:00', '2026-04-30 07:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (433, 14, 291, '2026-04-29 04:00:00', '2026-04-29 08:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (434, 32, 294, '2026-04-29 09:00:00', '2026-04-29 10:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (435, 24, 277, '2026-04-29 11:00:00', '2026-04-29 13:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (436, 25, 304, '2026-04-29 10:00:00', '2026-04-29 14:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (437, 20, 306, '2026-04-29 11:00:00', '2026-04-29 12:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (438, 24, 296, '2026-04-29 01:00:00', '2026-04-29 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (439, 29, 312, '2026-04-29 05:00:00', '2026-04-29 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (440, 31, 291, '2026-04-29 01:00:00', '2026-04-29 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (441, 36, 301, '2026-04-29 00:00:00', '2026-04-29 02:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (442, 25, 305, '2026-04-29 02:00:00', '2026-04-29 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (443, 28, 282, '2026-04-29 11:00:00', '2026-04-29 14:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (444, 15, 282, '2026-04-29 09:00:00', '2026-04-29 11:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (445, 32, 293, '2026-04-29 00:00:00', '2026-04-29 04:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (446, 35, 282, '2026-04-29 05:00:00', '2026-04-29 07:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (447, 26, 311, '2026-04-29 10:00:00', '2026-04-29 13:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (448, 30, 275, '2026-04-28 10:00:00', '2026-04-28 13:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (449, 30, 295, '2026-04-28 07:00:00', '2026-04-28 11:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (450, 27, 308, '2026-04-28 00:00:00', '2026-04-28 03:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (451, 26, 301, '2026-04-28 01:00:00', '2026-04-28 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (452, 31, 305, '2026-04-28 03:00:00', '2026-04-28 04:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (453, 16, 285, '2026-04-28 04:00:00', '2026-04-28 08:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (454, 23, 295, '2026-04-28 02:00:00', '2026-04-28 05:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (455, 22, 307, '2026-04-28 08:00:00', '2026-04-28 12:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (456, 22, 310, '2026-04-28 03:00:00', '2026-04-28 06:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (457, 34, 290, '2026-04-28 11:00:00', '2026-04-28 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (458, 27, 301, '2026-04-28 04:00:00', '2026-04-28 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (459, 27, 295, '2026-04-27 08:00:00', '2026-04-27 09:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (460, 21, 289, '2026-04-27 07:00:00', '2026-04-27 08:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (461, 17, 313, '2026-04-27 08:00:00', '2026-04-27 10:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (462, 21, 283, '2026-04-27 08:00:00', '2026-04-27 09:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (463, 34, 295, '2026-04-27 05:00:00', '2026-04-27 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (464, 37, 312, '2026-04-27 03:00:00', '2026-04-27 04:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (465, 16, 296, '2026-04-27 11:00:00', '2026-04-27 13:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (466, 17, 283, '2026-04-27 06:00:00', '2026-04-27 08:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (467, 25, 305, '2026-04-26 07:00:00', '2026-04-26 08:00:00', '50.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (468, 33, 285, '2026-04-26 00:00:00', '2026-04-26 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (469, 30, 289, '2026-04-26 05:00:00', '2026-04-26 09:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (470, 27, 290, '2026-04-26 11:00:00', '2026-04-26 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (471, 15, 308, '2026-04-26 05:00:00', '2026-04-26 06:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (472, 18, 295, '2026-04-26 03:00:00', '2026-04-26 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (473, 22, 285, '2026-04-26 07:00:00', '2026-04-26 08:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (474, 24, 279, '2026-04-26 09:00:00', '2026-04-26 11:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (475, 23, 286, '2026-04-26 09:00:00', '2026-04-26 12:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (476, 15, 290, '2026-04-26 00:00:00', '2026-04-26 02:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (477, 18, 292, '2026-04-26 03:00:00', '2026-04-26 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (478, 30, 288, '2026-04-26 09:00:00', '2026-04-26 12:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (479, 32, 281, '2026-04-26 09:00:00', '2026-04-26 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (480, 33, 290, '2026-04-25 01:00:00', '2026-04-25 05:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (481, 21, 303, '2026-04-25 08:00:00', '2026-04-25 09:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (482, 28, 305, '2026-04-25 00:00:00', '2026-04-25 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (483, 24, 292, '2026-04-25 07:00:00', '2026-04-25 09:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (484, 22, 299, '2026-04-25 04:00:00', '2026-04-25 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (485, 28, 298, '2026-04-25 04:00:00', '2026-04-25 08:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (486, 36, 284, '2026-04-25 04:00:00', '2026-04-25 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (487, 23, 296, '2026-04-25 05:00:00', '2026-04-25 09:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (488, 36, 276, '2026-04-25 05:00:00', '2026-04-25 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (489, 25, 277, '2026-04-24 03:00:00', '2026-04-24 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (490, 19, 286, '2026-04-24 02:00:00', '2026-04-24 06:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (491, 20, 286, '2026-04-24 09:00:00', '2026-04-24 10:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (492, 18, 303, '2026-04-24 09:00:00', '2026-04-24 12:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (493, 27, 287, '2026-04-24 02:00:00', '2026-04-24 03:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (494, 14, 284, '2026-04-24 11:00:00', '2026-04-24 13:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (495, 28, 302, '2026-04-24 01:00:00', '2026-04-24 05:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (496, 28, 313, '2026-04-24 03:00:00', '2026-04-24 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (497, 30, 274, '2026-04-23 07:00:00', '2026-04-23 08:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (498, 35, 303, '2026-04-23 00:00:00', '2026-04-23 04:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (499, 27, 293, '2026-04-23 00:00:00', '2026-04-23 03:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (500, 32, 285, '2026-04-23 08:00:00', '2026-04-23 11:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (501, 16, 281, '2026-04-23 04:00:00', '2026-04-23 06:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (502, 27, 280, '2026-04-22 00:00:00', '2026-04-22 04:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (503, 34, 306, '2026-04-22 02:00:00', '2026-04-22 03:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (504, 16, 291, '2026-04-22 09:00:00', '2026-04-22 11:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (505, 18, 313, '2026-04-22 00:00:00', '2026-04-22 03:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (506, 37, 278, '2026-04-22 09:00:00', '2026-04-22 11:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (507, 18, 313, '2026-04-22 01:00:00', '2026-04-22 05:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (508, 20, 303, '2026-04-22 08:00:00', '2026-04-22 09:00:00', '50.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (509, 35, 304, '2026-04-22 08:00:00', '2026-04-22 10:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (510, 27, 312, '2026-04-22 06:00:00', '2026-04-22 10:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (511, 36, 312, '2026-04-21 01:00:00', '2026-04-21 05:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (512, 23, 313, '2026-04-21 09:00:00', '2026-04-21 10:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (513, 22, 308, '2026-04-21 05:00:00', '2026-04-21 07:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (514, 38, 285, '2026-04-21 09:00:00', '2026-04-21 12:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (515, 34, 312, '2026-04-21 02:00:00', '2026-04-21 03:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (516, 28, 283, '2026-04-21 09:00:00', '2026-04-21 13:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (517, 33, 312, '2026-04-21 08:00:00', '2026-04-21 11:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (518, 21, 304, '2026-04-21 10:00:00', '2026-04-21 12:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (519, 23, 307, '2026-04-20 02:00:00', '2026-04-20 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (520, 31, 304, '2026-04-20 06:00:00', '2026-04-20 07:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (521, 23, 279, '2026-04-20 04:00:00', '2026-04-20 08:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (522, 30, 278, '2026-04-20 05:00:00', '2026-04-20 07:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (523, 37, 285, '2026-04-20 10:00:00', '2026-04-20 13:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (524, 16, 286, '2026-04-20 06:00:00', '2026-04-20 07:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (525, 22, 306, '2026-04-20 11:00:00', '2026-04-20 14:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (526, 37, 279, '2026-04-20 08:00:00', '2026-04-20 11:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (527, 18, 310, '2026-04-19 08:00:00', '2026-04-19 10:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (528, 37, 313, '2026-04-19 01:00:00', '2026-04-19 03:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (529, 35, 285, '2026-04-19 10:00:00', '2026-04-19 12:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (530, 18, 294, '2026-04-19 11:00:00', '2026-04-19 15:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (531, 18, 313, '2026-04-19 01:00:00', '2026-04-19 05:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (532, 32, 274, '2026-04-19 04:00:00', '2026-04-19 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (533, 21, 311, '2026-04-19 03:00:00', '2026-04-19 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (534, 27, 280, '2026-04-19 08:00:00', '2026-04-19 11:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (535, 35, 312, '2026-04-19 07:00:00', '2026-04-19 09:00:00', '100.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (536, 27, 277, '2026-04-19 03:00:00', '2026-04-19 07:00:00', '200.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (537, 24, 286, '2026-04-19 11:00:00', '2026-04-19 13:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (538, 32, 281, '2026-04-19 02:00:00', '2026-04-19 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (539, 38, 304, '2026-04-19 00:00:00', '2026-04-19 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (540, 30, 279, '2026-04-19 02:00:00', '2026-04-19 04:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (541, 20, 288, '2026-04-19 01:00:00', '2026-04-19 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (542, 15, 289, '2026-04-18 09:00:00', '2026-04-18 10:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (543, 23, 297, '2026-04-18 03:00:00', '2026-04-18 05:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (544, 15, 302, '2026-04-18 10:00:00', '2026-04-18 13:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (545, 38, 278, '2026-04-18 06:00:00', '2026-04-18 08:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (546, 25, 275, '2026-04-18 00:00:00', '2026-04-18 04:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (547, 23, 313, '2026-04-18 00:00:00', '2026-04-18 01:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (548, 31, 303, '2026-04-18 01:00:00', '2026-04-18 05:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (549, 16, 303, '2026-04-18 01:00:00', '2026-04-18 04:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (550, 38, 295, '2026-04-18 00:00:00', '2026-04-18 03:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (551, 35, 308, '2026-04-18 00:00:00', '2026-04-18 04:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (552, 37, 281, '2026-04-18 00:00:00', '2026-04-18 03:00:00', '150.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (553, 22, 293, '2026-04-18 05:00:00', '2026-04-18 06:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (554, 27, 292, '2026-04-17 10:00:00', '2026-04-17 11:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (555, 36, 286, '2026-04-17 10:00:00', '2026-04-17 11:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (556, 19, 299, '2026-04-17 01:00:00', '2026-04-17 04:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (557, 34, 303, '2026-04-17 07:00:00', '2026-04-17 09:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (558, 19, 286, '2026-04-17 10:00:00', '2026-04-17 13:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (559, 25, 295, '2026-04-17 06:00:00', '2026-04-17 09:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (560, 35, 293, '2026-04-17 00:00:00', '2026-04-17 03:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (561, 15, 274, '2026-04-16 11:00:00', '2026-04-16 15:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (562, 29, 299, '2026-04-16 07:00:00', '2026-04-16 08:00:00', '50.00', 'cashier', 'unpaid', NULL, NULL, 'cancelled', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (563, 31, 295, '2026-04-16 01:00:00', '2026-04-16 03:00:00', '100.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (564, 27, 309, '2026-04-16 04:00:00', '2026-04-16 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (565, 36, 286, '2026-04-16 06:00:00', '2026-04-16 10:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
+INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (566, 14, 299, '2026-05-15 05:50:31', '2026-05-15 06:50:31', '0.00', 'cashier', 'unpaid', NULL, NULL, 'confirmed', '2026-05-15 05:50:31');
 
-LOCK TABLES `reservations` WRITE;
-/*!40000 ALTER TABLE `reservations` DISABLE KEYS */;
-/*!40000 ALTER TABLE `reservations` ENABLE KEYS */;
-UNLOCK TABLES;
+-- Table structure for table `seat_transfer_requests`
+DROP TABLE IF EXISTS `seat_transfer_requests`;
+CREATE TABLE `seat_transfer_requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `current_element_id` int(11) NOT NULL,
+  `requested_element_id` int(11) NOT NULL,
+  `status` enum('pending','approved','declined') DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `current_element_id` (`current_element_id`),
+  KEY `requested_element_id` (`requested_element_id`),
+  CONSTRAINT `seat_transfer_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `seat_transfer_requests_ibfk_2` FOREIGN KEY (`current_element_id`) REFERENCES `floor_elements` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `seat_transfer_requests_ibfk_3` FOREIGN KEY (`requested_element_id`) REFERENCES `floor_elements` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
+-- Dumping data for table `seat_transfer_requests`
+
 -- Table structure for table `sessions`
---
-
 DROP TABLE IF EXISTS `sessions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `sessions` (
   `session_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `expires` int(11) unsigned NOT NULL,
   `data` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   PRIMARY KEY (`session_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Dumping data for table `sessions`
---
+INSERT INTO `sessions` (`session_id`, `expires`, `data`) VALUES ('62QODGD66pT86jQOToYYX23mRCFmw-Jf', 1778896460, '{"cookie":{"originalMaxAge":86400000,"expires":"2026-05-16T01:49:29.552Z","httpOnly":true,"path":"/"},"user":{"id":1,"username":"admin","email":"thelastmuster@gmail.com","role":"admin","status":"active","firstName":"Super","lastName":"Admin"}}');
+INSERT INTO `sessions` (`session_id`, `expires`, `data`) VALUES ('UXwt4KZF_yVVYcUPbra3j97iCX2DkE7U', 1778911636, '{"cookie":{"originalMaxAge":86400000,"expires":"2026-05-16T05:47:58.987Z","httpOnly":true,"path":"/"},"user":{"id":11,"username":"admin","email":"thelastmuster@gmail.com","role":"admin","status":"active","firstName":"Admin","lastName":"User"}}');
 
-LOCK TABLES `sessions` WRITE;
-/*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
-INSERT INTO `sessions` VALUES ('TKwj9dw8l-BzELjKn19JKiT-jkdiq5OB',1778520513,'{\"cookie\":{\"originalMaxAge\":86400000,\"expires\":\"2026-05-11T16:22:55.982Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":{\"id\":5,\"username\":\"thelastmuster@gmail.com\",\"email\":\"thelastmuster@gmail.com\",\"role\":\"admin\",\"status\":\"active\",\"firstName\":\"Admin\",\"lastName\":\"User\"}}');
-/*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user_memberships`
---
-
 DROP TABLE IF EXISTS `user_memberships`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_memberships` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -371,65 +1443,75 @@ CREATE TABLE `user_memberships` (
   CONSTRAINT `user_memberships_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `user_memberships_ibfk_2` FOREIGN KEY (`plan_id`) REFERENCES `membership_plans` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Dumping data for table `user_memberships`
---
 
-LOCK TABLES `user_memberships` WRITE;
-/*!40000 ALTER TABLE `user_memberships` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_memberships` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `users`
---
-
 DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
   `role` enum('admin','staff','customer') NOT NULL DEFAULT 'customer',
+  `type` enum('member','walkin','staff') DEFAULT 'member',
   `status` enum('pending','active','suspended') DEFAULT 'pending',
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
   `phone` varchar(20) DEFAULT NULL,
   `location` varchar(100) DEFAULT NULL,
-  `schedule` varchar(255) DEFAULT NULL,
+  `mac_address` varchar(17) DEFAULT NULL,
+  `profile_picture` longtext DEFAULT NULL,
+  `schedule` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
 -- Dumping data for table `users`
---
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (11, 'admin', 'thelastmuster@gmail.com', '$2b$10$kUFUrUyKeEhj/ng11HB9KeXeBv7dZwdT.Oui4CvpI7bWnDYa.o2tS', 'admin', 'staff', 'active', 'Admin', 'User', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:43:24');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (12, 'belle', 'belle.staff@randomplay.com', '$2b$10$3cy4ObO6faxIqeDL.c04Duea0NthGSp93dexhNfhCmkORcHZEFpz.', 'staff', 'staff', 'active', 'Belle', 'Staff', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (13, 'wise', 'wise.staff@randomplay.com', '$2b$10$Ivj616bKsMuqzy0kqyPDAeJ1NdvxM4QT71WsHfKrP6XdzlRPzg.gq', 'staff', 'staff', 'active', 'Wise', 'Staff', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (14, 'anby', 'anby@neweridu.com', '$2b$10$n1.S1yObwYLEAJLvGlIBMulFegGS3lx460mp5fuJ3m5anl40NmSYW', 'customer', 'member', 'active', 'Anby', 'Demara', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (15, 'nicole', 'nicole@neweridu.com', '$2b$10$AV0rK7sl8gHonTLaAgEz7eSswAHHu32vukp3Cts7zu.zOwd/D7rPa', 'customer', 'member', 'active', 'Nicole', 'Demara', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (16, 'billy', 'billy@neweridu.com', '$2b$10$1l4TVTEyZqK7OjH.N3vJtOnr.ZMOrO3F7jc8trkZTuht.4ziqd5YK', 'customer', 'member', 'active', 'Billy', 'Kid', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (17, 'nekomata', 'nekomata@neweridu.com', '$2b$10$cTp7RlvPZMzhtDtoFmvOqOsL8LJnkEc8jkRbyELPyndmX4bKDDs8.', 'customer', 'member', 'active', 'Nekomata', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (18, 'soldier11', 'soldier11@neweridu.com', '$2b$10$r7iYD3efQAnThFUAD4A5Xe.ldTDqWbHku7EXdWGWFPghirE/SZMwW', 'customer', 'member', 'active', 'Soldier', '11', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (19, 'koleda', 'koleda@neweridu.com', '$2b$10$BbDAqN16sFFmSuLLl.9mmeb9OH2PRmf4lZuOadBKK3hE0/twX2uYm', 'customer', 'member', 'active', 'Koleda', 'Belobog', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (20, 'ben', 'ben@neweridu.com', '$2b$10$14fPPC2j1H.dbNyfjm1ZgOks50F6190UE4YcAYg3hCb.WKU./pEy.', 'customer', 'member', 'active', 'Ben', 'Bigger', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (21, 'anton', 'anton@neweridu.com', '$2b$10$x7kMtwL8NTnuijobqCoSbOMmfHnXwFKDHWwdC9guzLM9NMY7V1w3q', 'customer', 'member', 'active', 'Anton', 'Ivanov', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (22, 'grace', 'grace@neweridu.com', '$2b$10$6T4jjdpp5WmvRw.BWotNIONAMljXrFrFrsw2O1mnTuEZW9I38zapC', 'customer', 'member', 'active', 'Grace', 'Howard', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (23, 'ellen', 'ellen@neweridu.com', '$2b$10$MfFeo6yGg62BQp24rnWoAuquLXElAWc6cVDCLwcZQtKKpEm.HUidC', 'customer', 'member', 'active', 'Ellen', 'Joe', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (24, 'corin', 'corin@neweridu.com', '$2b$10$oGpFfGJEvl7FMS6LfTdfIO4j6z7Wv14JMkZWHyi7JxZUZenhyu9fW', 'customer', 'member', 'active', 'Corin', 'Wickes', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (25, 'rina', 'rina@neweridu.com', '$2b$10$CK8dSWdQO9obrTfF6Di6rOYuoxG/EE2cbZkea5XoaMeNy8bMh98w6', 'customer', 'member', 'active', 'Alexandrina', 'Sebastiane', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (26, 'lycaon', 'lycaon@neweridu.com', '$2b$10$SBkmvlWlhoYjOhskEhMq.OAk0g07eoez6zjQiLuuehC7OpSN9D/Ju', 'customer', 'member', 'active', 'Lycaon', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (27, 'soukaku', 'soukaku@neweridu.com', '$2b$10$l4XTgvWKy.sCQdSx6EWz/eFhyajMwClnsoNs16IFG8zqYcsucohzO', 'customer', 'member', 'active', 'Soukaku', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (28, 'miyabi', 'miyabi@neweridu.com', '$2b$10$VJEst5qorrJl76btEYYGaeSs59F71AUjGbHKttl7C5QjptuPBNhf6', 'customer', 'member', 'active', 'Hoshimi', 'Miyabi', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (29, 'qingyi', 'qingyi@neweridu.com', '$2b$10$BZGnsTJN36ZBhnKYCLzQEu5OxZEnHgQaBwU1CSlmMKLvZp5Bazxy2', 'customer', 'member', 'active', 'Qingyi', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (30, 'zhuyuan', 'zhuyuan@neweridu.com', '$2b$10$77G76CWDctKMk/.3xILPVutzMS.GGP/3onW.t2vcDva.EjtwuG8be', 'customer', 'member', 'active', 'Zhu', 'Yuan', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (31, 'seth', 'seth@neweridu.com', '$2b$10$4zJNek4umvMSXJqWRI/jSudHCkvHf4c24687GPJJdI7tIDvFMASIu', 'customer', 'member', 'active', 'Seth', 'Lowell', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (32, 'jane', 'jane@neweridu.com', '$2b$10$wt4EJvsyxwD5tceMjsV.C.iDxeDFe3T1ni9JD5qAuUT540v5/nghS', 'customer', 'member', 'active', 'Jane', 'Doe', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (33, 'caesar', 'caesar@neweridu.com', '$2b$10$k7gbwE8OVDCM3Lh1EoNv9ugvcaSsq7xqZZn.YHLcmHxP0mJmi69hi', 'customer', 'member', 'active', 'Caesar', 'King', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (34, 'burnice', 'burnice@neweridu.com', '$2b$10$/8P2tCWcQlfVYZF.akCzrebBLXqWPYJW5Uw1eruAUzYrvqJATwkYK', 'customer', 'member', 'active', 'Burnice', 'White', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (35, 'piper', 'piper@neweridu.com', '$2b$10$hTZblog/WwDY4O8jRDpN5.VpD.CkuGJQh/0WNoRvdntI2UffkaRd6', 'customer', 'member', 'active', 'Piper', 'Wheel', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (36, 'lucy', 'lucy@neweridu.com', '$2b$10$JIogwg3iMFjk5FfbirPUVOjXiLwtUVL3SW0k29/1bqdSW6ZzWBZDW', 'customer', 'member', 'active', 'Lucy', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (37, 'lighter', 'lighter@neweridu.com', '$2b$10$OM5g7HvLVqrQ2rJvF9Abo.AS5XAp/2G6kimFgomckHp6GI9E/B4vW', 'customer', 'member', 'active', 'Lighter', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (38, 'harumasa', 'harumasa@neweridu.com', '$2b$10$xiF8nCLA6j9ZkI8Px5U1QOlaCfn/PxnYNK7k1qeTOIhPzFawrlh2y', 'customer', 'member', 'active', 'Harumasa', 'Asaba', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
 
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (5,'thelastmuster@gmail.com','thelastmuster@gmail.com','$2b$10$aySiCKFjmhIeL.QHauXs0eFVV0Lnvj4A0g.4WJfv19tMFnjkjbvPS','','active','The Last','Muster',NULL,NULL,NULL,'2026-05-10 16:16:18','2026-05-10 16:29:38'),(6,'staff@gmail.com','staff@gmail.com','$2b$10$O0WXGv1IvF2SAdj/cMa7HOaxPV5PYXAMUJYYOCMh9Kxfgfjvtwxbi','staff','active','Staff','User',NULL,NULL,NULL,'2026-05-10 16:16:18','2026-05-10 16:16:18'),(7,'customer@gmail.com','customer@gmail.com','$2b$10$1EDXTDeX1Thwzk.69bPnH.I4l61nkBrweRm5g8g8JmdS9Yp45Av9e','customer','active','Alice','Customer',NULL,NULL,NULL,'2026-05-10 16:16:18','2026-05-10 16:16:18');
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-UNLOCK TABLES;
+-- Table structure for table `wifi_extension_requests`
+DROP TABLE IF EXISTS `wifi_extension_requests`;
+CREATE TABLE `wifi_extension_requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `requested_hours` int(11) NOT NULL,
+  `status` enum('pending','approved','declined') DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `wifi_extension_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping routines for database 'dolgo_db'
---
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+-- Dumping data for table `wifi_extension_requests`
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2026-05-11 11:30:04

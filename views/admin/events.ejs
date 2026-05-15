@@ -681,7 +681,7 @@ function switchView(){
       const timeStr = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
       return `
         <div class="event-card" onclick="showEventDetail(${JSON.stringify(ev).replace(/"/g, '&quot;')})">
-          <div class="card-banner" style="background-image: url('${ev.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 100\'%3E%3Crect width=\'200\' height=\'100\' fill=\'%23CF6322\'/%3E%3Ctext x=\'100\' y=\'55\' text-anchor=\'middle\' fill=\'white\' font-size=\'14\' font-weight=\'bold\'%3E'+ev.title.substring(0,15)+'%3C/text%3E%3C/svg%3E'}'); background-size: cover;">
+          <div class="card-banner" style="background-image: url('${ev.image || '/images/seat_default.jpg'}'); background-size: cover;">
             <div class="card-badge">${viewType === 'upcomingEvents' ? 'Upcoming' : 'Past'}</div>
           </div>
           <div class="card-content">
@@ -701,7 +701,7 @@ function switchView(){
       const duration = Math.round((new Date(r.end_time) - d) / (1000 * 60 * 60));
       return `
         <div class="event-card" onclick="showReservationDetail(${JSON.stringify(r).replace(/"/g, '&quot;')})">
-          <div class="card-banner" style="background-image: url('${r.seat_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='${getDefaultSeatColor(r.seat_label).replace('#','%23')}'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='white' font-size='12' font-weight='bold'%3ESeat ${r.seat_label}%3C/text%3E%3C/svg%3E`}'); background-size: cover;">
+          <div class="card-banner" style="background-image: url('${r.seat_image || '/images/seat_default.jpg'}'); background-size: cover;">
             <div class="card-badge" style="background:#8A8636;">${r.status === 'confirmed' ? 'Confirmed' : 'Pending'}</div>
           </div>
           <div class="card-content">
@@ -726,7 +726,7 @@ function showReservationDetail(reservation){
   modalBody.innerHTML = `
     <div style="text-align:center;margin-bottom:15px;">
       <div style="position:relative;">
-        <img src="${reservation.seat_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Crect width='200' height='100' fill='${getDefaultSeatColor(reservation.seat_label).replace('#','%23')}'/%3E%3Ctext x='100' y='55' text-anchor='middle' fill='white' font-size='16' font-weight='bold'%3ESeat ${reservation.seat_label || 'N/A'}%3C/text%3E%3C/svg%3E`}" style="width:100%;max-width:300px;border-radius:12px;object-fit:cover;">
+        <img src="${reservation.seat_image || '/images/seat_default.jpg'}" style="width:100%;max-width:300px;border-radius:12px;object-fit:cover;">
         <button onclick="event.stopPropagation(); openSeatImageEditor('${reservation.seat_label}', '${reservation.seat_image || ''}')" style="position:absolute;bottom:10px;right:10px;background:#CF6322;color:white;border:none;border-radius:20px;padding:4px 12px;cursor:pointer;font-size:11px;"><i class="fa-solid fa-camera"></i> Change Image</button>
       </div>
     </div>
@@ -810,7 +810,7 @@ function showEventDetail(event){
 
   modalBody.innerHTML = `
     <div style="text-align:center;margin-bottom:15px;">
-      <img src="${event.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 100\'%3E%3Crect width=\'200\' height=\'100\' fill=\'%23CF6322\'/%3E%3Ctext x=\'100\' y=\'55\' text-anchor=\'middle\' fill=\'white\' font-size=\'14\' font-weight=\'bold\'%3E'+event.title.substring(0,20)+'%3C/text%3E%3C/svg%3E'}" style="width:100%;border-radius:12px;object-fit:cover;max-height:200px;">
+      <img src="${event.image || '/images/seat_default.jpg'}" style="width:100%;border-radius:12px;object-fit:cover;max-height:200px;">
     </div>
     <div class="event-detail-row"><span class="reservation-label">Event Name:</span><span class="reservation-value">${escapeHtml(event.title)}</span></div>
     <div class="event-detail-row"><span class="reservation-label">Date:</span><span class="reservation-value">${dateStr}</span></div>
