@@ -204,6 +204,28 @@
 <%- contentFor('script') %>
 <script>
 
+function formatTimeLeft(endTime, isPaused = false, remainingSeconds = 0) {
+    let diffMs;
+    if (isPaused) {
+        diffMs = remainingSeconds * 1000;
+    } else {
+        if (!endTime) return null;
+        const now = new Date();
+        const end = new Date(endTime);
+        diffMs = end - now;
+    }
+    
+    if (diffMs <= 0) return 'Expired';
+    
+    const hrs = Math.floor(diffMs / 3600000);
+    const mins = Math.floor((diffMs % 3600000) / 60000);
+    const secs = Math.floor((diffMs % 60000) / 1000);
+    
+    if (hrs > 0) return `${hrs}h ${mins}m`;
+    if (mins > 0) return `${mins}m ${secs}s`;
+    return `${secs}s`;
+}
+
 function openSidebar(){
   document.getElementById('sidebar').classList.add('mobile-open');
   document.getElementById('mobileOverlay').classList.add('show');
@@ -227,6 +249,13 @@ async function init() {
     loadData();
     loadTransferRequests();
   }, 5000);
+
+  // Update timers every second
+  setInterval(() => {
+    renderTimers();
+    updateCustListTimers();
+    updateDetailTimer();
+  }, 1000);
 }
 
 async function loadTransferRequests() {
@@ -463,8 +492,8 @@ async function buildList(){
                     <div class="cust-row-name">${c.first_name} ${c.last_name}</div>
                     <div class="cust-row-sub">
                       <i class="fa-solid fa-couch" style="font-size:10px"></i> ${c.seat_label || 'No Seat'} · 
-                      <span style="color: ${diffMs < 900000 ? '#ef4444' : 'inherit'}; font-weight: ${diffMs < 900000 ? '700' : 'normal'}">
-                        ${timeStr}
+                      <span data-end-time="${c.end_time}" data-is-paused="${c.is_paused}" data-remaining-seconds="${c.remaining_seconds}" style="color: ${!c.is_paused && diffMs < 900000 ? '#ef4444' : 'inherit'}; font-weight: ${!c.is_paused && diffMs < 900000 ? '700' : 'normal'}">
+                        ${timeStr}${c.is_paused ? ' (Paused)' : ''}
                       </span>
                     </div>
                 </div>
@@ -493,6 +522,74 @@ function doTransferFor(name){
   }
 }
 
+function renderTimers() {
+  items.forEach(item => {
+    if ((item.status === 'taken' || item.status === 'idle') && (item.endTime || item.remainingSeconds)) {
+        const el = document.querySelector(`[data-id="${item.id}"]`);
+        if (el) {
+            let tag = el.querySelector('.timer-tag');
+            if (!tag) {
+                tag = document.createElement('div');
+                tag.className = 'timer-tag';
+                tag.style.position = 'absolute';
+                tag.style.bottom = '-18px';
+                tag.style.left = '50%';
+                tag.style.transform = 'translateX(-50%)';
+                tag.style.fontSize = '8px';
+                tag.style.fontWeight = '800';
+                tag.style.color = 'white';
+                tag.style.padding = '1px 4px';
+                tag.style.borderRadius = '4px';
+                tag.style.whiteSpace = 'nowrap';
+                tag.style.zIndex = '20';
+                el.appendChild(tag);
+            }
+            const timeLeft = formatTimeLeft(item.endTime, item.isPaused, item.remainingSeconds);
+            tag.textContent = timeLeft + (item.isPaused ? ' (P)' : '');
+            tag.style.background = item.isPaused ? '#facc15' : (timeLeft === 'Expired' ? '#ef4444' : '#1e293b');
+            tag.style.color = item.isPaused ? '#1e293b' : 'white';
+        }
+    }
+  });
+}
+
+function updateCustListTimers() {
+  const rows = document.querySelectorAll('.cust-row-sub');
+  rows.forEach(row => {
+      const span = row.querySelector('span');
+      if (span && (span.dataset.endTime || span.dataset.remainingSeconds)) {
+          const isPaused = span.dataset.isPaused === '1';
+          const remainingSeconds = parseInt(span.dataset.remainingSeconds || 0);
+          const timeLeft = formatTimeLeft(span.dataset.endTime, isPaused, remainingSeconds);
+          
+          span.textContent = timeLeft + (isPaused ? ' (Paused)' : '');
+          const isUrgent = !isPaused && timeLeft && (timeLeft.includes('s') && !timeLeft.includes('m'));
+          span.style.color = isPaused ? '#f59e0b' : (isUrgent ? '#ef4444' : 'inherit');
+          span.style.fontWeight = (isUrgent || isPaused) ? '700' : 'normal';
+      }
+  });
+}
+
+function updateDetailTimer() {
+  const panel = document.getElementById('sideDetailPanel');
+  if (panel.style.display === 'block') {
+      const item = items.find(i => i.id === currentSelectedElementId);
+      if (item && (item.status === 'taken' || item.status === 'idle')) {
+          const timeLeft = formatTimeLeft(item.endTime, item.isPaused, item.remainingSeconds);
+          const badge = document.getElementById('detailStatusBadge');
+          if (item.isPaused) {
+              badge.textContent = `Paused (${timeLeft})`;
+              badge.style.background = '#fef9c3';
+              badge.style.color = '#854d0e';
+          } else {
+              badge.textContent = `Taken (${timeLeft || 'Expired'})`;
+              badge.style.background = '#fee2e2';
+              badge.style.color = '#ef4444';
+          }
+      }
+  }
+}
+
 
 
 function escapeHtml(text) {
@@ -508,7 +605,9 @@ async function loadData() {
     if (data && data.items) {
       items = data.items;
       renderCanvas();
-      buildList();
+      renderTimers();
+      await buildList();
+      updateCustListTimers();
     }
   } catch (e) {
     console.error(e);
@@ -521,6 +620,7 @@ function renderCanvas() {
   items.forEach(item => {
     const el = document.createElement('div');
     el.className = 'fp-item';
+    el.dataset.id = item.id;
     el.style.left = item.x + 'px';
     el.style.top = item.y + 'px';
     el.style.width = item.w + 'px';
@@ -535,15 +635,17 @@ function renderCanvas() {
       visual.classList.add('chair-icon');
       visual.style.webkitMaskImage = 'url(/images/chair.png)';
       visual.style.maskImage = 'url(/images/chair.png)';
-      const status = item.statuses ? item.statuses[0] : 'open';
-      if (status === 'taken') visual.style.backgroundColor = '#d65c29';
+      const status = item.statuses ? item.statuses[0] : (item.status || 'open');
+      const isPaused = !!item.isPaused;
+      if (isPaused || status === 'idle') visual.style.backgroundColor = '#facc15';
+      else if (status === 'taken') visual.style.backgroundColor = '#d65c29';
       else if (status === 'reserved') visual.style.backgroundColor = '#1e293b';
-      else if (status === 'idle') visual.style.backgroundColor = '#facc15';
       else visual.style.backgroundColor = '#10b981';
       el.onclick = (e) => { e.stopPropagation(); showDetail(item.label || 'Seat', item.label, 'Now', status === 'open', item.id); };
     } else if (item.type === 'chair-sq') {
-      const status = item.statuses ? item.statuses[0] : 'open';
-      const sqColor = status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981';
+      const status = item.statuses ? item.statuses[0] : (item.status || 'open');
+      const isPaused = !!item.isPaused;
+      const sqColor = (isPaused || status === 'idle') ? '#facc15' : status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : '#10b981';
       visual.style.background = sqColor;
       visual.style.borderRadius = '6px';
       visual.style.border = '2px solid #8B4513';

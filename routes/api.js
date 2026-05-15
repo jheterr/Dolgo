@@ -21,8 +21,24 @@ async function autoCleanup() {
             }
         }
 
-        // 2. Mark active sessions as completed
-        await db.query('UPDATE active_sessions SET status = "completed" WHERE status = "active" AND end_time < NOW()');
+        // 2. Mark active sessions AND their corresponding reservations as completed (only if NOT paused)
+        // First, find IDs to update both tables
+        const [toComplete] = await db.query('SELECT id, user_id FROM active_sessions WHERE status = "active" AND is_paused = 0 AND end_time < NOW()');
+        
+        if (toComplete.length > 0) {
+            const userIds = toComplete.map(s => s.user_id);
+            await db.query('UPDATE active_sessions SET status = "completed" WHERE id IN (?)', [toComplete.map(s => s.id)]);
+            // Also complete the reservations for these users
+            await db.query('UPDATE reservations SET status = "completed" WHERE user_id IN (?) AND status = "confirmed"', [userIds]);
+        }
+
+        // 3. Ensure floor_elements are 'open' if they have no active confirmed reservation
+        await db.query(`
+            UPDATE floor_elements fe
+            LEFT JOIN reservations r ON fe.id = r.element_id AND r.status = 'confirmed'
+            SET fe.status = 'open'
+            WHERE (fe.status = 'taken' OR fe.status = 'idle') AND r.id IS NULL
+        `);
 
     } catch (e) {
         console.error('Auto-Cleanup Error:', e);
@@ -42,22 +58,49 @@ router.get('/layout', async (req, res) => {
         }
 
         const planId = plans[0].id;
-        const [elements] = await db.query('SELECT * FROM floor_elements WHERE floor_plan_id = ?', [planId]);
+        // Join with active reservations and active_sessions to get end_time and pause status
+        // Using a subquery for sessions to ensure we get the latest active session per user
+        const [elements] = await db.query(`
+            SELECT fe.*, r.end_time, r.user_id, u.first_name, u.last_name, 
+                   s.is_paused, s.remaining_seconds
+            FROM floor_elements fe
+            LEFT JOIN reservations r ON fe.id = r.element_id AND r.status = 'confirmed'
+            LEFT JOIN users u ON r.user_id = u.id
+            LEFT JOIN (
+                SELECT s1.* FROM active_sessions s1
+                WHERE s1.status = 'active'
+                AND s1.id = (SELECT MAX(id) FROM active_sessions s2 WHERE s2.user_id = s1.user_id AND s2.status = 'active')
+            ) s ON r.user_id = s.user_id
+            WHERE fe.floor_plan_id = ?
+        `, [planId]);
 
         // Transform elements into expected format
-        const items = elements.map(e => ({
-            id: e.id,
-            type: e.element_type,
-            x: e.pos_x,
-            y: e.pos_y,
-            w: e.width,
-            h: e.height,
-            rot: e.rotation,
-            color: e.color,
-            label: e.label,
-            seats: e.capacity,
-            statuses: [e.status]
-        }));
+        const items = elements.map(e => {
+            let status = e.status;
+            // Force status to 'idle' if we have an active paused session
+            if (e.is_paused) status = 'idle';
+            // Also ensure 'taken' if user_id exists but status is 'open' (backup check)
+            else if (e.user_id && status === 'open') status = 'taken';
+
+            return {
+                id: e.id,
+                type: e.element_type,
+                x: e.pos_x,
+                y: e.pos_y,
+                w: e.width,
+                h: e.height,
+                rot: e.rotation,
+                color: e.color,
+                label: e.label,
+                seats: e.capacity,
+                status: status,
+                statuses: [status],
+                endTime: e.end_time,
+                userName: e.first_name ? `${e.first_name} ${e.last_name}` : null,
+                isPaused: !!e.is_paused,
+                remainingSeconds: e.remaining_seconds || 0
+            };
+        });
 
         res.json({ items });
     } catch (error) {
@@ -205,6 +248,7 @@ router.get('/active-customers', async (req, res) => {
         const [customers] = await db.query(`
             SELECT u.id, u.first_name, u.last_name, u.email, u.role, u.type, 
                    s.start_time, s.end_time, s.mac_address, s.ip_address,
+                   s.is_paused, s.remaining_seconds,
                    fe.label as seat_label
             FROM users u
             JOIN active_sessions s ON u.id = s.user_id
@@ -745,6 +789,9 @@ router.post('/messages', async (req, res) => {
         res.status(500).json({ success: false, error: 'Database error: ' + error.message });
     }
 });
+
+// Run auto-cleanup every minute in the background
+setInterval(autoCleanup, 60000);
 
 module.exports = router;
 

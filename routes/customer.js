@@ -33,11 +33,24 @@ router.get('/dashboard', async (req, res) => {
             AND NOW() BETWEEN r.start_time AND r.end_time LIMIT 1
         `, [userId]);
 
+        // Calculate remaining seconds on server to avoid client clock drift
+        let remainingSecs = 0;
+        if (sessions[0]) {
+            if (sessions[0].is_paused) {
+                remainingSecs = sessions[0].remaining_seconds;
+            } else {
+                const now = new Date();
+                const end = new Date(sessions[0].end_time);
+                remainingSecs = Math.max(0, Math.floor((end - now) / 1000));
+            }
+        }
+
         res.render('customer/dashboard', {
             active: 'Dashboard',
             role: 'customer',
             user: users[0] || { first_name: 'User' },
             session: sessions[0] || null,
+            remainingSeconds: remainingSecs,
             availableSeats: seatCount[0].available,
             mySeat: currentSeat[0] ? currentSeat[0].label : 'N/A'
         });
@@ -53,23 +66,59 @@ router.post('/session/pause-toggle', async (req, res) => {
         const userId = (req.session.user && req.session.user.id) ? req.session.user.id : (req.session.userId || 2);
         const { isPaused, remainingSeconds } = req.body;
 
+        // Find the active reservation for this user to get the element_id
+        const [reservations] = await db.execute(
+            'SELECT element_id FROM reservations WHERE user_id = ? AND status = "confirmed" LIMIT 1',
+            [userId]
+        );
+
         if (isPaused) {
-            // PAUSING: Save the remaining seconds to DB
+            // PAUSING: Save the remaining seconds to DB and set seat to 'idle'
             await db.execute(
                 `UPDATE active_sessions SET is_paused = 1, remaining_seconds = ? 
                  WHERE user_id = ? AND status = 'active'`,
                 [remainingSeconds, userId]
             );
+            if (reservations.length > 0) {
+                await db.execute('UPDATE floor_elements SET status = "idle" WHERE id = ?', [reservations[0].element_id]);
+            }
         } else {
-            // RESUMING: Create a new end_time based on saved seconds
-            await db.execute(
+            // RESUMING: Create a new end_time and set seat back to 'taken'
+            const [updateResult] = await db.execute(
                 `UPDATE active_sessions 
                  SET is_paused = 0, end_time = DATE_ADD(NOW(), INTERVAL ? SECOND) 
                  WHERE user_id = ? AND status = 'active'`,
                 [remainingSeconds, userId]
             );
+
+            if (reservations.length > 0) {
+                // Also update the reservation end_time so the floor plan shows the correct time
+                await db.execute(
+                    `UPDATE reservations 
+                     SET end_time = DATE_ADD(NOW(), INTERVAL ? SECOND) 
+                     WHERE id = (
+                        SELECT id FROM (
+                            SELECT id FROM reservations 
+                            WHERE user_id = ? AND element_id = ? AND status = 'confirmed' 
+                            ORDER BY id DESC LIMIT 1
+                        ) as t
+                     )`,
+                    [remainingSeconds, userId, reservations[0].element_id]
+                );
+                await db.execute('UPDATE floor_elements SET status = "taken" WHERE id = ?', [reservations[0].element_id]);
+            }
         }
-        res.json({ success: true });
+        
+        // Get the updated session to return the new end_time
+        const [updatedSession] = await db.execute(
+            'SELECT end_time, is_paused, remaining_seconds FROM active_sessions WHERE user_id = ? AND status = "active" LIMIT 1',
+            [userId]
+        );
+
+        res.json({ 
+            success: true, 
+            session: updatedSession[0] 
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false });

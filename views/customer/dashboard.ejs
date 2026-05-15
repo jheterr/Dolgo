@@ -219,7 +219,9 @@
                 <div style="font-size: 18px; font-weight: 600; color: white; margin-top: 16px; line-height: 1.5;">
                     Your MAC Address: <span class="font-mono"><%= session.mac_address || 'Not Detected' %></span><br>
                     Your IP Address: <span class="font-mono"><%= session.ip_address || 'Connecting...' %></span><br>
-                    <span style="font-size: 16px; font-weight: 500; opacity: 0.9;">Session ends at <%= new Date(session.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %></span>
+                    <span id="sessionEndTimeDisplay" style="font-size: 16px; font-weight: 500; opacity: 0.9;">
+                        Session ends at <%= new Date(session.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %>
+                    </span>
                 </div>
             <% } else { %>
                 <h2 style="font-size: 1.8rem; font-weight: 600; color: white;">No Active Session</h2>
@@ -330,11 +332,7 @@
     let timerInterval = null;
 
     <% if (session) { %>
-        <% if (session.is_paused) { %>
-            timeRemaining = <%= session.remaining_seconds || 0 %> * 1000;
-        <% } else if (session.end_time) { %>
-            timeRemaining = Math.max(0, new Date("<%= session.end_time %>").getTime() - Date.now());
-        <% } %>
+        timeRemaining = (<%= (locals.remainingSeconds !== undefined) ? remainingSeconds : 0 %>) * 1000;
     <% } %>
 
     const timerEl = document.getElementById('timer');
@@ -375,9 +373,18 @@
             });
 
             if (response.ok) {
+                const data = await response.json();
                 isPaused = newPauseState;
                 pauseBtn.innerHTML = isPaused ? '<i class="fa-solid fa-play"></i>' : '<i class="fa-solid fa-pause"></i>';
                 pauseBtn.classList.toggle('paused', isPaused);
+
+                if (data.session && data.session.end_time) {
+                    // Update the "Session ends at" text
+                    const newEnd = new Date(data.session.end_time);
+                    const timeStr = newEnd.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    const displayEl = document.getElementById('sessionEndTimeDisplay');
+                    if (displayEl) displayEl.textContent = `Session ends at ${timeStr}`;
+                }
             }
         } catch (err) { console.error("Error toggling pause", err); }
     }

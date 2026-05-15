@@ -682,6 +682,28 @@
         } catch(e) { console.error(e); }
     }
 
+    function formatTimeLeft(endTime, isPaused = false, remainingSeconds = 0) {
+        let diffMs;
+        if (isPaused) {
+            diffMs = remainingSeconds * 1000;
+        } else {
+            if (!endTime) return null;
+            const now = new Date();
+            const end = new Date(endTime);
+            diffMs = end - now;
+        }
+        
+        if (diffMs <= 0) return 'Expired';
+        
+        const hrs = Math.floor(diffMs / 3600000);
+        const mins = Math.floor((diffMs % 3600000) / 60000);
+        const secs = Math.floor((diffMs % 60000) / 1000);
+        
+        if (hrs > 0) return `${hrs}h ${mins}m`;
+        if (mins > 0) return `${mins}m ${secs}s`;
+        return `${secs}s`;
+    }
+
     // State
     let items = [];
     let mode = 'select';
@@ -841,7 +863,9 @@
           items = [...defaultItems]; nextId = 60;
         }
         render();
-        buildCustList();
+        renderTimers(); // Immediate update to prevent flicker
+        await buildCustList();
+        updateCustListTimers(); // Immediate update to prevent flicker
         fetchCustomersForSelect();
       } catch (e) {
         console.error(e);
@@ -890,13 +914,87 @@
         selectedId = null;
         hideProps();
         document.getElementById('hintText').innerHTML = '<i class="fa-solid fa-radar"></i> Live Tracking: Auto-refreshing statuses every 5s.';
+        
         if (trackInterval) clearInterval(trackInterval);
         trackInterval = setInterval(() => {
           loadData();
           loadTransferRequests();
         }, 5000);
+
+        // Update timers every second for smooth countdown
+        setInterval(() => {
+            if (!isEditMode) {
+                renderTimers();
+                updateCustListTimers();
+                updateDetailTimer();
+            }
+        }, 1000);
       }
       render();
+    }
+
+    function renderTimers() {
+        items.forEach(item => {
+            if ((item.status === 'taken' || item.status === 'idle') && (item.endTime || item.remainingSeconds)) {
+                const el = document.querySelector(`[data-id="${item.id}"]`);
+                if (el) {
+                    let tag = el.querySelector('.timer-tag');
+                    if (!tag) {
+                        tag = document.createElement('div');
+                        tag.className = 'timer-tag';
+                        tag.style.position = 'absolute';
+                        tag.style.bottom = '-18px';
+                        tag.style.left = '50%';
+                        tag.style.transform = 'translateX(-50%)';
+                        tag.style.fontSize = '8px';
+                        tag.style.fontWeight = '800';
+                        tag.style.color = 'white';
+                        tag.style.padding = '1px 4px';
+                        tag.style.borderRadius = '4px';
+                        tag.style.whiteSpace = 'nowrap';
+                        tag.style.zIndex = '20';
+                        el.appendChild(tag);
+                    }
+                    const timeLeft = formatTimeLeft(item.endTime, item.isPaused, item.remainingSeconds);
+                    tag.textContent = timeLeft + (item.isPaused ? ' (P)' : '');
+                    tag.style.background = item.isPaused ? '#facc15' : (timeLeft === 'Expired' ? '#ef4444' : '#1e293b');
+                    tag.style.color = item.isPaused ? '#1e293b' : 'white';
+                }
+            }
+        });
+    }
+
+    function updateCustListTimers() {
+        const rows = document.querySelectorAll('.cust-row-sub');
+        rows.forEach(row => {
+            // Find the time span. We need to be careful with the structure.
+            // Earlier I added: <span style="color: ...">${timeStr}</span>
+            const span = row.querySelector('span');
+            if (span && (span.dataset.endTime || span.dataset.remainingSeconds)) {
+                const isPaused = span.dataset.isPaused === '1';
+                const remainingSeconds = parseInt(span.dataset.remainingSeconds || 0);
+                const timeLeft = formatTimeLeft(span.dataset.endTime, isPaused, remainingSeconds);
+                
+                span.textContent = timeLeft + (isPaused ? ' (Paused)' : '');
+                const isUrgent = !isPaused && timeLeft && (timeLeft.includes('s') && !timeLeft.includes('m'));
+                span.style.color = isPaused ? '#f59e0b' : (isUrgent ? '#ef4444' : 'inherit');
+                span.style.fontWeight = (isUrgent || isPaused) ? '700' : 'normal';
+            }
+        });
+    }
+
+    function updateDetailTimer() {
+        const panel = document.getElementById('sideDetailPanel');
+        if (panel.style.display === 'block') {
+            const item = items.find(i => i.id === currentSelectedElementId);
+            if (item && item.status === 'taken' || item.status === 'idle') {
+                const timeLeft = formatTimeLeft(item.endTime, item.isPaused, item.remainingSeconds);
+                const badge = document.getElementById('detailStatusBadge');
+                badge.textContent = item.isPaused ? `Paused (${timeLeft})` : `Occupied (${timeLeft || 'Expired'})`;
+                badge.style.background = item.isPaused ? '#fef9c3' : '#fee2e2';
+                badge.style.color = item.isPaused ? '#854d0e' : '#ef4444';
+            }
+        }
     }
 
     function closeUnsavedModal() {
@@ -954,15 +1052,17 @@
             visual.style.webkitMaskImage = 'url(/images/chair.png)';
             visual.style.maskImage = 'url(/images/chair.png)';
             const status = (item.statuses && item.statuses[0]) || item.status || 'open';
-            if (status === 'taken') visual.style.backgroundColor = '#d65c29';
+            const isPaused = !!item.isPaused;
+            if (isPaused || status === 'idle') visual.style.backgroundColor = '#facc15';
+            else if (status === 'taken') visual.style.backgroundColor = '#d65c29';
             else if (status === 'reserved') visual.style.backgroundColor = '#1e293b';
-            else if (status === 'idle') visual.style.backgroundColor = '#facc15';
             else visual.style.backgroundColor = '#10b981';
           }
           el.onclick = (e) => { e.stopPropagation(); handleItemClick(e, item.id) };
         } else if (item.type === 'chair-sq') {
           const status = (item.statuses && item.statuses[0]) || item.status || 'open';
-          const sqColor = isEditMode ? '#faecd4' : (status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : status === 'idle' ? '#facc15' : '#10b981');
+          const isPaused = !!item.isPaused;
+          const sqColor = isEditMode ? '#faecd4' : ((isPaused || status === 'idle') ? '#facc15' : status === 'taken' ? '#d65c29' : status === 'reserved' ? '#1e293b' : '#10b981');
           visual.style.background = sqColor;
           visual.style.borderRadius = '6px';
           visual.style.border = '2px solid #8B4513';
@@ -1008,6 +1108,29 @@
           el.appendChild(lbl);
         }
 
+        // Add Timer for Taken seats
+        const status = (item.statuses && item.statuses[0]) || item.status || 'open';
+        if ((status === 'taken' || status === 'idle') && item.endTime && !isEditMode) {
+            const timeLeft = formatTimeLeft(item.endTime, item.isPaused, item.remainingSeconds);
+            if (timeLeft) {
+                const timerTag = document.createElement('div');
+                timerTag.style.position = 'absolute';
+                timerTag.style.bottom = '-18px';
+                timerTag.style.left = '50%';
+                timerTag.style.transform = 'translateX(-50%)';
+                timerTag.style.fontSize = '8px';
+                timerTag.style.fontWeight = '800';
+                timerTag.style.background = item.isPaused ? '#facc15' : (timeLeft === 'Expired' ? '#ef4444' : '#1e293b');
+                timerTag.style.color = item.isPaused ? '#1e293b' : 'white';
+                timerTag.style.padding = '1px 4px';
+                timerTag.style.borderRadius = '4px';
+                timerTag.style.whiteSpace = 'nowrap';
+                timerTag.style.zIndex = '20';
+                timerTag.textContent = timeLeft + (item.isPaused ? ' (P)' : '');
+                el.appendChild(timerTag);
+            }
+        }
+
         const del = document.createElement('button');
         del.className = 'delete-btn';
         del.innerHTML = '<i class="fa-solid fa-xmark"></i>';
@@ -1033,11 +1156,32 @@
     function showDetail(name, seatLabel, time, isAvailable = false, elementId, image) {
       currentSelectedElementId = elementId;
       currentSelectedElementLabel = seatLabel;
-      document.getElementById('detailName').textContent = name;
-      const badge = document.getElementById('detailStatusBadge');
-      badge.textContent = isAvailable ? 'Available' : 'Occupied';
-      badge.style.background = isAvailable ? '#dcfce7' : '#fee2e2';
-      badge.style.color = isAvailable ? '#16a34a' : '#ef4444';
+      
+      const item = items.find(i => i.id === elementId);
+      const status = (item && item.status) || (isAvailable ? 'open' : 'taken');
+      const isReallyAvailable = status === 'open';
+
+      // If occupied or idle, show user name if we have it
+      if (!isReallyAvailable && item && item.userName) {
+          document.getElementById('detailName').textContent = item.userName;
+          const timeLeft = formatTimeLeft(item.endTime, item.isPaused, item.remainingSeconds);
+          const badge = document.getElementById('detailStatusBadge');
+          if (item.isPaused) {
+              badge.textContent = `Paused (${timeLeft})`;
+              badge.style.background = '#fef9c3';
+              badge.style.color = '#854d0e';
+          } else {
+              badge.textContent = `Taken (${timeLeft || 'Expired'})`;
+              badge.style.background = '#fee2e2';
+              badge.style.color = '#ef4444';
+          }
+      } else {
+          document.getElementById('detailName').textContent = name;
+          const badge = document.getElementById('detailStatusBadge');
+          badge.textContent = isReallyAvailable ? 'Available' : 'Taken';
+          badge.style.background = isReallyAvailable ? '#dcfce7' : '#fee2e2';
+          badge.style.color = isReallyAvailable ? '#16a34a' : '#ef4444';
+      }
 
       const detailImg = document.getElementById('detailImg');
       detailImg.src = image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=400';
@@ -1046,7 +1190,8 @@
       document.getElementById('sideDetailPanel').style.display = 'block';
       document.getElementById('propsPanel').classList.remove('show');
       cancelAssignment();
-      document.getElementById('btnAssign').style.display = isAvailable ? 'flex' : 'none';
+      document.getElementById('btnAssign').style.display = isReallyAvailable ? 'flex' : 'none';
+      document.getElementById('btnTransfer').style.display = isReallyAvailable ? 'none' : 'flex';
     }
 
     async function changeSeatImage(event) {
@@ -1276,8 +1421,8 @@
                         <div class="cust-row-name">${c.first_name} ${c.last_name}</div>
                         <div class="cust-row-sub">
                           <i class="fa-solid fa-couch" style="font-size:10px"></i> ${c.seat_label || 'No Seat'} · 
-                          <span style="color: ${diffMs < 900000 ? '#ef4444' : 'inherit'}; font-weight: ${diffMs < 900000 ? '700' : 'normal'}">
-                            ${timeStr}
+                          <span data-end-time="${c.end_time}" data-is-paused="${c.is_paused}" data-remaining-seconds="${c.remaining_seconds}" style="color: ${!c.is_paused && diffMs < 900000 ? '#ef4444' : 'inherit'}; font-weight: ${!c.is_paused && diffMs < 900000 ? '700' : 'normal'}">
+                            ${timeStr}${c.is_paused ? ' (Paused)' : ''}
                           </span>
                         </div>
                     </div>
