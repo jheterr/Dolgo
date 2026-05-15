@@ -1,10 +1,10 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Staff Management' %>
 
 <%- contentFor('style') %>
 <style>
 
-    /* Status Toggle */
+    /* status toggle function */
     .status-toggle {
       cursor: pointer;
       padding: 4px 12px;
@@ -18,7 +18,7 @@
       transform: scale(1.02);
     }
 
-    /* Modal Styles */
+    /* modal styles function */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -41,7 +41,7 @@
       overflow-y: auto;
     }
 
-    /* Modal Header */
+    /* modal header function */
     .modal-header {
       display: flex;
       align-items: center;
@@ -79,7 +79,7 @@
       color: #475569;
     }
 
-    /* Modal Body */
+    /* modal body function */
     .modal-body {
       padding: 24px;
       display: flex;
@@ -87,7 +87,7 @@
       gap: 18px;
     }
 
-    /* Modal Footer */
+    /* modal footer function */
     .modal-footer {
       padding: 16px 24px;
       border-top: 1px solid #e2e8f0;
@@ -98,7 +98,7 @@
       border-radius: 0 0 var(--radius) var(--radius);
     }
 
-    /* Form Styles */
+    /* form styles function */
     .form-group {
       display: flex;
       flex-direction: column;
@@ -144,14 +144,14 @@
       min-height: 80px;
     }
 
-    /* Form Row - Two Columns */
+    /* form row  two columns function */
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
 
-    /* Page Header */
+    /* page header function */
     .page-header {
       display: flex;
       justify-content: space-between;
@@ -203,7 +203,7 @@
       font-size: 12px;
     }
 
-    /* ========== CARD-BASED STAFF LIST ========== */
+    /* cardbased staff list function */
     .staff-sections {
       display: flex;
       flex-direction: column;
@@ -328,7 +328,7 @@
       transform: scale(1.02);
     }
 
-    /* Mobile Menu Button */
+    /* mobile menu button function */
     .mobile-menu-btn {
       position: fixed;
       top: 18px;
@@ -353,7 +353,7 @@
       color: #94a3b8;
     }
 
-    /* Desktop Table View (hidden on mobile by default) */
+    /* desktop table view (hidden on mobile by default) function */
     .desktop-table-view {
       display: block;
     }
@@ -361,7 +361,7 @@
       display: none;
     }
 
-    /* Section divider styles */
+    /* section divider styles function */
     .section-divider td {
       background: transparent !important;
       padding: 12px 8px 8px 8px !important;
@@ -381,7 +381,7 @@
       border-radius: 8px;
     }
 
-    /* Button Styles */
+    /* button styles function */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -419,7 +419,7 @@
       font-size: 11px;
     }
 
-    /* Card component */
+    /* card component function */
     .card {
       background: white;
       border-radius: 20px;
@@ -455,7 +455,7 @@
       color: #1e293b;
     }
 
-    /* ========== MOBILE OPTIMIZATIONS ========== */
+    /* mobile optimizations function */
     @media (max-width: 768px) {
       .mobile-menu-btn { display: flex !important; }
       .content { padding-top: 75px; }
@@ -569,7 +569,7 @@
         </div>
       </div>
 
-      <!-- DESKTOP TABLE VIEW -->
+      <!-- desktop table view function -->
       <div class="desktop-table-view">
         <div class="card">
           <div class="table-wrap">
@@ -583,14 +583,14 @@
         </div>
       </div>
 
-      <!-- MOBILE CARD VIEW -->
+      <!-- mobile card view function -->
       <div class="mobile-card-view">
         <div id="staffCardsContainer"></div>
       </div>
     </main>
   </div>
 
-  <!-- Add Staff Modal -->
+  <!-- add staff modal function -->
   <div class="modal-overlay" id="addStaffModal">
     <div class="modal">
       <div class="modal-header">
@@ -650,7 +650,7 @@
     </div>
   </div>
 
-  <!-- Edit Staff Modal -->
+  <!-- edit staff modal function -->
   <div class="modal-overlay" id="editStaffModal">
     <div class="modal">
       <div class="modal-header">
@@ -715,7 +715,7 @@
 
     async function loadStaff() {
       try {
-        // Fetch users with staff role only
+        /* fetch users with staff role only function */
         const res = await fetch('/api/users?role=staff'); 
         const data = await res.json();
         
@@ -785,7 +785,7 @@
     function filterStaff() {
       const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
       
-      // Filter Table Rows
+      /* filter table rows function */
       document.querySelectorAll('#staffTableBody tr').forEach(tr => {
         const name  = tr.getAttribute('data-name') || '';
         const email = tr.getAttribute('data-email') || '';
@@ -794,7 +794,7 @@
         tr.style.display = match ? '' : 'none';
       });
 
-      // Filter Cards
+      /* filter cards function */
       document.querySelectorAll('#staffCardsContainer .staff-card').forEach(card => {
         const name  = card.getAttribute('data-name') || '';
         const email = card.getAttribute('data-email') || '';

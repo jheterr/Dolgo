@@ -5,36 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%- typeof title !== 'undefined' ? title : 'The Last Muster' %></title>
   
-  <!-- Global Styles -->
+  <!-- global styles function -->
   <link rel="stylesheet" href="/stylesheets/<%= typeof role !== 'undefined' ? role : 'main' %>.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Chart.js (available globally for all pages) -->
+  <!-- chart.js (available globally for all pages) function -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 
-  <!-- Page Specific Head Scripts (e.g. additional CDN libs) -->
+  <!-- page specific head scripts (e.g. additional cdn libs) function -->
   <%- typeof head !== 'undefined' ? head : '' %>
 
-  <!-- Page Specific Styles -->
+  <!-- page specific styles function -->
   <%- typeof style !== 'undefined' ? style : '' %>
 
 </head>
 <body>
   
-  <!-- Main Application Body -->
+  <!-- main application body function -->
   <%- body %>
 
-  <!-- Global Logout Script -->
+  <!-- global logout script function -->
   <script>
     function handleLogout() {
       window.location.href = '/login/logout';
     }
   </script>
 
-  <!-- Page Specific Scripts -->
+  <!-- page specific scripts function -->
   <%- typeof script !== 'undefined' ? script : '' %>
 
-  <!-- Global Scripts -->
+  <!-- global scripts function -->
   <script>
     function confirmLogout() {
       if (confirm('Are you sure you want to logout?')) {

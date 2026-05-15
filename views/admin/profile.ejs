@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Profile' %>
 
 <%- contentFor('head') %>
@@ -6,7 +6,7 @@
 
 <%- contentFor('style') %>
 <style>
-  /* ── Layout ── */
+  /* ── layout ── function */
   .profile-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -14,7 +14,7 @@
   }
   @media(max-width:800px){ .profile-layout{ grid-template-columns:1fr; } }
 
-  /* ── Profile Card ── */
+  /* ── profile card ── function */
   .profile-card {
     border-radius: 20px;
     padding: 32px 20px;
@@ -82,7 +82,7 @@
     letter-spacing:.06em;
   }
 
-  /* ── Info Card ── */
+  /* ── info card ── function */
   .info-card {
     border-radius: 20px;
     padding: 24px;
@@ -108,7 +108,7 @@
   .info-lbl { font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.05em; margin-bottom:2px; }
   .info-val { font-size:13px; font-weight:700; color:#1e293b; }
 
-  /* ── Base Modal ── */
+  /* ── base modal ── function */
   .modal-overlay {
     position:fixed; inset:0;
     background:rgba(15,23,42,.55);
@@ -118,7 +118,7 @@
   }
   .modal-overlay.open { display:flex; }
 
-  /* Standard modal (edit profile) */
+  /* standard modal (edit profile) function */
   .modal-std {
     background:#fff; border-radius:20px; padding:28px;
     width:100%; max-width:480px;
@@ -133,7 +133,7 @@
   .modal-body { display:flex; flex-direction:column; gap:14px; }
   .modal-footer { display:flex; justify-content:flex-end; gap:10px; }
 
-  /* ── Photo Choice Modal ── */
+  /* ── photo choice modal ── function */
   .photo-modal {
     background:#fff; border-radius:24px; padding:36px 32px 28px;
     width:100%; max-width:500px;
@@ -158,7 +158,7 @@
   .photo-modal-sub { font-size:13px; color:#94a3b8; margin-bottom:24px; }
 
 
-  /* Choice row */
+  /* choice row function */
   .choice-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
   .choice-card {
     display:flex; flex-direction:column; align-items:center; gap:10px;
@@ -182,7 +182,7 @@
   .choice-card:hover .choice-card-icon.camera { background:#dcfce7; }
   .choice-card span { font-size:12px; font-weight:700; color:#475569; }
 
-  /* ── Camera Modal ── */
+  /* ── camera modal ── function */
   .camera-modal {
     background: #fff; border-radius: 24px; padding: 28px;
     width: 100%; max-width: 460px;
@@ -227,7 +227,7 @@
   }
   .camera-modal-close:hover { background:#e2e8f0; color:#1e293b; }
 
-  /* Camera Preview State */
+  /* camera preview state function */
   .camera-modal.preview-mode .camera-ring,
   .camera-modal.preview-mode .shutter-row { display:none; }
   
@@ -258,7 +258,7 @@
   }
   .btn-retake:hover { background: #e2e8f0; color: #1e293b; }
 
-  /* ── Crop Modal ── */
+  /* ── crop modal ── function */
   .crop-modal {
     background:#fff; border-radius:24px; padding:28px;
     width:100%; max-width:580px;
@@ -283,7 +283,7 @@
     <h1 class="page-title">Profile</h1>
 
     <div class="profile-layout">
-      <!-- Left Card -->
+      <!-- left card function -->
       <div class="profile-card">
         <div class="avatar-wrapper" onclick="openModal('photoChoiceModal')">
           <div class="avatar" id="profileAvatar">
@@ -305,7 +305,7 @@
         </button>
       </div>
 
-      <!-- Right Info Card -->
+      <!-- right info card function -->
       <div class="info-card">
         <div class="info-title">Account Information</div>
         <div class="info-field">
@@ -335,7 +335,7 @@
       </div>
     </div>
 
-    <!-- ── Edit Profile Modal ── -->
+    <!-- ── edit profile modal ── function -->
     <div class="modal-overlay" id="editProfileModal">
       <div class="modal-std">
         <div class="modal-header">
@@ -355,7 +355,7 @@
       </div>
     </div>
 
-    <!-- ── Photo Choice Modal ── -->
+    <!-- ── photo choice modal ── function -->
     <div class="modal-overlay" id="photoChoiceModal">
       <div class="photo-modal">
         <button class="photo-modal-close" onclick="closeModal('photoChoiceModal')"><i class="fa-solid fa-xmark"></i></button>
@@ -365,7 +365,7 @@
         <div class="photo-modal-sub">Upload from your device or snap a selfie</div>
 
 
-        <!-- Choice buttons -->
+        <!-- choice buttons function -->
         <div class="choice-row">
           <div class="choice-card" onclick="triggerFileUpload()">
             <div class="choice-card-icon upload"><i class="fa-solid fa-cloud-arrow-up"></i></div>
@@ -379,7 +379,7 @@
       </div>
     </div>
 
-    <!-- ── Camera Modal ── -->
+    <!-- ── camera modal ── function -->
     <div class="modal-overlay" id="cameraModal">
       <div class="camera-modal">
         <button class="camera-modal-close" onclick="stopCamera()"><i class="fa-solid fa-xmark"></i></button>
@@ -406,7 +406,7 @@
       </div>
     </div>
 
-    <!-- ── Crop Modal ── -->
+    <!-- ── crop modal ── function -->
     <div class="modal-overlay" id="cropModal">
       <div class="crop-modal">
         <div class="modal-header">
@@ -430,18 +430,18 @@
 <%- contentFor('script') %>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 <script>
-  /* ── Helpers ── */
+  /* ── helpers ── function */
   function openSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
   function closeSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
   function openModal(id){ document.getElementById(id).classList.add('open'); }
   function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
 
-  /* ── File Upload ── */
+  /* ── file upload ── function */
   function triggerFileUpload(){ document.getElementById('profileInput').click(); }
   function handleFileSelect(input){ if(input.files && input.files[0]) loadImageForCrop(input.files[0]); }
 
-  /* ── Load image into cropper ── */
+  /* ── load image into cropper ── function */
   function loadImageForCrop(file){
     closeModal('photoChoiceModal');
     const reader = new FileReader();
@@ -455,7 +455,7 @@
     reader.readAsDataURL(file);
   }
 
-  /* ── Camera ── */
+  /* ── camera ── function */
   let cropper, videoStream;
 
   async function startCamera(){
@@ -484,7 +484,7 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     
-    // Proportional center crop based on the 70% guide ring
+    /* proportional center crop based on the 70% guide ring function */
     const size = Math.min(video.videoWidth, video.videoHeight);
     const cropSize = size * 0.7;
     const startX = (video.videoWidth - cropSize) / 2;
@@ -501,7 +501,7 @@
     preview.src = capturedImageBase64;
     document.querySelector('.camera-modal').classList.add('preview-mode');
     
-    // Prevent accidental double-click by adding a tiny delay before button is 'ready'
+    /* prevent accidental doubleclick by adding a tiny delay before button is 'ready' function */
     const btn = document.getElementById('btnApprove');
     btn.disabled = true;
     btn.style.opacity = '0.5';
@@ -532,7 +532,7 @@
       const data = await res.json();
       if(data.success){
         document.getElementById('profileAvatar').innerHTML = `<img src="${capturedImageBase64}" alt="Profile" id="avatarImg">`;
-        // Also update the sidebar if it exists
+        /* also update the sidebar if it exists function */
         const sidebarAvatar = document.querySelector('.sidebar-user-img img');
         if(sidebarAvatar) sidebarAvatar.src = capturedImageBase64;
         
@@ -550,7 +550,7 @@
     }
   }
 
-  /* ── Apply Crop & Save ── */
+  /* ── apply crop & save ── function */
   async function applyCrop(){
     if(!cropper) return;
     const canvas = cropper.getCroppedCanvas({ width: 320, height: 320 });
@@ -581,7 +581,7 @@
     }
   }
 
-  /* ── Save Profile Info ── */
+  /* ── save profile info ── function */
   async function saveProfile(){
     const name = document.getElementById('ep-name').value.trim();
     const phone = document.getElementById('ep-phone').value.trim();

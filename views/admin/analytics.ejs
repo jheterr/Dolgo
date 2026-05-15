@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title='The Last Muster | Analytics & Reports' %>
 
   <%- contentFor('style') %>
@@ -329,7 +329,7 @@
         margin-top: 5px;
       }
 
-      /* Income Logs Table Styles */
+      /* income logs table styles function */
       .income-logs-section {
         margin-top: 24px;
       }
@@ -460,7 +460,7 @@
         }
       }
 
-      /* Modal Styles */
+      /* modal styles function */
       .modal-overlay {
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
@@ -531,7 +531,7 @@
             <h1 class="page-title">Analytics & Reports</h1>
           </div>
 
-          <!-- ========== SINCE ESTABLISHMENT CARDS ========== -->
+          <!-- since establishment cards function -->
           <div class="establishment-card">
             <div class="chart-title" style="justify-content:center;"><i class="fa-solid fa-building"
                 style="color:#fbbf24;"></i> Since Establishment (January 2024)</div>
@@ -551,31 +551,36 @@
             </div>
           </div>
 
-          <!-- ========== STATS CARDS ========== -->
-          <div class="stat-grid-4">
+          <!-- stats cards function -->
+          <div class="stat-grid-4" style="grid-template-columns: repeat(5, 1fr);">
             <div class="an-card">
               <div class="an-icon" style="color:var(--olive)"><i class="fa-solid fa-arrow-trend-up"></i></div>
-              <div class="an-val" id="statPeak">32</div>
+              <div class="an-val" id="statPeak">0</div>
               <div class="an-lbl">Peak</div>
             </div>
             <div class="an-card">
               <div class="an-icon" style="color:var(--orange)"><i class="fa-solid fa-chart-bar"></i></div>
-              <div class="an-val" id="statAvg">18</div>
+              <div class="an-val" id="statAvg">0</div>
               <div class="an-lbl">Average</div>
             </div>
             <div class="an-card">
               <div class="an-icon" style="color:#3498db"><i class="fa-solid fa-users"></i></div>
-              <div class="an-val" id="statTotal">169</div>
+              <div class="an-val" id="statTotal">0</div>
               <div class="an-lbl">Total</div>
             </div>
             <div class="an-card">
               <div class="an-icon" style="color:var(--green)"><i class="fa-solid fa-arrow-trend-down"></i></div>
-              <div class="an-val" id="statLow">3</div>
+              <div class="an-val" id="statLow">0</div>
               <div class="an-lbl">Low</div>
+            </div>
+            <div class="an-card" style="border: 2px solid var(--orange);">
+              <div class="an-icon" style="color:var(--orange)"><i class="fa-solid fa-chair"></i></div>
+              <div class="an-val" id="statOccupied" style="color:var(--orange);">0</div>
+              <div class="an-lbl">Occupied Now</div>
             </div>
           </div>
 
-          <!-- ========== CUSTOMER TRAFFIC SECTION ========== -->
+          <!-- customer traffic section function -->
           <div class="section-header">
             <h2><i class="fa-solid fa-chart-line"></i> Customer Traffic</h2>
           </div>
@@ -594,12 +599,12 @@
             <div class="chart-box"><canvas id="trafficChart"></canvas></div>
           </div>
 
-          <!-- ========== INCOME SECTION ========== -->
+          <!-- income section function -->
           <div class="section-header">
             <h2><i class="fa-solid fa-coins"></i> Income</h2>
           </div>
 
-          <!-- Income Overview Card (linked to Income Breakdown dropdown) -->
+          <!-- income overview card (linked to income breakdown dropdown) function -->
           <div class="income-overview-card">
             <div class="chart-title"><i class="fa-solid fa-chart-simple" style="color:#fbbf24;"></i> Income Overview
             </div>
@@ -619,7 +624,7 @@
             </div>
           </div>
 
-          <!-- Income Breakdown Chart -->
+          <!-- income breakdown chart function -->
           <div class="chart-card">
             <div class="chart-header">
               <div class="chart-title">Income Breakdown</div>
@@ -635,7 +640,7 @@
             <div class="chart-box"><canvas id="incomeChart"></canvas></div>
           </div>
 
-          <!-- ========== INCOME LOGS SECTION (DAILY, WEEKLY, MONTHLY DROPDOWN) ========== -->
+          <!-- income logs section (daily, weekly, monthly dropdown) function -->
           <div class="income-logs-section">
             <div class="income-logs-header">
               <div class="chart-title"><i class="fa-solid fa-receipt"></i> Income Logs & Transaction Details</div>
@@ -671,12 +676,12 @@
             </div>
           </div>
 
-          <!-- ========== CUSTOMER BREAKDOWN SECTION ========== -->
+          <!-- customer breakdown section function -->
           <div class="section-header">
             <h2><i class="fa-solid fa-users"></i> Customer Breakdown</h2>
           </div>
 
-          <!-- Top Customers (Members vs Walk-ins) -->
+          <!-- top customers (members vs walkins) function -->
           <div class="two-col-grid">
             <div class="summary-card">
               <div class="chart-title"><i class="fa-solid fa-crown"></i> Top Members by Hours</div>
@@ -706,7 +711,7 @@
             </div>
           </div>
 
-          <!-- Customer Type Breakdown with Total Customers -->
+          <!-- customer type breakdown with total customers function -->
           <div class="summary-card" style="margin-bottom:24px;">
             <div class="chart-title"><i class="fa-solid fa-chart-pie"></i> Customer Type Breakdown</div>
             <div class="chart-box" style="height:200px"><canvas id="typeChart"></canvas></div>
@@ -725,12 +730,12 @@
             </div>
           </div>
 
-          <!-- ========== TRANSACTION & ACTIVITY SECTION ========== -->
+          <!-- transaction & activity section function -->
           <div class="section-header">
             <h2><i class="fa-solid fa-receipt"></i> Transaction & Activity</h2>
           </div>
 
-          <!-- Transaction History Table -->
+          <!-- transaction history table function -->
           <div class="summary-card" style="margin-bottom:24px;">
             <div class="search-wrapper">
               <i class="fa-solid fa-magnifying-glass"></i>
@@ -756,7 +761,7 @@
             </div>
           </div>
 
-          <!-- Activity History Table -->
+          <!-- activity history table function -->
           <div class="summary-card" style="margin-bottom:24px;">
             <div class="search-wrapper">
               <i class="fa-solid fa-magnifying-glass"></i>
@@ -780,7 +785,7 @@
             </div>
           </div>
 
-          <!-- ========== FINANCIAL SUMMARY SECTION (with LOSS) ========== -->
+          <!-- financial summary section (with loss) function -->
           <div class="section-header">
             <h2><i class="fa-solid fa-chart-simple"></i> Financial Summary</h2>
           </div>
@@ -825,7 +830,7 @@
             </div>
           </div>
 
-          <!-- Global Generate Report Buttons -->
+          <!-- global generate report buttons function -->
           <div style="display:flex;justify-content:flex-end;margin-top:16px;gap:12px;">
             <button class="btn btn-secondary" onclick="openReportModal('csv')" style="padding:12px 24px; background: #8A8636; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-file-csv"></i> Export CSV
@@ -835,7 +840,7 @@
             </button>
           </div>
 
-          <!-- Report Config Modal -->
+          <!-- report config modal function -->
           <div id="reportModal" class="modal-overlay">
             <div class="modal-card">
               <div class="modal-header">
@@ -860,13 +865,8 @@
                     <label class="checkbox-item"><input type="checkbox" id="checkCustomers" checked> <span>Top Members</span></label>
                   </div>
                 </div>
-                <div class="modal-section">
-                  <label class="section-title">Filter Keywords</label>
-                  <div class="search-wrapper" style="position:relative;">
-                    <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8;"></i>
-                    <input type="text" id="reportSearch" placeholder="Search customer, location, status..." class="search-input" style="padding-left:35px;">
-                  </div>
-                </div>
+                <!-- filter keywords removed as requested function -->
+
               </div>
               <div class="modal-footer">
                 <button class="modal-btn-cancel" onclick="closeReportModal()">Cancel</button>
@@ -881,25 +881,28 @@
     </div>
 
     <%- contentFor('script') %>
+      <!-- html2pdf.js for professional pdf reports function -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
       <script>
-        // ======================== GLOBAL STATE ========================
+
+        /* global state function */
         let rawData = null;
         let trafficChart = null;
         let incomeChart = null;
         let typeChart = null;
 
-        // Sort States
+        /* sort states function */
         let transSort = { key: 'date', dir: 'desc' };
         let activitySort = { key: 'timestamp', dir: 'desc' };
         let logsSort = { key: 'period', dir: 'desc' };
 
-        // ======================== FETCH DATA ========================
+        /* fetch data function */
         async function loadAnalyticsData() {
           try {
             const res = await fetch('/api/analytics');
             rawData = await res.json();
             
-            // Initial render
+            /* initial render function */
             updateDashboard();
           } catch (error) {
             console.error('Failed to load analytics:', error);
@@ -920,7 +923,7 @@
           renderTransactionSummary();
         }
 
-        // ======================== RENDER FUNCTIONS ========================
+        /* render functions function */
         function formatPHP(amount) { 
           return '₱' + (amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
         }
@@ -939,18 +942,25 @@
 
           if (period === 'today') {
             const hours = rawData.hourlyStats || [];
-            // Create 24h array
             labels = Array.from({length: 24}, (_, i) => `${i}:00`);
             dataset = Array.from({length: 24}, () => 0);
-            hours.forEach(h => {
-              dataset[h.hour] = Number(h.count);
-            });
+            hours.forEach(h => { dataset[h.hour] = Number(h.count); });
           } else if (period === 'week') {
-            const last7 = rawData.dailyStats.slice(-7);
-            labels = last7.map(d => new Date(d.date).toLocaleDateString('en-US', { weekday: 'short' }));
-            dataset = last7.map(d => Number(d.count));
+            /* build dynamic 7day window ending today function */
+            const dataMap = {};
+            (rawData.dailyStats || []).forEach(d => {
+              const key = new Date(d.date).toISOString().split('T')[0];
+              dataMap[key] = Number(d.count);
+            });
+            for (let i = 6; i >= 0; i--) {
+              const dt = new Date();
+              dt.setDate(dt.getDate() - i);
+              const key = dt.toISOString().split('T')[0];
+              labels.push(dt.toLocaleDateString('en-US', { weekday: 'short' }));
+              dataset.push(dataMap[key] || 0);
+            }
           } else {
-            const stats = rawData.dailyStats;
+            const stats = rawData.dailyStats || [];
             labels = stats.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
             dataset = stats.map(d => Number(d.count));
           }
@@ -976,7 +986,7 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
           });
 
-          // Update Top Cards
+          /* update top cards function */
           const peak = Math.max(...dataset, 0);
           const total = dataset.reduce((a, b) => a + Number(b), 0);
           const avg = dataset.length ? Math.round(total / dataset.length) : 0;
@@ -986,11 +996,14 @@
           document.getElementById('statAvg').textContent = avg;
           document.getElementById('statTotal').textContent = total;
           document.getElementById('statLow').textContent = low;
+          /* show occupied now if element exists function */
+          const occEl = document.getElementById('statOccupied');
+          if (occEl) occEl.textContent = rawData.occupiedSeats || 0;
         }
 
         function updateIncomeChart() {
           const period = document.getElementById('incomePeriodSelect').value;
-          const stats = [...rawData.dailyStats];
+          const stats = [...(rawData.dailyStats || [])];
           let labels = [];
           let dataset = [];
 
@@ -998,13 +1011,21 @@
             const hours = rawData.hourlyStats || [];
             labels = Array.from({length: 24}, (_, i) => `${i}:00`);
             dataset = Array.from({length: 24}, () => 0);
-            hours.forEach(h => {
-              dataset[h.hour] = Number(h.income);
-            });
+            hours.forEach(h => { dataset[h.hour] = Number(h.income || 0); });
           } else if (period === 'week') {
-            const last7 = stats.slice(-7);
-            labels = last7.map(d => new Date(d.date).toLocaleDateString('en-US', { weekday: 'short' }));
-            dataset = last7.map(d => Number(d.income || 0));
+            /* build dynamic 7day window ending today function */
+            const dataMap = {};
+            stats.forEach(d => {
+              const key = new Date(d.date).toISOString().split('T')[0];
+              dataMap[key] = Number(d.income || 0);
+            });
+            for (let i = 6; i >= 0; i--) {
+              const dt = new Date();
+              dt.setDate(dt.getDate() - i);
+              const key = dt.toISOString().split('T')[0];
+              labels.push(dt.toLocaleDateString('en-US', { weekday: 'short' }));
+              dataset.push(dataMap[key] || 0);
+            }
           } else {
             labels = stats.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
             dataset = stats.map(d => Number(d.income || 0));
@@ -1014,15 +1035,17 @@
           const ctx = document.getElementById('incomeChart').getContext('2d');
           incomeChart = new Chart(ctx, {
             type: 'bar',
-            data: { labels: labels, datasets: [{ label: 'Income (₱)', data: dataset, backgroundColor: '#8A8636', borderRadius: 6 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => formatPHP(ctx.raw) } } }, scales: { y: { beginAtZero: true, ticks: { callback: (val) => '₱' + val.toLocaleString() } } } }
+            data: { labels: labels, datasets: [{ label: 'Income (Php)', data: dataset, backgroundColor: '#8A8636', borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => 'Php ' + Number(ctx.raw).toFixed(2) } } }, scales: { y: { beginAtZero: true, ticks: { callback: (val) => 'Php ' + val.toLocaleString() } } } }
           });
 
-          const total = dataset.reduce((a, b) => a + Number(b), 0);
-          const avg = dataset.length ? Math.round(total / dataset.length) : 0;
-          document.getElementById('incomeTotal').innerHTML = formatPHP(total);
-          document.getElementById('incomeAvg').innerHTML = formatPHP(avg);
-          document.getElementById('incomeProjected').innerHTML = formatPHP(total * 1.15); // Simple projection
+          /* overview stats: always use alltime paid income from incomelogs function */
+          const allLogs = rawData.incomeLogs || [];
+          const allTimeTotal = allLogs.reduce((a, l) => a + Number(l.paidAmount || 0), 0);
+          const allTimeAvg = allLogs.length ? allTimeTotal / allLogs.length : 0;
+          document.getElementById('incomeTotal').innerHTML = formatPHP(allTimeTotal);
+          document.getElementById('incomeAvg').innerHTML = formatPHP(allTimeAvg);
+          document.getElementById('incomeProjected').innerHTML = formatPHP(allTimeAvg * 30);
         }
 
         function renderIncomeLogs() {
@@ -1189,7 +1212,7 @@
           document.getElementById('weeklyTotal').textContent = (ws.weeklyMembers || 0) + (ws.weeklyWalkins || 0) + (ws.weeklyPremium || 0);
         }
 
-        // Sidebar and Init
+        /* sidebar and init function */
         function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
         function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
 
@@ -1219,7 +1242,7 @@
           renderIncomeLogs();
         }
 
-        // Report Modal Logic
+        /* report modal logic function */
         let currentExportFormat = 'csv';
 
         function openReportModal(format) {
@@ -1242,36 +1265,74 @@
         }
 
         function executeExport() {
-          const start = new Date(document.getElementById('reportStartDate').value);
-          const end = new Date(document.getElementById('reportEndDate').value);
-          const q = document.getElementById('reportSearch').value.toLowerCase();
+          /* use iso strings so json.stringify serializes them correctly function */
+          const startVal = document.getElementById('reportStartDate').value;
+          const endVal = document.getElementById('reportEndDate').value;
+          /* end date: include the whole day function */
+          const start = startVal + 'T00:00:00';
+          const end = endVal + 'T23:59:59';
           
           const includeIncome = document.getElementById('checkIncome').checked;
           const includeTrans = document.getElementById('checkTrans').checked;
           const includeActivity = document.getElementById('checkActivity').checked;
           const includeCustomers = document.getElementById('checkCustomers').checked;
 
-          if (currentExportFormat === 'csv') {
-            generateCSVReport({ start, end, q, includeIncome, includeTrans, includeActivity, includeCustomers });
-          } else {
-            generatePDFReport({ start, end, q, includeIncome, includeTrans, includeActivity, includeCustomers });
-          }
-          
           closeReportModal();
+
+          if (currentExportFormat === 'csv') {
+            generateCSVReport({ start, end, includeIncome, includeTrans, includeActivity, includeCustomers });
+          } else {
+            generatePDFReport({ start, end, includeIncome, includeTrans, includeActivity, includeCustomers });
+          }
         }
 
-        function generateCSVReport(filters) {
-          let csv = "THE LAST MUSTER - ANALYTICS REPORT\n";
+        async function generateCSVReport(filters) {
+          const btn = document.getElementById('finalExportBtn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Generating CSV...';
+          btn.disabled = true;
+
+          try {
+            const response = await fetch('/api/export/csv', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filters })
+            });
+
+            if (!response.ok) throw new Error('Server-side CSV generation failed');
+
+            const text = await response.text();
+            const blob = new Blob([text], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `TheLastMuster_Report_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+          } catch (error) {
+            console.error('CSV Export Error:', error);
+            alert('Failed to generate CSV. Falling back to local data...');
+            /* fallback to local generation if server fails function */
+            localCSVFallback(filters);
+          } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          }
+        }
+
+        function localCSVFallback(filters) {
+          let csv = "\uFEFF"; // BOM for Excel UTF-8 support
+          csv += "THE LAST MUSTER - ANALYTICS REPORT (LOCAL FALLBACK)\n";
           csv += `Generated: ${new Date().toLocaleString()}\n`;
           csv += `Range: ${filters.start.toLocaleDateString()} to ${filters.end.toLocaleDateString()}\n\n`;
           
           if (filters.includeIncome) {
             csv += "INCOME LOGS\n";
             csv += "Date,Total Income,Paid,Unpaid,Transactions\n";
-            rawData.incomeLogs.filter(l => {
-              const d = new Date(l.period);
-              return d >= filters.start && d <= filters.end;
-            }).forEach(log => {
+            rawData.incomeLogs.forEach(log => {
                csv += `"${new Date(log.period).toLocaleDateString()}",${log.totalIncome || 0},${log.paidAmount || 0},${log.unpaidAmount || 0},${log.transactions}\n`;
             });
             csv += "\n";
@@ -1280,80 +1341,64 @@
           if (filters.includeTrans) {
             csv += "TRANSACTION HISTORY\n";
             csv += "Date,Customer,Type,Amount,Status\n";
-            rawData.transactions.filter(t => {
-              const d = new Date(t.start_time);
-              const matchQ = !filters.q || (t.first_name + " " + t.last_name).toLowerCase().includes(filters.q) || t.payment_status.toLowerCase().includes(filters.q);
-              return d >= filters.start && d <= filters.end && matchQ;
-            }).forEach(t => {
+            rawData.transactions.forEach(t => {
                csv += `"${new Date(t.start_time).toLocaleString()}","${t.first_name} ${t.last_name}","Reservation",${t.amount},${t.payment_status}\n`;
             });
             csv += "\n";
-          }
-
-          if (filters.includeActivity) {
-            csv += "ACTIVITY LOGS\n";
-            csv += "Timestamp,User,Location,Status\n";
-            rawData.doorLogs.filter(l => {
-              const d = new Date(l.access_time);
-              const matchQ = !filters.q || (l.first_name + " " + l.last_name).toLowerCase().includes(filters.q) || l.door_name.toLowerCase().includes(filters.q);
-              return d >= filters.start && d <= filters.end && matchQ;
-            }).forEach(l => {
-               csv += `"${new Date(l.access_time).toLocaleString()}","${l.first_name} ${l.last_name}","${l.door_name}","${l.status}"\n`;
-            });
           }
 
           const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `TheLastMuster_Report_${new Date().toISOString().split('T')[0]}.csv`;
+          a.download = `TheLastMuster_Report_Fallback.csv`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
         }
 
-        function generatePDFReport(filters) {
-          const originalContent = {
-             trans: [...rawData.transactions],
-             activity: [...rawData.doorLogs],
-             income: [...rawData.incomeLogs]
-          };
+        async function generatePDFReport(filters) {
+          const btn = document.getElementById('finalExportBtn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Generating PDF...';
+          btn.disabled = true;
 
-          rawData.transactions = originalContent.trans.filter(t => {
-            const d = new Date(t.start_time);
-            const matchQ = !filters.q || (t.first_name + " " + t.last_name).toLowerCase().includes(filters.q);
-            return d >= filters.start && d <= filters.end && matchQ;
-          });
-          
-          rawData.doorLogs = originalContent.activity.filter(l => {
-            const d = new Date(l.access_time);
-            const matchQ = !filters.q || (l.first_name + " " + l.last_name).toLowerCase().includes(filters.q);
-            return d >= filters.start && d <= filters.end && matchQ;
-          });
+          try {
+            /* 1. safely capture charts as base64 images function */
+            const chartImages = {};
+            try { chartImages.traffic = document.getElementById('trafficChart').toDataURL('image/png'); } catch(e) {}
+            try { chartImages.type    = document.getElementById('typeChart').toDataURL('image/png'); }    catch(e) {}
+            try { chartImages.income  = document.getElementById('incomeChart').toDataURL('image/png'); }  catch(e) {}
 
-          renderTransactionHistory();
-          renderActivityHistory();
-          
-          document.querySelector('.income-overview-card').style.display = filters.includeIncome ? '' : 'none';
-          document.querySelector('.an-card:nth-of-type(1)').style.display = filters.includeTrans ? '' : 'none';
-          document.querySelector('.an-card:nth-of-type(2)').style.display = filters.includeActivity ? '' : 'none';
-          document.querySelector('.stat-grid-3').style.display = filters.includeTopCustomers ? '' : 'none';
+            /* 2. call serverside pdf api function */
+            const response = await fetch('/api/export/pdf', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filters, chartImages })
+            });
 
-          const originalTitle = document.title;
-          document.title = "The Last Muster - Analytics Report " + new Date().toLocaleDateString();
-          
-          setTimeout(() => {
-            window.print();
-            
-            rawData.transactions = originalContent.trans;
-            rawData.doorLogs = originalContent.activity;
-            renderTransactionHistory();
-            renderActivityHistory();
-            document.querySelector('.income-overview-card').style.display = '';
-            document.querySelector('.an-card:nth-of-type(1)').style.display = '';
-            document.querySelector('.an-card:nth-of-type(2)').style.display = '';
-            document.querySelector('.stat-grid-3').style.display = '';
-            document.title = originalTitle;
-          }, 500);
+            if (!response.ok) {
+              const errText = await response.text();
+              throw new Error('Server error: ' + errText);
+            }
+
+            /* 3. download the binary pdf function */
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `TheLastMuster_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+          } catch (error) {
+            console.error('PDF Export Error:', error);
+            alert('PDF generation failed: ' + error.message + '\n\nCheck the browser console for details.');
+          } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          }
         }
       </script>

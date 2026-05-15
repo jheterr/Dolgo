@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Staff' %>
 
 <%- contentFor('style') %>
@@ -154,7 +154,7 @@
       background: #726f2c;
     }
 
-    /* Filter dropdown styles */
+    /* filter dropdown styles function */
     .filter-group {
       display: flex;
       gap: 12px;
@@ -198,7 +198,7 @@
       margin-bottom: 0;
     }
 
-    /* MAC Address fields */
+    /* mac address fields function */
     .mac-fields-container {
       background: #f8fafc;
       padding: 12px;
@@ -239,7 +239,7 @@
       margin-top: 8px;
     }
 
-    /* RFID Scan group */
+    /* rfid scan group function */
     .rfid-input-group {
       display: flex;
       gap: 8px;
@@ -262,7 +262,7 @@
       background: #3d6a4a;
     }
 
-    /* Seat Layout inside Modal */
+    /* seat layout inside modal function */
     .modal-seat-layout {
       background: #f8fafc;
       border-radius: 20px;
@@ -432,7 +432,7 @@
         <button class="tab-btn" onclick="switchTab(event,'tab-pending')">Pending Approvals <span id="pendingBadge" style="background:#dc2626; color:white; border-radius:50%; padding:2px 6px; font-size:10px; margin-left:4px; display:none;">0</span></button>
       </div>
 
-      <!-- TAB: MEMBERS -->
+      <!-- tab: members function -->
       <div id="tab-members" class="tab-panel active">
         <div class="card">
           <div class="card-header-with-filter">
@@ -594,7 +594,7 @@
         </div>
       </div>
 
-      <!-- TAB: WALK-IN -->
+      <!-- tab: walkin function -->
       <div id="tab-walkins" class="tab-panel">
         <div class="card">
           <div class="card-header-with-filter">
@@ -690,7 +690,7 @@
         </div>
       </div>
 
-      <!-- TAB: PENDING APPROVALS -->
+      <!-- tab: pending approvals function -->
       <div id="tab-pending" class="tab-panel">
         <div class="card">
           <div class="card-header-with-filter">
@@ -702,14 +702,14 @@
                 <tr><th>Date</th><th>Name</th><th>Email</th><th>Status</th><th>Action</th></tr>
               </thead>
               <tbody id="pendingBody">
-                <!-- Will be populated by JS -->
+                <!-- will be populated by js function -->
               </tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- Add Walk-in Modal -->
+      <!-- add walkin modal function -->
       <div class="modal-overlay" id="addWalkinModal">
         <div class="modal">
           <div class="modal-header">
@@ -768,7 +768,7 @@
         </div>
       </div>
 
-      <!-- Edit Customer Modal -->
+      <!-- edit customer modal function -->
       <div class="modal-overlay" id="editCustomerModal">
         <div class="modal">
           <div class="modal-header">
@@ -804,7 +804,7 @@
         </div>
       </div>
 
-      <!-- Edit Walk-in Modal -->
+      <!-- edit walkin modal function -->
       <div class="modal-overlay" id="editWalkinModal">
         <div class="modal">
           <div class="modal-header">
@@ -840,7 +840,7 @@
         </div>
       </div>
 
-      <!-- Session Time Edit Modal -->
+      <!-- session time edit modal function -->
       <div class="modal-overlay" id="wifiEditModal">
         <div class="modal">
           <div class="modal-header">
@@ -870,7 +870,7 @@
         </div>
       </div>
 
-      <!-- Customer Details Modal -->
+      <!-- customer details modal function -->
       <div class="modal-overlay" id="viewCustModal">
         <div class="modal">
           <div class="modal-header">
@@ -900,12 +900,12 @@
 
     async function loadRealUsers() {
       try {
-        // Load All Customers
+        /* load all customers function */
         const resMem = await fetch('/api/users?role=customer');
         const dataMem = await resMem.json();
         const allCustomers = dataMem.users || [];
         
-        // Load Active Sessions
+        /* load active sessions function */
         const resAct = await fetch('/api/active-customers');
         const dataAct = await resAct.json();
         const activeSessions = dataAct.customers || [];

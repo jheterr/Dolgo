@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Customers List' %>
 
 <%- contentFor('style') %>
@@ -30,7 +30,7 @@
   .btn-upgrade{background:#4A7C59;color:white;border:none;padding:5px 10px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;transition:0.2s;}
   .btn-upgrade:hover{background:#3d6a4a;transform:scale(1.05);}
 
-  /* Filter dropdown styles */
+  /* filter dropdown styles function */
   .filter-group {
     display: flex;
     gap: 12px;
@@ -69,7 +69,7 @@
     margin-bottom: 0;
   }
 
-  /* MAC Address fields */
+  /* mac address fields function */
   .mac-fields-container {
     background: #f8fafc;
     padding: 12px;
@@ -103,7 +103,7 @@
     margin-top: 8px;
   }
 
-  /* RFID Scan group */
+  /* rfid scan group function */
   .rfid-input-group {
     display: flex;
     gap: 8px;
@@ -124,7 +124,7 @@
     background: #3d6a4a;
   }
 
-  /* Seat Layout inside Modal (Visual) */
+  /* seat layout inside modal (visual) function */
   .modal-seat-layout {
     background: #f8fafc;
     border-radius: 12px;
@@ -251,7 +251,7 @@
         <button class="tab-btn" onclick="switchTab(event,'tab-pending')">Pending Approvals <span id="pendingBadge" style="background:#dc2626; color:white; border-radius:50%; padding:2px 6px; font-size:10px; margin-left:4px; display:none;">0</span></button>
       </div>
       
-      <!-- TAB: CUSTOMERS (Members + Walk-ins merged) -->
+      <!-- tab: customers (members + walkins merged) function -->
       <div id="tab-customers" class="tab-panel active">
         <div class="card">
           <div class="card-header-with-filter">
@@ -277,14 +277,14 @@
                 <tr><th>Seat</th><th>Name</th><th>Email</th><th>Type</th><th>RFID</th><th>WiFi</th><th>MAC Address</th><th>Status</th><th>Action</th></tr>
               </thead>
               <tbody id="custBody">
-                <!-- Populated by JS loadRealUsers() -->
+                <!-- populated by js loadrealusers() function -->
               </tbody>
             </table>
           </div>
         </div>
       </div>
       
-      <!-- TAB: PENDING APPROVALS -->
+      <!-- tab: pending approvals function -->
       <div id="tab-pending" class="tab-panel">
         <div class="card">
           <div class="card-header-with-filter">
@@ -296,14 +296,14 @@
                 <tr><th>Date</th><th>Name</th><th>Email</th><th>Status</th><th>Action</th></tr>
               </thead>
               <tbody id="pendingBody">
-                <!-- Will be populated by JS -->
+                <!-- will be populated by js function -->
               </tbody>
             </table>
           </div>
         </div>
       </div>
       
-      <!-- Add Walk-in Modal -->
+      <!-- add walkin modal function -->
       <div class="modal-overlay" id="addWalkinModal">
         <div class="modal">
           <div class="modal-header">
@@ -352,7 +352,7 @@
         </div>
       </div>
       
-      <!-- Edit Customer Modal -->
+      <!-- edit customer modal function -->
       <div class="modal-overlay" id="editCustomerModal">
         <div class="modal">
           <div class="modal-header"><div class="modal-title"><i class="fa-solid fa-pen"></i> Edit Customer</div><button class="modal-close" onclick="closeModal('editCustomerModal')">&times;</button></div>
@@ -369,7 +369,7 @@
         </div>
       </div>
       
-      <!-- Edit Walk-in Modal -->
+      <!-- edit walkin modal function -->
       <div class="modal-overlay" id="editWalkinModal">
         <div class="modal">
           <div class="modal-header"><div class="modal-title"><i class="fa-solid fa-pen"></i> Edit Walk-in</div><button class="modal-close" onclick="closeModal('editWalkinModal')">&times;</button></div>
@@ -386,7 +386,7 @@
         </div>
       </div>
       
-      <!-- Session Time Edit Modal -->
+      <!-- session time edit modal function -->
       <div class="modal-overlay" id="wifiEditModal">
         <div class="modal">
           <div class="modal-header"><div class="modal-title"><i class="fa-solid fa-clock"></i> Extend Session Time</div><button class="modal-close" onclick="closeModal('wifiEditModal')">&times;</button></div>
@@ -409,7 +409,7 @@
         </div>
       </div>
       
-      <!-- Customer Details Modal -->
+      <!-- customer details modal function -->
       <div class="modal-overlay" id="viewCustModal">
         <div class="modal">
           <div class="modal-header"><div class="modal-title"><i class="fa-solid fa-user"></i> Customer Details</div><button class="modal-close" onclick="closeModal('viewCustModal')">&times;</button></div>
@@ -434,7 +434,7 @@
 
     async function loadRealUsers() {
       try {
-        // Fetch members and walk-ins separately at DB level (no guessing)
+        /* fetch members and walkins separately at db level (no guessing) function */
         const [resMem, resWalk, resAct] = await Promise.all([
           fetch('/api/users?role=customer&typeGroup=member'),
           fetch('/api/users?role=customer&typeGroup=walkin'),
@@ -485,13 +485,13 @@
           return tr;
         }
 
-        // Populate Members tab — includes member, premium, and self-registered (NULL type)
+        /* populate members tab — includes member, premium, and selfregistered (null type) function */
         members.forEach(user => {
           const label = (user.type || '').toLowerCase().includes('prem') ? 'Premium' : 'Member';
           memberBody.appendChild(buildRow(user, label));
         });
 
-        // Populate Walk-in tab — only users with type LIKE '%walk%'
+        /* populate walkin tab — only users with type like '%walk%' function */
         walkins.forEach(user => {
           memberBody.appendChild(buildRow(user, 'Walk-in'));
         });
@@ -631,8 +631,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ type: 'member' }) // Backend will preserve other fields if we use PATCH or if API is robust
         });
-        // Note: Our PUT route at 208 expects all fields. Let's make it smarter or fetch first.
-        // For simplicity, I'll fetch user data first then update.
+        /* note: our put route at 208 expects all fields. let's make it smarter or fetch first. function */
+        /* for simplicity, i'll fetch user data first then update. function */
         const userRes = await fetch(`/api/users/${id}`);
         const userData = (await userRes.json()).user;
         
@@ -702,7 +702,7 @@
         if(data.success) {
           const userId = data.userId;
           
-          // Now start the session
+          /* now start the session function */
           const sessionRes = await fetch('/api/session/start', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -803,7 +803,7 @@
           container.appendChild(el);
         });
 
-        // Scale to fit modal
+        /* scale to fit modal function */
         const vWidth = viewport.clientWidth || 450;
         const vHeight = viewport.clientHeight || 300;
         const scale = Math.min(vWidth / 800, vHeight / 450) * 0.95;
@@ -872,7 +872,7 @@
         submitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Walk-in';
       }
       
-      // Reset form
+      /* reset form function */
       document.getElementById('wi-email').value = '';
       document.getElementById('wi-firstname').value = '';
       document.getElementById('wi-lastname').value = '';

@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Door Management' %>
 
 <%- contentFor('style') %>
@@ -76,7 +76,7 @@
       box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
     }
 
-    /* Table Styles */
+    /* table styles function */
     .data-table {
       width: 100%;
       border-collapse: collapse;
@@ -99,7 +99,7 @@
       color: #334155;
     }
 
-    /* Mobile Card View */
+    /* mobile card view function */
     .table-wrap {
       width: 100%;
     }
@@ -319,7 +319,7 @@
       gap: 12px;
     }
 
-    /* Fixed Mobile Menu Button - Right Side */
+    /* fixed mobile menu button  right side function */
     .mobile-menu-btn {
       position: fixed;
       top: 18px;
@@ -382,10 +382,11 @@
   <%- include('../partials/admin_sidebar', { active: 'Door Management' }) %>
 
   <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+  <div id="user-context" data-user="<%= JSON.stringify(locals.user || {}) %>" style="display: none;"></div>
 
-  <!-- Main Content -->
+  <!-- main content function -->
   <main class="content">
-    <!-- Fixed Mobile Menu Button - Right Side -->
+    <!-- fixed mobile menu button  right side function -->
     <button class="mobile-menu-btn" onclick="openSidebar()">
       <i class="fa-solid fa-bars"></i>
     </button>
@@ -427,7 +428,7 @@
         </div>
       </div>
       
-      <!-- DESKTOP TABLE VIEW -->
+      <!-- desktop table view function -->
       <div class="desktop-table-view">
         <div class="table-wrap">
           <table class="data-table" id="desktopLogTable">
@@ -445,7 +446,7 @@
         </div>
       </div>
 
-      <!-- MOBILE CARD VIEW (No large icons) -->
+      <!-- mobile card view (no large icons) function -->
       <div class="mobile-card-view">
         <div class="activity-timeline" id="mobileActivityTimeline"></div>
       </div>
@@ -455,10 +456,11 @@
 
 <%- contentFor('script') %>
 <script>
-// Current User Data
-const currentUser = <%- JSON.stringify(locals.user || {}) %>;
+/* current user data function */
+const userContextEl = document.getElementById('user-context');
+const currentUser = userContextEl ? JSON.parse(userContextEl.getAttribute('data-user')) : {};
 
-// Activity Logs Data
+/* activity logs data function */
 let activityLogs = [];
 let filteredLogs = [];
 let currentFilter = "all";
@@ -501,7 +503,7 @@ function handleSearch() {
   applyFilters();
 }
 
-// Helper: Escape HTML
+/* helper: escape html function */
 function escapeHtml(str) {
   if (!str) return '';
   return String(str).replace(/[&<>]/g, function(m) {
@@ -512,7 +514,7 @@ function escapeHtml(str) {
   });
 }
 
-// ========== DESKTOP RENDER ==========
+/* desktop render function */
 function renderDesktopLogs() {
   const tbody = document.getElementById('desktopLogBody');
   if (!tbody) return;
@@ -537,7 +539,7 @@ function renderDesktopLogs() {
   }).join('');
 }
 
-// ========== MOBILE CARD VIEW RENDER ==========
+/* mobile card view render function */
 function getMobileCardHTML(log) {
   const status = (log.status || 'denied').toLowerCase();
   const isUnlock = status === 'unlock' || status === 'unlocked' || status === 'granted';
@@ -580,7 +582,7 @@ function renderMobileLogs() {
   }
 }
 
-// ========== FILTER FUNCTION ==========
+/* filter function function */
 function filterLogs(filterType, btn) {
   currentFilter = filterType;
   
@@ -593,14 +595,14 @@ function filterLogs(filterType, btn) {
   applyFilters();
 }
 
-// ========== DOOR TRIGGER FUNCTION ==========
+/* door trigger function function */
 async function triggerDoor(status, role, method) {
-  // UI Feedback
+  /* ui feedback function */
   const el = document.getElementById('doorVal');
   el.textContent = status;
   el.className = 'door-status-value ' + (status === 'UNLOCKED' ? 'unlocked' : 'locked');
   
-  // Submit log to backend
+  /* submit log to backend function */
   try {
     await fetch('/api/door-logs', {
       method: 'POST',
@@ -613,14 +615,14 @@ async function triggerDoor(status, role, method) {
       })
     });
     
-    // Refresh the logs
+    /* refresh the logs function */
     fetchLogs();
   } catch (err) {
     console.error('Error logging door action:', err);
   }
 }
 
-// Initialize on page load
+/* initialize on page load function */
 document.addEventListener('DOMContentLoaded', function() {
   fetchLogs();
   

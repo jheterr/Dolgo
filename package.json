@@ -2,8 +2,9 @@
   "name": "dolgo",
   "version": "0.0.0",
   "private": true,
+  "main": "app.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -13,10 +14,14 @@
     "ejs": "~2.6.1",
     "express": "~4.16.1",
     "express-ejs-layouts": "^2.5.1",
-    "express-session": "^1.19.0",
     "express-mysql-session": "^3.0.0",
+    "express-session": "^1.19.0",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
-    "mysql2": "^3.22.3"
+    "mysql2": "^3.22.3",
+    "pdfkit": "^0.18.0"
+  },
+  "devDependencies": {
+    "@fontsource/montserrat": "^5.2.8"
   }
 }

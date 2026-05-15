@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Events & Reservations' %>
 
 <%- contentFor('style') %>
@@ -36,7 +36,7 @@
 .legend{display:flex;gap:12px;justify-content:center;margin-top:12px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;}
 .legend-dot{width:10px;height:10px;display:inline-block;border-radius:2px;margin-right:4px;}
 
-/* Calendar View Styles */
+/* calendar view styles function */
 .cal-grid.yearly-view {
   grid-template-columns: repeat(4, 1fr);
   gap: 15px;
@@ -91,7 +91,7 @@
   .cal-grid.yearly-view { grid-template-columns: 1fr; }
 }
 
-/* Filter Controls */
+/* filter controls function */
 .filter-controls {
   display: flex;
   justify-content: space-between;
@@ -125,7 +125,7 @@
   box-shadow: 0 0 0 2px rgba(207,99,34,0.1);
 }
 
-/* Schedule Modal Styles */
+/* schedule modal styles function */
 .schedule-list {
   max-height: 400px;
   overflow-y: auto;
@@ -169,7 +169,7 @@
   margin-bottom: 12px;
 }
 
-/* Cards Grid - 3 columns per row */
+/* cards grid  3 columns per row function */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -316,7 +316,7 @@
       
       <div id="cardsContainer" class="cards-grid"></div>
       
-      <!-- Schedule Modal -->
+      <!-- schedule modal function -->
       <div class="modal-overlay" id="scheduleModal">
         <div class="modal">
           <div class="modal-header">
@@ -330,7 +330,7 @@
         </div>
       </div>
       
-      <!-- Reservation Detail Modal -->
+      <!-- reservation detail modal function -->
       <div class="modal-overlay" id="reservationDetailModal">
         <div class="modal"><div class="modal-header"><div class="modal-title"><i class="fa-solid fa-calendar-check"></i> Reservation Details</div><button class="modal-close" onclick="closeModal('reservationDetailModal')">&times;</button></div>
           <div class="modal-body" id="reservationDetailBody"></div>
@@ -338,7 +338,7 @@
         </div>
       </div>
       
-      <!-- Event Detail Modal -->
+      <!-- event detail modal function -->
       <div class="modal-overlay" id="eventDetailModal">
         <div class="modal"><div class="modal-header"><div class="modal-title"><i class="fa-solid fa-calendar-star"></i> Event Details</div><button class="modal-close" onclick="closeModal('eventDetailModal')">&times;</button></div>
           <div class="modal-body" id="eventDetailBody"></div>
@@ -482,11 +482,11 @@ async function loadAllData() {
             fetch('/api/reservations').then(res => res.json())
         ]);
         events = evRes.events || [];
-        // Note: The client currently sees ALL reservations from /api/reservations.
-        // We'll filter for "My Reservations" if we want to follow typical customer behavior,
-        // but if the goal is "same as staff", we'll show them.
-        // For now, let's filter to keep it relevant to the customer.
-        // We can get the user ID from the session or just use what the server passed initially.
+        /* note: the client currently sees all reservations from /api/reservations. function */
+        /* we'll filter for "my reservations" if we want to follow typical customer behavior, function */
+        /* but if the goal is "same as staff", we'll show them. function */
+        /* for now, let's filter to keep it relevant to the customer. function */
+        /* we can get the user id from the session or just use what the server passed initially. function */
         const currentUserId = <%= user ? user.id : 'null' %>;
         myReservations = (revRes.reservations || []).filter(r => r.user_id === currentUserId);
         

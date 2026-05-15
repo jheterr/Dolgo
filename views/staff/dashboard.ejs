@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Staff Dashboard' %>
 
 <%- contentFor('style') %>
@@ -18,7 +18,7 @@
     .stat-lbl  { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; opacity:0.85; margin-bottom:6px; }
     .stat-val  { font-family:'Poppins',sans-serif; font-size:2.2rem; font-weight:800; line-height:1; }
     
-    /* Stat card backgrounds */
+    /* stat card backgrounds function */
     .sc-gold { background: linear-gradient(135deg, #8A8636, #b0ac4a); }
     .sc-orange { background: linear-gradient(135deg, #CF6322, #e0793a); }
     .sc-teal { background: linear-gradient(135deg, #2a6b5e, #3a8a7a); }
@@ -58,7 +58,7 @@
       .payments-grid{grid-template-columns:1fr;}
       .charts-row{grid-template-columns:1fr;}
     }
-    /* Dynamic Seat Map Styles */
+    /* dynamic seat map styles function */
     .seat-map-container {
       width: 100%;
       height: 380px;
@@ -145,7 +145,7 @@
 </style>
 
 <div class="app">
-    <!-- Sidebar -->
+    <!-- sidebar function -->
     <%- include('../partials/staff_sidebar', { active: 'Dashboard' }) %>
 
     <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
@@ -153,13 +153,13 @@
     <main class="content">
       <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
       
-      <!-- Welcome Banner -->
+      <!-- welcome banner function -->
       <div class="welcome-banner">
         <h2>Welcome back, <strong>Staff Zoro</strong> 👋</h2>
         <p>Manage daily operations, monitor seat status, and assist customers</p>
       </div>
 
-      <!-- Stats with backgrounds -->
+      <!-- stats with backgrounds function -->
       <div class="stat-grid">
         <div class="stat-card sc-gold"><div class="stat-icon"><i class="fa-solid fa-users"></i></div><div class="stat-lbl">TOTAL ACTIVE USERS</div><div class="stat-val"><%= stats.activeUsers %></div></div>
         <div class="stat-card sc-orange"><div class="stat-icon"><i class="fa-solid fa-user"></i></div><div class="stat-lbl">TOTAL CUSTOMERS</div><div class="stat-val"><%= stats.totalCustomers %></div></div>
@@ -167,7 +167,7 @@
         <div class="stat-card sc-green"><div class="stat-icon"><i class="fa-solid fa-couch"></i></div><div class="stat-lbl">SEAT AVAILABLE</div><div class="stat-val" id="statAvailable"><%= stats.availableSeats %></div></div>
       </div>
 
-      <!-- Charts -->
+      <!-- charts function -->
       <div class="charts-row">
         <div class="chart-card">
           <div class="chart-title">Today's Traffic</div>
@@ -179,7 +179,7 @@
         </div>
       </div>
 
-      <!-- Seat Map + Activity -->
+      <!-- seat map + activity function -->
       <div class="dash-bottom">
         <div class="card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -204,7 +204,7 @@
         </div>
       </div>
 
-      <!-- Pending Payments -->
+      <!-- pending payments function -->
       <div class="payments-section">
         <div class="section-title" style="margin-bottom:16px;"><i class="fa-solid fa-credit-card"></i> Pending Payments</div>
         <div class="payments-grid">
@@ -218,12 +218,12 @@
 
 <%- contentFor('script') %>
 <script>
-// Sidebar functions
+/* sidebar functions function */
 
 function openSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
 function closeSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
 
-// Pending Payments Data
+/* pending payments data function */
 let pendingReservations = <%- JSON.stringify(pendingReservations) %>;
 
 let pendingWifiExtensions = [
@@ -239,7 +239,7 @@ let pendingUpgrades = [
 function formatPHP(amount) { return '₱' + amount.toLocaleString(); }
 function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
 
-// Render Reservation Payments
+/* render reservation payments function */
 function renderReservationPayments() {
   const container = document.getElementById('reservationPaymentsList');
   if (pendingReservations.length === 0) { container.innerHTML = '<div class="empty-payments">No pending payments</div>'; return; }
@@ -267,7 +267,7 @@ window.markPaymentPaid = function(type, id) {
   alert('Payment marked as paid!');
 };
 
-// Render Activity Feed
+/* render activity feed function */
 function renderActivityFeed() {
   const activityFeed = <%- JSON.stringify(activities) %>;
   if (activityFeed.length === 0) {
@@ -277,11 +277,11 @@ function renderActivityFeed() {
   document.getElementById('activityFeed').innerHTML = activityFeed.map(a => `<div class="feed-item"><span class="feed-seat ${a.type}">${a.seat}</span><span class="feed-text">Seat ${a.action}</span><span class="feed-time">${a.time}</span></div>`).join('');
 }
 
-// Render Charts
+/* render charts function */
 const trafficLabels = ['8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm'];
 const trafficData = [12, 24, 38, 52, 68, 84, 72, 58, 42, 28, 18, 10];
 
-// Set Chart.js Defaults
+/* set chart.js defaults function */
 Chart.defaults.font.family = "'Montserrat', sans-serif";
 Chart.defaults.color = "#1E2A38";
 Chart.defaults.plugins.tooltip.titleFont = { family: "'Poppins', sans-serif", weight: '700' };
@@ -305,7 +305,7 @@ function renderSeatChart() {
   });
 }
 
-// Dynamic Seat Map Rendering
+/* dynamic seat map rendering function */
 async function renderLiveSeatMap() {
   const container = document.getElementById('dynamicSeatMap');
   const viewport = document.getElementById('seatMapViewport');
@@ -323,7 +323,7 @@ async function renderLiveSeatMap() {
       return;
     }
 
-    // Update stat counter
+    /* update stat counter function */
     const chairs = items.filter(i => (i.type === 'chair' || i.type === 'chair-sq'));
     const openChairs = chairs.filter(i => !i.statuses || i.statuses[0] === 'open');
     const statEl = document.getElementById('statAvailable');
@@ -406,11 +406,11 @@ async function renderLiveSeatMap() {
   }
 }
 
-// Polling interval for live status
+/* polling interval for live status function */
 setInterval(renderLiveSeatMap, 10000);
 window.addEventListener('resize', renderLiveSeatMap);
 
-// Initialize All
+/* initialize all function */
 function renderAll() {
   renderReservationPayments();
   renderWifiPayments();

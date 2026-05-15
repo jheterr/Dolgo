@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster • Profile' %>
 
 <%- contentFor('head') %>
@@ -7,7 +7,7 @@
 
 <%- contentFor('style') %>
 <style>
-    /* Profile-specific design synchronization */
+    /* profilespecific design synchronization function */
     .role-tag {
       background: var(--orange);
       color: #fff;
@@ -19,7 +19,7 @@
       text-transform: uppercase;
     }
 
-    /* Modal Design Sync */
+    /* modal design sync function */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -78,7 +78,7 @@
       gap: 10px;
     }
 
-    /* Choice row (Premium Sync) */
+    /* choice row (premium sync) function */
     .choice-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
     .choice-card {
       display:flex; flex-direction:column; align-items:center; gap:10px;
@@ -102,7 +102,7 @@
     .choice-card:hover .choice-card-icon.camera { background:#dcfce7; }
     .choice-card span { font-size:12px; font-weight:700; color:#475569; }
 
-    /* Photo Modal Styling Sync */
+    /* photo modal styling sync function */
     .photo-modal {
       background:#fff; border-radius:24px; padding:36px 32px 28px;
       width:100%; max-width:500px;
@@ -140,7 +140,7 @@
     .cropper-view-box { outline: none !important; }
     .cropper-dashed, .cropper-point, .cropper-line, .cropper-center { display: none !important; }
 
-    /* Override profile-layout for exact size match */
+    /* override profilelayout for exact size match function */
     .profile-layout {
       grid-template-columns: 260px 1fr;
       gap: 16px;
@@ -162,11 +162,11 @@
       <h1 class="page-title">Profile</h1>
 
       <div class="profile-layout">
-        <!-- Left: Summary Card -->
+        <!-- left: summary card function -->
         <div class="profile-card">
           <div class="avatar-wrapper" onclick="openModal('avatarChoiceModal')">
             <div class="avatar" id="avatarInitials">
-  <!-- The span will now hide itself automatically if there is a picture -->
+  <!-- the span will now hide itself automatically if there is a picture function -->
   <span id="initialsText" style="display: <%= user.profile_picture ? 'none' : 'block' %>;">
     <%= user.first_name ? user.first_name[0] : '' %><%= user.last_name ? user.last_name[0] : '' %>
   </span>
@@ -189,7 +189,7 @@
           </button>
         </div>
 
-        <!-- Right: Information Card -->
+        <!-- right: information card function -->
         <div class="info-card">
           <div class="info-title">Account Information</div>
           
@@ -236,7 +236,7 @@
       </div>
     </main>
 
-    <!-- Modals -->
+    <!-- modals function -->
     <div class="modal-overlay" id="avatarChoiceModal">
       <div class="photo-modal">
         <button class="modal-close" style="position:absolute; top:18px; right:20px;" onclick="closeModal('avatarChoiceModal')">&times;</button>
@@ -337,7 +337,7 @@
     function openModal(id){ document.getElementById(id).classList.add('open'); }
     function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
-    // MAC Address Formatter
+    /* mac address formatter function */
     function formatMAC(input) {
       let value = input.value.toUpperCase().replace(/[^0-9A-F]/g, '');
       if (value.length > 12) value = value.slice(0, 12);
@@ -349,16 +349,16 @@
     if (macInput) {
       macInput.placeholder = "XX:XX:XX:XX:XX:XX";
       macInput.addEventListener('input', () => formatMAC(macInput));
-      // Format initial value
+      /* format initial value function */
       formatMAC(macInput);
     }
 
-    // DATABASE SAVE: Profile Info
+    /* database save: profile info function */
     async function saveProfile() {
       const macInput = document.getElementById('ep-mac');
       const macValue = macInput.value;
       
-      // Basic MAC Validation (optional but recommended)
+      /* basic mac validation (optional but recommended) function */
       if (macValue && !/^([0-9A-F]{2}:){5}([0-9A-F]{2})$/.test(macValue)) {
         alert("Invalid MAC address format. Expected XX:XX:XX:XX:XX:XX");
         return;
@@ -375,7 +375,7 @@
       console.log("Sending data:", data);
 
       try {
-        // IMPORTANT: Ensure the path starts with /customer/ if your router is mounted there
+        /* important: ensure the path starts with /customer/ if your router is mounted there function */
         const response = await fetch('/customer/profile/update', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -397,7 +397,7 @@
       }
     }
 
-    // Avatar Logic
+    /* avatar logic function */
     let cropper = null;
     let videoStream = null;
     const avatarInput = document.getElementById('avatarInput');
@@ -442,7 +442,7 @@
       }, 200);
     }
 
-    // DATABASE SAVE: Avatar
+    /* database save: avatar function */
     document.getElementById('cropSaveBtn').addEventListener('click', async function () {
       if (!cropper) return;
       const canvas = cropper.getCroppedCanvas({ width: 240, height: 240 });

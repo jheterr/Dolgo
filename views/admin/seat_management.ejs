@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Seat Management' %>
 
 <%- contentFor('style') %>
@@ -146,7 +146,7 @@
       border-radius: 10px;
       position: relative;
       display: flex;
-      justify-content: center; /* Centering for desktop */
+      justify-content: center; /* centering for desktop function */
       align-items: flex-start;
       padding: 10px;
     }
@@ -157,7 +157,7 @@
 
     .canvas-board {
       position: relative;
-      width: 800px; /* 16:9 Compact Landscape */
+      width: 800px; /* 16:9 compact landscape function */
       height: 450px;
       background: #f0f4f8;
       background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
@@ -175,7 +175,7 @@
       cursor: default;
     }
 
-    /* Booking Modal */
+    /* booking modal function */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -228,7 +228,7 @@
       font-family: 'Montserrat', sans-serif
     }
 
-    /* FLOOR PLAN ITEMS */
+    /* floor plan items function */
     .fp-item {
       position: absolute;
       cursor: move;
@@ -312,7 +312,7 @@
       display: flex
     }
 
-    /* TOOLBAR BUTTONS */
+    /* toolbar buttons function */
     .toolbar .tb-group {
       display: flex;
       gap: 4px;
@@ -365,7 +365,7 @@
       letter-spacing: .08em
     }
 
-    /* PROPS PANEL */
+    /* props panel function */
     .props-panel {
       background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(10px);
@@ -424,7 +424,7 @@
       padding-bottom: 8px
     }
 
-    /* LEGEND */
+    /* legend function */
     .legend {
       display: flex;
       gap: 12px;
@@ -473,7 +473,7 @@
       <div class="seat-page">
         <div class="card"
           style="padding:0;overflow:hidden;box-shadow:var(--shadow-md);border:none;background:rgba(255,255,255,0.7);backdrop-filter:blur(5px)">
-          <!-- TOOLBAR -->
+          <!-- toolbar function -->
           <div class="toolbar">
             <div class="tb-group">
               <span class="tb-sep" style="color:#94a3b8">Tools</span>
@@ -514,9 +514,9 @@
                   class="fa-solid fa-trash"></i> Clear</button>
             </div>
           </div>
-          <!-- CANVAS VIEWPORT -->
+          <!-- canvas viewport function -->
           <div class="canvas-viewport">
-            <!-- Transfer Mode Banner -->
+            <!-- transfer mode banner function -->
           <div id="transferBanner" style="display:none; position:absolute; top:20px; left:50%; transform:translateX(-50%); background:var(--orange); color:white; padding:12px 24px; border-radius:30px; font-weight:700; font-size:0.9rem; z-index:100; box-shadow:0 10px 25px rgba(249, 115, 22, 0.3); align-items:center; gap:12px;">
             <i class="fa-solid fa-arrow-right-arrow-left"></i>
             <span id="transferBannerText">Select a new seat</span>
@@ -527,7 +527,7 @@
 
           <div id="canvas" onmousedown="canvasDown(event)" onmousemove="canvasMove(event)" onmouseup="canvasUp(event)" onmouseleave="canvasUp(event)"></div>
           </div>
-          <!-- LEGEND -->
+          <!-- legend function -->
           <div class="legend" id="canvasLegend">
             <span><span class="legend-dot" style="background:#10b981"></span>Available</span>
             <span><span class="legend-dot" style="background:#d65c29"></span>Taken</span>
@@ -538,9 +538,9 @@
           </div>
         </div>
 
-        <!-- RIGHT COL -->
+        <!-- right col function -->
         <div class="right-col">
-          <!-- Properties Panel -->
+          <!-- properties panel function -->
           <div class="props-panel" id="propsPanel">
             <div class="props-title"><i class="fa-solid fa-sliders"></i> Properties</div>
             <label>Label</label>
@@ -566,7 +566,7 @@
           <div class="transfer-card">
             <div class="transfer-title"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer Seat Request</div>
             <div class="transfer-info">
-              <!-- Dynamically populated -->
+              <!-- dynamically populated function -->
             </div>
           </div>
           <div class="active-cust-card" id="activeCustCard">
@@ -579,7 +579,7 @@
             <div class="cust-list" id="todayResList"></div>
           </div>
 
-          <!-- Side Detail Panel (Figma Style) -->
+          <!-- side detail panel (figma style) function -->
           <div class="detail-panel" id="sideDetailPanel" style="display:none; margin:0; flex:none; position:relative; padding:24px; font-family:'Montserrat', sans-serif;">
             <button onclick="closeDetail()" style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.05); border:none; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#64748b; transition:0.2s; z-index:10;">
               <i class="fa-solid fa-xmark"></i>
@@ -596,7 +596,7 @@
             <div class="detail-name" id="detailName" style="font-family:'Poppins', sans-serif; font-size: 1.4rem; font-weight:700; color: var(--text); margin-bottom: 4px;"></div>
             <div id="detailStatusBadge" style="display:inline-block; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 24px; letter-spacing: 0.05em;">Available</div>
 
-            <!-- Selection Actions -->
+            <!-- selection actions function -->
             <div id="detailActions" style="display:flex; flex-direction:column; gap:12px;">
               <button class="btn btn-primary" id="btnAssign" onclick="showAssignForm()" style="width:100%; justify-content: center; padding:14px; border-radius:12px; font-weight:700;">
                 <i class="fa-solid fa-user-plus"></i> Assign User
@@ -609,7 +609,7 @@
               </button>
             </div>
 
-            <!-- Assignment Form -->
+            <!-- assignment form function -->
             <div id="assignForm" style="display: none;">
               <div style="font-size: 11px; font-weight: 800; color: var(--orange); text-transform: uppercase; margin-bottom: 18px; letter-spacing:0.05em;">Customer Assignment</div>
               
@@ -625,7 +625,7 @@
                 </div>
                 
                 <div id="custResultsContainer" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 10px; background: white; padding: 4px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
-                  <!-- Results will be injected here -->
+                  <!-- results will be injected here function -->
                   <div style="padding: 10px; font-size: 12px; color: #94a3b8; text-align: center;">Start typing to find...</div>
                 </div>
                 <input type="hidden" id="assignCustId">
@@ -661,7 +661,7 @@
     </main>
   </div>
 
-  <!-- Unsaved Changes Modal -->
+  <!-- unsaved changes modal function -->
   <div class="modal-overlay" id="unsavedModal">
     <div class="booking-modal" style="width:400px; text-align:center;">
       <div class="booking-title" style="color:var(--orange)"><i class="fa-solid fa-triangle-exclamation"></i> Unsaved Changes</div>
@@ -677,7 +677,7 @@
 
 <%- contentFor('script') %>
 <script>
-    // Sidebar
+    /* sidebar function */
     
     function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show') }
     function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show') }
@@ -720,7 +720,7 @@
         return `${secs}s`;
     }
 
-    // State
+    /* state function */
     let items = [];
     let mode = 'select';
     let isEditMode = false;
@@ -732,7 +732,7 @@
     let nextId = 1;
     const canvas = document.getElementById('canvas');
 
-    // Default layout
+    /* default layout function */
     const defaultItems = [
       { id: 1, type: 'block-gray', x: 0, y: 0, w: 600, h: 45, rot: 0, color: '#cbd5e1', label: 'Wall' },
       { id: 2, type: 'block-gray', x: 0, y: 0, w: 12, h: 480, rot: 0, color: '#cbd5e1', label: 'Wall' },
@@ -810,7 +810,7 @@
         const data = await res.json();
         allCustomers = data.users || [];
         
-        // Sort descending: active > pending > inactive
+        /* sort descending: active > pending > inactive function */
         const statusOrder = { 'active': 1, 'pending': 2, 'inactive': 3 };
         allCustomers.sort((a, b) => (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99));
 
@@ -939,7 +939,7 @@
           loadTodayReservations();
         }, 5000);
 
-        // Update timers every second for smooth countdown
+        /* update timers every second for smooth countdown function */
         setInterval(() => {
             if (!isEditMode) {
                 renderTimers();
@@ -956,7 +956,7 @@
             if ((item.status === 'taken' || item.status === 'idle') && (item.endTime || item.remainingSeconds)) {
                 const el = document.querySelector(`[data-id="${item.id}"]`);
                 if (el) {
-                    // Update Title Tooltip
+                    /* update title tooltip function */
                     if (item.userName) {
                         el.title = `Occupied by: ${item.userName}`;
                     }
@@ -980,10 +980,10 @@
                     }
                     const timeLeft = formatTimeLeft(item.endTime, item.isPaused, item.remainingSeconds);
                     
-                    // Show name + time if available
+                    /* show name + time if available function */
                     let displayLabel = timeLeft;
                     if (item.userName && !item.label.includes('T')) { // Only for small chairs
-                         // Keep it short for chairs
+                         /* keep it short for chairs function */
                     }
                     
                     tag.textContent = displayLabel + (item.isPaused ? ' (P)' : '');
@@ -1000,8 +1000,8 @@
     function updateCustListTimers() {
         const rows = document.querySelectorAll('.cust-row-sub');
         rows.forEach(row => {
-            // Find the time span. We need to be careful with the structure.
-            // Earlier I added: <span style="color: ...">${timeStr}</span>
+            /* find the time span. we need to be careful with the structure. function */
+            /* earlier i added: <span style"color: ...">${timestr}</span> function */
             const span = row.querySelector('span');
             if (span && (span.dataset.endTime || span.dataset.remainingSeconds)) {
                 const isPaused = span.dataset.isPaused === '1';
@@ -1049,7 +1049,7 @@
       closeUnsavedModal();
     }
 
-    // Browser navigation guard
+    /* browser navigation guard function */
     window.onbeforeunload = function(e) {
       if (hasUnsavedChanges()) {
         const msg = "You have unsaved layout changes!";
@@ -1141,7 +1141,7 @@
           el.appendChild(lbl);
         }
 
-        // Add Timer for Taken seats
+        /* add timer for taken seats function */
         const status = (item.statuses && item.statuses[0]) || item.status || 'open';
         if ((status === 'taken' || status === 'idle') && item.endTime && !isEditMode) {
             const timeLeft = formatTimeLeft(item.endTime, item.isPaused, item.remainingSeconds);
@@ -1207,7 +1207,7 @@
       const status = (item && item.status) || (isAvailable ? 'open' : 'taken');
       const isReallyAvailable = status === 'open';
 
-      // If occupied or idle, show user name if we have it
+      /* if occupied or idle, show user name if we have it function */
       if (!isReallyAvailable && item && item.userName) {
           document.getElementById('detailName').innerHTML = `<span style="font-size: 0.7rem; color: var(--text-sm); display:block; margin-bottom: 2px;">${seatLabel}</span>${item.userName}`;
           const timeLeft = formatTimeLeft(item.endTime, item.isPaused, item.remainingSeconds);
@@ -1257,7 +1257,7 @@
                 const data = await res.json();
                 if (data.success) {
                     document.getElementById('detailImg').src = imageData;
-                    // Update local items array too
+                    /* update local items array too function */
                     const item = items.find(i => i.id === currentSelectedElementId);
                     if (item) item.image = imageData;
                 }
@@ -1282,7 +1282,7 @@
       document.getElementById('assignForm').style.display = 'none';
       document.getElementById('detailActions').style.display = 'flex';
 
-      // Reset search fields
+      /* reset search fields function */
       document.getElementById('custSearchInput').value = '';
       document.getElementById('custSearchInput').style.borderColor = 'var(--border)';
       document.getElementById('custSearchInput').style.background = 'white';
@@ -1488,12 +1488,12 @@
     async function loadTodayReservations() {
         const el = document.getElementById('todayResList');
         try {
-            // 1. Fetch reservations
+            /* 1. fetch reservations function */
             const res = await fetch('/api/reservations');
             const data = await res.json();
             if (!data.reservations) return;
 
-            // 2. Fetch active customers to avoid duplicates
+            /* 2. fetch active customers to avoid duplicates function */
             const activeRes = await fetch('/api/active-customers');
             const activeData = await activeRes.json();
             const activeUserIds = (activeData.customers || []).map(c => c.id);
@@ -1505,10 +1505,10 @@
                 const rDate = new Date(r.start_time).toISOString().split('T')[0];
                 const rEnd = new Date(r.end_time);
                 
-                // Basic checks: Today, Confirmed, Not yet finished
+                /* basic checks: today, confirmed, not yet finished function */
                 if (rDate !== todayStr || r.status !== 'confirmed' || rEnd <= now) return false;
 
-                // Hide if user is already active/seated
+                /* hide if user is already active/seated function */
                 if (activeUserIds.includes(r.user_id)) return false;
 
                 return true;
@@ -1545,7 +1545,7 @@
     function startManualTransfer() {
         const item = items.find(i => i.id === currentSelectedElementId);
         let name = document.getElementById('detailName').textContent;
-        // Clean up the name string as it might contain HTML from the label
+        /* clean up the name string as it might contain html from the label function */
         name = name.replace(/<[^>]*>?/gm, '').trim().split('\n').pop().trim();
         
         manualTransferSource = {
@@ -1581,7 +1581,7 @@
         toast("Transfer cancelled.", "info");
     }
 
-    // Update handleItemClick to handle manual transfer target selection
+    /* update handleitemclick to handle manual transfer target selection function */
     function handleItemClick(e, itemId) {
       if (isEditMode) {
         if (mode === 'select') canvasDown(e);
@@ -1622,7 +1622,7 @@
 
             if (!userId) { 
                 toast("User session not found! Trying fallback search...", "warning");
-                // Last ditch effort: search by label in items
+                /* last ditch effort: search by label in items function */
                 const item = items.find(i => i.label === manualTransferSource.label);
                 if (item && item.user_id) userId = item.user_id;
             }
@@ -1643,7 +1643,7 @@
             if (result.success) {
                 toast("Seat transferred successfully!", "success");
                 
-                // Optimistic UI Update: immediately update the local state to avoid delay
+                /* optimistic ui update: immediately update the local state to avoid delay function */
                 const sourceItem = items.find(i => i.id === manualTransferSource.elementId);
                 const destItem = items.find(i => i.id === targetItem.id);
                 if (sourceItem && destItem) {
@@ -1678,7 +1678,7 @@
             return;
         }
 
-        // Always show the confirmation first
+        /* always show the confirmation first function */
         if (!confirm("Are you sure you want to end this customer's session? This will release the seat immediately.")) return;
 
         if (!currentSelectedUserId) {
@@ -1700,7 +1700,7 @@
                 toast("Session ended successfully", "success");
                 closeDetail();
                 
-                // Optimistic UI Update
+                /* optimistic ui update function */
                 const item = items.find(i => i.id === currentSelectedElementId);
                 if (item) {
                     item.status = 'open';
@@ -1718,7 +1718,7 @@
 
     window.onload = init;
 
-    // Close search results when clicking outside
+    /* close search results when clicking outside function */
     window.addEventListener('click', function(e) {
       const container = document.getElementById('custResultsContainer');
       const searchInput = document.getElementById('custSearchInput');

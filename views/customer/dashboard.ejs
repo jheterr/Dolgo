@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster • Customer Dashboard' %>
 
 <%- contentFor('style') %>
@@ -46,7 +46,7 @@
         color: #d65c29;
     }
 
-    /* Approved Green Session Card */
+    /* approved green session card function */
     .session-banner {
         background: linear-gradient(135deg, #d65c29, #b0461c);
         color: white;
@@ -117,7 +117,7 @@
 
     .font-mono { font-family: monospace; font-weight: 700; }
 
-    /* Modal Styles Sync with Staff */
+    /* modal styles sync with staff function */
     .modal-overlay {
         position: fixed;
         inset: 0;
@@ -194,13 +194,13 @@
     <main class="content">
         <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
 
-        <!-- Welcome Section -->
+        <!-- welcome section function -->
         <div class="welcome-section">
             <h1 class="welcome-text"><span class="light">Welcome,</span> <span class="bold"><%= user.first_name %>!</span></h1>
             <p style="color: #475569; margin-top: 2px; font-size: 14px; font-weight: 500;">Study well... ✍️</p>
         </div>
 
-        <!-- Session Banner -->
+        <!-- session banner function -->
         <div class="session-banner">
             <% if (session) { %>
                 <button onclick="openExtendModal()" style="position: absolute; top: 20px; right: 20px; background: white; color: #d65c29; border: none; border-radius: 20px; padding: 8px 18px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10;">
@@ -232,9 +232,9 @@
             <% } %>
         </div>
 
-        <!-- Stats Grid -->
+        <!-- stats grid function -->
         <div class="stats-grid">
-            <!-- Available Seats -->
+            <!-- available seats function -->
             <div class="stat-card">
                 <div class="stat-value" id="seats-available">
                     <%= availableSeats %>
@@ -242,7 +242,7 @@
                 <p class="stat-label">Seats Available Now</p>
             </div>
 
-            <!-- Your Seat -->
+            <!-- your seat function -->
             <div class="stat-card">
                 <div class="stat-value">
                     <%= mySeat || 'N/A' %>
@@ -256,7 +256,7 @@
     </main>
 </div>
 
-<!-- Modal: Extend Session -->
+<!-- modal: extend session function -->
 <div id="extendModal" class="modal-overlay" onclick="if(event.target===this) closeExtendModal()">
     <div class="modal-content">
         <h3 class="modal-title">Extend Session Time</h3>
@@ -304,7 +304,7 @@
     </div>
 </div>
 
-<!-- Modal: Transfer Seat -->
+<!-- modal: transfer seat function -->
 <div id="transferModal" class="modal-overlay" onclick="if(event.target===this) closeTransferModal()">
     <div class="modal-content" style="max-width: 440px;">
         <h3 class="modal-title">Transfer Seat</h3>
@@ -326,7 +326,7 @@
     function openSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
     function closeSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
 
-    // Timer State
+    /* timer state function */
     let isPaused = <%= (session && session.is_paused) ? 'true' : 'false' %>;
     let timeRemaining = 0;
     let timerInterval = null;
@@ -360,7 +360,7 @@
         }, 1000);
     }
 
-    // Pause/Resume
+    /* pause/resume function */
     async function togglePause() {
         const newPauseState = !isPaused;
         const remainingSecs = Math.floor(timeRemaining / 1000);
@@ -379,7 +379,7 @@
                 pauseBtn.classList.toggle('paused', isPaused);
 
                 if (data.session && data.session.end_time) {
-                    // Update the "Session ends at" text
+                    /* update the "session ends at" text function */
                     const newEnd = new Date(data.session.end_time);
                     const timeStr = newEnd.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                     const displayEl = document.getElementById('sessionEndTimeDisplay');
@@ -389,7 +389,7 @@
         } catch (err) { console.error("Error toggling pause", err); }
     }
 
-    // Extend Time
+    /* extend time function */
     async function confirmExtendTime() {
         const activeBtn = document.querySelector('.time-btn.active');
         const minutes = parseInt(activeBtn.getAttribute('data-mins'));
@@ -407,7 +407,7 @@
         } catch (err) { console.error("Error extending time", err); }
     }
 
-    // Seat Transfer
+    /* seat transfer function */
     async function loadSeatsForTransfer() {
         try {
             const res = await fetch('/api/layout');
@@ -430,7 +430,7 @@
         location.reload();
     }
 
-    // UI Modals
+    /* ui modals function */
     function openExtendModal() { document.getElementById('extendModal').classList.add('active'); }
     function closeExtendModal() { document.getElementById('extendModal').classList.remove('active'); }
     function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
@@ -440,7 +440,7 @@
         btn.classList.add('active');
     }
 
-    // Init
+    /* init function */
     if (timeRemaining > 0) {
         updateTimerDisplay();
         if (isPaused) {

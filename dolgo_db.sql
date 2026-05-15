@@ -1,59 +1,45 @@
--- Dolgo DB Export
--- Generated: 5/15/2026, 2:10:12 PM
-
--- Table structure for table `active_sessions`
 DROP TABLE IF EXISTS `active_sessions`;
 CREATE TABLE `active_sessions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `start_time` datetime NOT NULL DEFAULT current_timestamp(),
-  `end_time` datetime DEFAULT NULL,
-  `status` enum('active','completed') DEFAULT 'active',
-  `mac_address` varchar(17) DEFAULT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `is_paused` tinyint(1) DEFAULT 0,
-  `remaining_seconds` int(11) DEFAULT 0,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `active_sessions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`user_id` int(11) NOT NULL,
+`start_time` datetime NOT NULL DEFAULT current_timestamp(),
+`end_time` datetime DEFAULT NULL,
+`status` enum('active','completed') DEFAULT 'active',
+`mac_address` varchar(17) DEFAULT NULL,
+`ip_address` varchar(45) DEFAULT NULL,
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+`is_paused` tinyint(1) DEFAULT 0,
+`remaining_seconds` int(11) DEFAULT 0,
+PRIMARY KEY (`id`),
+KEY `user_id` (`user_id`),
+CONSTRAINT `active_sessions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `active_sessions`
 INSERT INTO `active_sessions` (`id`, `user_id`, `start_time`, `end_time`, `status`, `mac_address`, `ip_address`, `created_at`, `is_paused`, `remaining_seconds`) VALUES (6, 14, '2026-05-15 05:50:31', '2026-05-15 06:50:31', 'active', NULL, NULL, '2026-05-15 05:50:31', 0, 0);
-
--- Table structure for table `broadcasts`
 DROP TABLE IF EXISTS `broadcasts`;
 CREATE TABLE `broadcasts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `audience` varchar(50) DEFAULT NULL,
-  `recipients` text DEFAULT NULL,
-  `subject` varchar(255) DEFAULT NULL,
-  `body` text DEFAULT NULL,
-  `sender_id` int(11) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `sender_id` (`sender_id`),
-  CONSTRAINT `broadcasts_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`)
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`audience` varchar(50) DEFAULT NULL,
+`recipients` text DEFAULT NULL,
+`subject` varchar(255) DEFAULT NULL,
+`body` text DEFAULT NULL,
+`sender_id` int(11) DEFAULT NULL,
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`),
+KEY `sender_id` (`sender_id`),
+CONSTRAINT `broadcasts_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `broadcasts`
-
--- Table structure for table `door_access_logs`
 DROP TABLE IF EXISTS `door_access_logs`;
 CREATE TABLE `door_access_logs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `door_name` varchar(50) NOT NULL,
-  `method` varchar(50) DEFAULT 'RFID',
-  `access_time` timestamp NOT NULL DEFAULT current_timestamp(),
-  `status` enum('granted','denied','unlocked','locked') NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `door_access_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`user_id` int(11) NOT NULL,
+`door_name` varchar(50) NOT NULL,
+`method` varchar(50) DEFAULT 'RFID',
+`access_time` timestamp NOT NULL DEFAULT current_timestamp(),
+`status` enum('granted','denied','unlocked','locked') NOT NULL,
+PRIMARY KEY (`id`),
+KEY `user_id` (`user_id`),
+CONSTRAINT `door_access_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=593 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `door_access_logs`
 INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (21, 14, 'Main Entrance', 'RFID', '2026-05-15 12:35:37', 'granted');
 INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (22, 33, 'Main Entrance', 'RFID', '2026-05-14 16:44:37', 'granted');
 INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (23, 27, 'Main Entrance', 'RFID', '2026-05-15 10:13:37', 'granted');
@@ -626,65 +612,53 @@ INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_
 INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (590, 19, 'Main Entrance', 'RFID', '2026-04-16 07:31:37', 'granted');
 INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (591, 38, 'Main Entrance', 'RFID', '2026-04-15 23:56:37', 'granted');
 INSERT INTO `door_access_logs` (`id`, `user_id`, `door_name`, `method`, `access_time`, `status`) VALUES (592, 22, 'Main Entrance', 'RFID', '2026-04-16 08:51:37', 'granted');
-
--- Table structure for table `event_attendees`
 DROP TABLE IF EXISTS `event_attendees`;
 CREATE TABLE `event_attendees` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `event_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `registered_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `event_id` (`event_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `event_attendees_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `event_attendees_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`event_id` int(11) NOT NULL,
+`user_id` int(11) NOT NULL,
+`registered_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`),
+KEY `event_id` (`event_id`),
+KEY `user_id` (`user_id`),
+CONSTRAINT `event_attendees_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
+CONSTRAINT `event_attendees_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `event_attendees`
-
--- Table structure for table `events`
 DROP TABLE IF EXISTS `events`;
 CREATE TABLE `events` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(100) NOT NULL,
-  `description` text DEFAULT NULL,
-  `event_date` datetime NOT NULL,
-  `location` varchar(100) DEFAULT NULL,
-  `image` longtext DEFAULT NULL,
-  `price` decimal(10,2) DEFAULT 0.00,
-  `max_attendees` int(11) DEFAULT NULL,
-  `created_by` int(11) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `created_by` (`created_by`),
-  CONSTRAINT `events_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`title` varchar(100) NOT NULL,
+`description` text DEFAULT NULL,
+`event_date` datetime NOT NULL,
+`location` varchar(100) DEFAULT NULL,
+`image` longtext DEFAULT NULL,
+`price` decimal(10,2) DEFAULT 0.00,
+`max_attendees` int(11) DEFAULT NULL,
+`created_by` int(11) DEFAULT NULL,
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`),
+KEY `created_by` (`created_by`),
+CONSTRAINT `events_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `events`
-
--- Table structure for table `floor_elements`
 DROP TABLE IF EXISTS `floor_elements`;
 CREATE TABLE `floor_elements` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `floor_plan_id` int(11) NOT NULL,
-  `element_type` varchar(50) NOT NULL,
-  `label` varchar(50) DEFAULT NULL,
-  `pos_x` int(11) NOT NULL,
-  `pos_y` int(11) NOT NULL,
-  `width` int(11) NOT NULL,
-  `height` int(11) NOT NULL,
-  `rotation` int(11) DEFAULT 0,
-  `color` varchar(20) DEFAULT NULL,
-  `capacity` int(11) DEFAULT 1,
-  `status` enum('open','taken','reserved','maintenance') DEFAULT 'open',
-  `image` longtext DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `floor_plan_id` (`floor_plan_id`),
-  CONSTRAINT `floor_elements_ibfk_1` FOREIGN KEY (`floor_plan_id`) REFERENCES `floor_plans` (`id`) ON DELETE CASCADE
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`floor_plan_id` int(11) NOT NULL,
+`element_type` varchar(50) NOT NULL,
+`label` varchar(50) DEFAULT NULL,
+`pos_x` int(11) NOT NULL,
+`pos_y` int(11) NOT NULL,
+`width` int(11) NOT NULL,
+`height` int(11) NOT NULL,
+`rotation` int(11) DEFAULT 0,
+`color` varchar(20) DEFAULT NULL,
+`capacity` int(11) DEFAULT 1,
+`status` enum('open','taken','reserved','maintenance') DEFAULT 'open',
+`image` longtext DEFAULT NULL,
+PRIMARY KEY (`id`),
+KEY `floor_plan_id` (`floor_plan_id`),
+CONSTRAINT `floor_elements_ibfk_1` FOREIGN KEY (`floor_plan_id`) REFERENCES `floor_plans` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=315 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `floor_elements`
 INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (274, 8, 'block-gray', 'Wall', 0, 0, 600, 45, 0, '#cbd5e1', 1, 'open', NULL);
 INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (275, 8, 'block-gray', 'Wall', 0, 0, 12, 450, 0, '#cbd5e1', 1, 'open', NULL);
 INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (276, 8, 'block-yellow', 'Counter', 29, 55, 300, 95, 0, '#fde68a', 1, 'open', NULL);
@@ -726,113 +700,89 @@ INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `p
 INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (312, 8, 'chair', 'T4-1', 510, 321, 40, 40, -30, '#faecd4', 1, 'open', NULL);
 INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (313, 8, 'chair', 'T4-2', 584, 321, 40, 40, 30, '#faecd4', 1, 'open', NULL);
 INSERT INTO `floor_elements` (`id`, `floor_plan_id`, `element_type`, `label`, `pos_x`, `pos_y`, `width`, `height`, `rotation`, `color`, `capacity`, `status`, `image`) VALUES (314, 8, 'chair', 'T4-3', 548, 404, 40, 40, 180, '#faecd4', 1, 'open', NULL);
-
--- Table structure for table `floor_plans`
 DROP TABLE IF EXISTS `floor_plans`;
 CREATE TABLE `floor_plans` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `width` int(11) DEFAULT 800,
-  `height` int(11) DEFAULT 450,
-  `is_active` tinyint(1) DEFAULT 1,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`name` varchar(100) NOT NULL,
+`width` int(11) DEFAULT 800,
+`height` int(11) DEFAULT 450,
+`is_active` tinyint(1) DEFAULT 1,
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `floor_plans`
 INSERT INTO `floor_plans` (`id`, `name`, `width`, `height`, `is_active`, `created_at`) VALUES (8, 'Main Floor', 800, 450, 1, '2026-05-10 17:02:06');
-
--- Table structure for table `membership_plans`
 DROP TABLE IF EXISTS `membership_plans`;
 CREATE TABLE `membership_plans` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  `description` text DEFAULT NULL,
-  `price` decimal(10,2) NOT NULL,
-  `duration_days` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`name` varchar(50) NOT NULL,
+`description` text DEFAULT NULL,
+`price` decimal(10,2) NOT NULL,
+`duration_days` int(11) NOT NULL,
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `membership_plans`
-
--- Table structure for table `messages`
 DROP TABLE IF EXISTS `messages`;
 CREATE TABLE `messages` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `sender_id` int(11) NOT NULL,
-  `receiver_id` int(11) NOT NULL,
-  `content` text NOT NULL,
-  `is_read` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `sender_id` (`sender_id`),
-  KEY `receiver_id` (`receiver_id`),
-  CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`sender_id` int(11) NOT NULL,
+`receiver_id` int(11) NOT NULL,
+`content` text NOT NULL,
+`is_read` tinyint(1) DEFAULT 0,
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`),
+KEY `sender_id` (`sender_id`),
+KEY `receiver_id` (`receiver_id`),
+CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `messages`
-
--- Table structure for table `notifications`
 DROP TABLE IF EXISTS `notifications`;
 CREATE TABLE `notifications` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `title` varchar(100) NOT NULL,
-  `message` text NOT NULL,
-  `is_read` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`user_id` int(11) NOT NULL,
+`title` varchar(100) NOT NULL,
+`message` text NOT NULL,
+`is_read` tinyint(1) DEFAULT 0,
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`),
+KEY `user_id` (`user_id`),
+CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `notifications`
-
--- Table structure for table `plan_upgrade_requests`
 DROP TABLE IF EXISTS `plan_upgrade_requests`;
 CREATE TABLE `plan_upgrade_requests` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `current_plan_id` int(11) DEFAULT NULL,
-  `requested_plan_id` int(11) NOT NULL,
-  `status` enum('pending','approved','declined') DEFAULT 'pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `current_plan_id` (`current_plan_id`),
-  KEY `requested_plan_id` (`requested_plan_id`),
-  CONSTRAINT `plan_upgrade_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `plan_upgrade_requests_ibfk_2` FOREIGN KEY (`current_plan_id`) REFERENCES `membership_plans` (`id`),
-  CONSTRAINT `plan_upgrade_requests_ibfk_3` FOREIGN KEY (`requested_plan_id`) REFERENCES `membership_plans` (`id`)
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`user_id` int(11) NOT NULL,
+`current_plan_id` int(11) DEFAULT NULL,
+`requested_plan_id` int(11) NOT NULL,
+`status` enum('pending','approved','declined') DEFAULT 'pending',
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`),
+KEY `user_id` (`user_id`),
+KEY `current_plan_id` (`current_plan_id`),
+KEY `requested_plan_id` (`requested_plan_id`),
+CONSTRAINT `plan_upgrade_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+CONSTRAINT `plan_upgrade_requests_ibfk_2` FOREIGN KEY (`current_plan_id`) REFERENCES `membership_plans` (`id`),
+CONSTRAINT `plan_upgrade_requests_ibfk_3` FOREIGN KEY (`requested_plan_id`) REFERENCES `membership_plans` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `plan_upgrade_requests`
-
--- Table structure for table `reservations`
 DROP TABLE IF EXISTS `reservations`;
 CREATE TABLE `reservations` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `element_id` int(11) NOT NULL,
-  `start_time` datetime NOT NULL,
-  `end_time` datetime NOT NULL,
-  `amount` decimal(10,2) DEFAULT 0.00,
-  `payment_method` enum('cashier','gcash') DEFAULT 'cashier',
-  `payment_status` enum('unpaid','paid') DEFAULT 'unpaid',
-  `reference_number` varchar(100) DEFAULT NULL,
-  `proof_image` longtext DEFAULT NULL,
-  `status` enum('pending','confirmed','completed','cancelled') DEFAULT 'pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `element_id` (`element_id`),
-  CONSTRAINT `reservations_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `reservations_ibfk_2` FOREIGN KEY (`element_id`) REFERENCES `floor_elements` (`id`) ON DELETE CASCADE
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`user_id` int(11) NOT NULL,
+`element_id` int(11) NOT NULL,
+`start_time` datetime NOT NULL,
+`end_time` datetime NOT NULL,
+`amount` decimal(10,2) DEFAULT 0.00,
+`payment_method` enum('cashier','gcash') DEFAULT 'cashier',
+`payment_status` enum('unpaid','paid') DEFAULT 'unpaid',
+`reference_number` varchar(100) DEFAULT NULL,
+`proof_image` longtext DEFAULT NULL,
+`status` enum('pending','confirmed','completed','cancelled') DEFAULT 'pending',
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`),
+KEY `user_id` (`user_id`),
+KEY `element_id` (`element_id`),
+CONSTRAINT `reservations_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+CONSTRAINT `reservations_ibfk_2` FOREIGN KEY (`element_id`) REFERENCES `floor_elements` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=567 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `reservations`
 INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (7, 27, 295, '2026-05-15 04:00:00', '2026-05-15 07:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
 INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (8, 16, 287, '2026-05-15 05:00:00', '2026-05-15 08:00:00', '150.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
 INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (9, 37, 279, '2026-05-15 06:00:00', '2026-05-15 07:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:45:38');
@@ -1393,125 +1343,104 @@ INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_ti
 INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (564, 27, 309, '2026-04-16 04:00:00', '2026-04-16 05:00:00', '50.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
 INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (565, 36, 286, '2026-04-16 06:00:00', '2026-04-16 10:00:00', '200.00', 'cashier', 'paid', NULL, NULL, 'completed', '2026-05-15 05:46:37');
 INSERT INTO `reservations` (`id`, `user_id`, `element_id`, `start_time`, `end_time`, `amount`, `payment_method`, `payment_status`, `reference_number`, `proof_image`, `status`, `created_at`) VALUES (566, 14, 299, '2026-05-15 05:50:31', '2026-05-15 06:50:31', '0.00', 'cashier', 'unpaid', NULL, NULL, 'confirmed', '2026-05-15 05:50:31');
-
--- Table structure for table `seat_transfer_requests`
 DROP TABLE IF EXISTS `seat_transfer_requests`;
 CREATE TABLE `seat_transfer_requests` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `current_element_id` int(11) NOT NULL,
-  `requested_element_id` int(11) NOT NULL,
-  `status` enum('pending','approved','declined') DEFAULT 'pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `current_element_id` (`current_element_id`),
-  KEY `requested_element_id` (`requested_element_id`),
-  CONSTRAINT `seat_transfer_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `seat_transfer_requests_ibfk_2` FOREIGN KEY (`current_element_id`) REFERENCES `floor_elements` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `seat_transfer_requests_ibfk_3` FOREIGN KEY (`requested_element_id`) REFERENCES `floor_elements` (`id`) ON DELETE CASCADE
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`user_id` int(11) NOT NULL,
+`current_element_id` int(11) NOT NULL,
+`requested_element_id` int(11) NOT NULL,
+`status` enum('pending','approved','declined') DEFAULT 'pending',
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`),
+KEY `user_id` (`user_id`),
+KEY `current_element_id` (`current_element_id`),
+KEY `requested_element_id` (`requested_element_id`),
+CONSTRAINT `seat_transfer_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+CONSTRAINT `seat_transfer_requests_ibfk_2` FOREIGN KEY (`current_element_id`) REFERENCES `floor_elements` (`id`) ON DELETE CASCADE,
+CONSTRAINT `seat_transfer_requests_ibfk_3` FOREIGN KEY (`requested_element_id`) REFERENCES `floor_elements` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `seat_transfer_requests`
-
--- Table structure for table `sessions`
 DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE `sessions` (
-  `session_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `expires` int(11) unsigned NOT NULL,
-  `data` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  PRIMARY KEY (`session_id`)
+`session_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+`expires` int(11) unsigned NOT NULL,
+`data` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+PRIMARY KEY (`session_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `sessions`
 INSERT INTO `sessions` (`session_id`, `expires`, `data`) VALUES ('62QODGD66pT86jQOToYYX23mRCFmw-Jf', 1778896460, '{"cookie":{"originalMaxAge":86400000,"expires":"2026-05-16T01:49:29.552Z","httpOnly":true,"path":"/"},"user":{"id":1,"username":"admin","email":"thelastmuster@gmail.com","role":"admin","status":"active","firstName":"Super","lastName":"Admin"}}');
 INSERT INTO `sessions` (`session_id`, `expires`, `data`) VALUES ('UXwt4KZF_yVVYcUPbra3j97iCX2DkE7U', 1778911636, '{"cookie":{"originalMaxAge":86400000,"expires":"2026-05-16T05:47:58.987Z","httpOnly":true,"path":"/"},"user":{"id":11,"username":"admin","email":"thelastmuster@gmail.com","role":"admin","status":"active","firstName":"Admin","lastName":"User"}}');
-
--- Table structure for table `user_memberships`
 DROP TABLE IF EXISTS `user_memberships`;
 CREATE TABLE `user_memberships` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `plan_id` int(11) NOT NULL,
-  `start_date` date NOT NULL,
-  `end_date` date NOT NULL,
-  `status` enum('active','expired','cancelled') DEFAULT 'active',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `plan_id` (`plan_id`),
-  CONSTRAINT `user_memberships_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `user_memberships_ibfk_2` FOREIGN KEY (`plan_id`) REFERENCES `membership_plans` (`id`)
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`user_id` int(11) NOT NULL,
+`plan_id` int(11) NOT NULL,
+`start_date` date NOT NULL,
+`end_date` date NOT NULL,
+`status` enum('active','expired','cancelled') DEFAULT 'active',
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`),
+KEY `user_id` (`user_id`),
+KEY `plan_id` (`plan_id`),
+CONSTRAINT `user_memberships_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+CONSTRAINT `user_memberships_ibfk_2` FOREIGN KEY (`plan_id`) REFERENCES `membership_plans` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `user_memberships`
-
--- Table structure for table `users`
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `role` enum('admin','staff','customer') NOT NULL DEFAULT 'customer',
-  `type` enum('member','walkin','staff') DEFAULT 'member',
-  `status` enum('pending','active','suspended') DEFAULT 'pending',
-  `first_name` varchar(50) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `location` varchar(100) DEFAULT NULL,
-  `mac_address` varchar(17) DEFAULT NULL,
-  `profile_picture` longtext DEFAULT NULL,
-  `schedule` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `email` (`email`)
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`username` varchar(50) NOT NULL,
+`email` varchar(100) NOT NULL,
+`password_hash` varchar(255) NOT NULL,
+`role` enum('admin','staff','customer') NOT NULL DEFAULT 'customer',
+`type` enum('member','walkin','staff') DEFAULT 'member',
+`status` enum('pending','active','suspended') DEFAULT 'pending',
+`first_name` varchar(50) NOT NULL,
+`last_name` varchar(50) NOT NULL,
+`phone` varchar(20) DEFAULT NULL,
+`location` varchar(100) DEFAULT NULL,
+`mac_address` varchar(17) DEFAULT NULL,
+`profile_picture` longtext DEFAULT NULL,
+`schedule` text DEFAULT NULL,
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+`updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+PRIMARY KEY (`id`),
+UNIQUE KEY `username` (`username`),
+UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `users`
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (11, 'admin', 'thelastmuster@gmail.com', '$2b$10$kUFUrUyKeEhj/ng11HB9KeXeBv7dZwdT.Oui4CvpI7bWnDYa.o2tS', 'admin', 'staff', 'active', 'Admin', 'User', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:43:24');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (12, 'belle', 'belle.staff@randomplay.com', '$2b$10$3cy4ObO6faxIqeDL.c04Duea0NthGSp93dexhNfhCmkORcHZEFpz.', 'staff', 'staff', 'active', 'Belle', 'Staff', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (13, 'wise', 'wise.staff@randomplay.com', '$2b$10$Ivj616bKsMuqzy0kqyPDAeJ1NdvxM4QT71WsHfKrP6XdzlRPzg.gq', 'staff', 'staff', 'active', 'Wise', 'Staff', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (14, 'anby', 'anby@neweridu.com', '$2b$10$n1.S1yObwYLEAJLvGlIBMulFegGS3lx460mp5fuJ3m5anl40NmSYW', 'customer', 'member', 'active', 'Anby', 'Demara', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (15, 'nicole', 'nicole@neweridu.com', '$2b$10$AV0rK7sl8gHonTLaAgEz7eSswAHHu32vukp3Cts7zu.zOwd/D7rPa', 'customer', 'member', 'active', 'Nicole', 'Demara', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (16, 'billy', 'billy@neweridu.com', '$2b$10$1l4TVTEyZqK7OjH.N3vJtOnr.ZMOrO3F7jc8trkZTuht.4ziqd5YK', 'customer', 'member', 'active', 'Billy', 'Kid', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (17, 'nekomata', 'nekomata@neweridu.com', '$2b$10$cTp7RlvPZMzhtDtoFmvOqOsL8LJnkEc8jkRbyELPyndmX4bKDDs8.', 'customer', 'member', 'active', 'Nekomata', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (18, 'soldier11', 'soldier11@neweridu.com', '$2b$10$r7iYD3efQAnThFUAD4A5Xe.ldTDqWbHku7EXdWGWFPghirE/SZMwW', 'customer', 'member', 'active', 'Soldier', '11', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (19, 'koleda', 'koleda@neweridu.com', '$2b$10$BbDAqN16sFFmSuLLl.9mmeb9OH2PRmf4lZuOadBKK3hE0/twX2uYm', 'customer', 'member', 'active', 'Koleda', 'Belobog', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (20, 'ben', 'ben@neweridu.com', '$2b$10$14fPPC2j1H.dbNyfjm1ZgOks50F6190UE4YcAYg3hCb.WKU./pEy.', 'customer', 'member', 'active', 'Ben', 'Bigger', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (21, 'anton', 'anton@neweridu.com', '$2b$10$x7kMtwL8NTnuijobqCoSbOMmfHnXwFKDHWwdC9guzLM9NMY7V1w3q', 'customer', 'member', 'active', 'Anton', 'Ivanov', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (22, 'grace', 'grace@neweridu.com', '$2b$10$6T4jjdpp5WmvRw.BWotNIONAMljXrFrFrsw2O1mnTuEZW9I38zapC', 'customer', 'member', 'active', 'Grace', 'Howard', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (23, 'ellen', 'ellen@neweridu.com', '$2b$10$MfFeo6yGg62BQp24rnWoAuquLXElAWc6cVDCLwcZQtKKpEm.HUidC', 'customer', 'member', 'active', 'Ellen', 'Joe', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (24, 'corin', 'corin@neweridu.com', '$2b$10$oGpFfGJEvl7FMS6LfTdfIO4j6z7Wv14JMkZWHyi7JxZUZenhyu9fW', 'customer', 'member', 'active', 'Corin', 'Wickes', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (25, 'rina', 'rina@neweridu.com', '$2b$10$CK8dSWdQO9obrTfF6Di6rOYuoxG/EE2cbZkea5XoaMeNy8bMh98w6', 'customer', 'member', 'active', 'Alexandrina', 'Sebastiane', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (26, 'lycaon', 'lycaon@neweridu.com', '$2b$10$SBkmvlWlhoYjOhskEhMq.OAk0g07eoez6zjQiLuuehC7OpSN9D/Ju', 'customer', 'member', 'active', 'Lycaon', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (27, 'soukaku', 'soukaku@neweridu.com', '$2b$10$l4XTgvWKy.sCQdSx6EWz/eFhyajMwClnsoNs16IFG8zqYcsucohzO', 'customer', 'member', 'active', 'Soukaku', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (28, 'miyabi', 'miyabi@neweridu.com', '$2b$10$VJEst5qorrJl76btEYYGaeSs59F71AUjGbHKttl7C5QjptuPBNhf6', 'customer', 'member', 'active', 'Hoshimi', 'Miyabi', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (29, 'qingyi', 'qingyi@neweridu.com', '$2b$10$BZGnsTJN36ZBhnKYCLzQEu5OxZEnHgQaBwU1CSlmMKLvZp5Bazxy2', 'customer', 'member', 'active', 'Qingyi', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (30, 'zhuyuan', 'zhuyuan@neweridu.com', '$2b$10$77G76CWDctKMk/.3xILPVutzMS.GGP/3onW.t2vcDva.EjtwuG8be', 'customer', 'member', 'active', 'Zhu', 'Yuan', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (31, 'seth', 'seth@neweridu.com', '$2b$10$4zJNek4umvMSXJqWRI/jSudHCkvHf4c24687GPJJdI7tIDvFMASIu', 'customer', 'member', 'active', 'Seth', 'Lowell', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (32, 'jane', 'jane@neweridu.com', '$2b$10$wt4EJvsyxwD5tceMjsV.C.iDxeDFe3T1ni9JD5qAuUT540v5/nghS', 'customer', 'member', 'active', 'Jane', 'Doe', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (33, 'caesar', 'caesar@neweridu.com', '$2b$10$k7gbwE8OVDCM3Lh1EoNv9ugvcaSsq7xqZZn.YHLcmHxP0mJmi69hi', 'customer', 'member', 'active', 'Caesar', 'King', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (34, 'burnice', 'burnice@neweridu.com', '$2b$10$/8P2tCWcQlfVYZF.akCzrebBLXqWPYJW5Uw1eruAUzYrvqJATwkYK', 'customer', 'member', 'active', 'Burnice', 'White', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (35, 'piper', 'piper@neweridu.com', '$2b$10$hTZblog/WwDY4O8jRDpN5.VpD.CkuGJQh/0WNoRvdntI2UffkaRd6', 'customer', 'member', 'active', 'Piper', 'Wheel', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (36, 'lucy', 'lucy@neweridu.com', '$2b$10$JIogwg3iMFjk5FfbirPUVOjXiLwtUVL3SW0k29/1bqdSW6ZzWBZDW', 'customer', 'member', 'active', 'Lucy', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (37, 'lighter', 'lighter@neweridu.com', '$2b$10$OM5g7HvLVqrQ2rJvF9Abo.AS5XAp/2G6kimFgomckHp6GI9E/B4vW', 'customer', 'member', 'active', 'Lighter', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (38, 'harumasa', 'harumasa@neweridu.com', '$2b$10$xiF8nCLA6j9ZkI8Px5U1QOlaCfn/PxnYNK7k1qeTOIhPzFawrlh2y', 'customer', 'member', 'active', 'Harumasa', 'Asaba', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
-
--- Table structure for table `wifi_extension_requests`
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (11, 'admin', 'thelastmuster@gmail.com', '$2b$10$Cs4nqq/bh2h1aFSeBpthF.rgNWG8E2TR0/yghn0SiA1vboi7RmbWS', 'admin', 'staff', 'active', 'Admin', 'User', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:43:24');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (12, 'belle', 'belle.staff@randomplay.com', '$2b$10$QutIvHZ5UM.dM7a72nAkh./XRQfWtn5MyGZuYTMRRmGO8fPx9KCbK', 'staff', 'staff', 'active', 'Belle', 'Staff', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (13, 'wise', 'wise.staff@randomplay.com', '$2b$10$QRcl8fB.8Umzbt9Git33W.ycBtgDEejevf4msQrC5trzVadwUYPDe', 'staff', 'staff', 'active', 'Wise', 'Staff', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (14, 'anby', 'anby@neweridu.com', '$2b$10$O9ToXWn2ePZeUcKVk1SSNeXa7iuGytiYqXpv4xar4jddmYixn66te', 'customer', 'member', 'active', 'Anby', 'Demara', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (15, 'nicole', 'nicole@neweridu.com', '$2b$10$1TcvHXWD9nEIjKgkkr61xeKt28ys62gdLr5AnvstK2w1ZAdvzshvm', 'customer', 'member', 'active', 'Nicole', 'Demara', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (16, 'billy', 'billy@neweridu.com', '$2b$10$znzdTfE0sYhhI8/2NK8cF.bDsUl53VsEgeevzaCehHt4oxtyK7FX6', 'customer', 'member', 'active', 'Billy', 'Kid', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (17, 'nekomata', 'nekomata@neweridu.com', '$2b$10$7vK7kiXaOIFAR8NVLLD8m..qP9mgNMX17fikWyc.AlFN0U.21oa/2', 'customer', 'member', 'active', 'Nekomata', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:18', '2026-05-15 05:41:18');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (18, 'soldier11', 'soldier11@neweridu.com', '$2b$10$8V6ECiSrDnUbk4XLvdI90Oqw64JXZsUvnGyX4tw05CHpXqxlxM6Fy', 'customer', 'member', 'active', 'Soldier', '11', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (19, 'koleda', 'koleda@neweridu.com', '$2b$10$qKX0Cntdf/4ivvrnRfo0M.HehG0sFzUbyZEfYBmXQB5/X/wu1XoH2', 'customer', 'member', 'active', 'Koleda', 'Belobog', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (20, 'ben', 'ben@neweridu.com', '$2b$10$V7tHNFB9L2IRFhNb3jjsdOXaFoO.IdZ8jvDLDNXwcjrmAWIdp9oqq', 'customer', 'member', 'active', 'Ben', 'Bigger', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (21, 'anton', 'anton@neweridu.com', '$2b$10$T86s27mrOJjSUHWiWIwFB.PcPsSFQ30UZo5b/HWKRERKma2NzslCu', 'customer', 'member', 'active', 'Anton', 'Ivanov', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (22, 'grace', 'grace@neweridu.com', '$2b$10$hiCHaj09G4e.NboFUITJhOB3gd0edWh4vttPOny52cumH8JFq8Bx6', 'customer', 'member', 'active', 'Grace', 'Howard', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (23, 'ellen', 'ellen@neweridu.com', '$2b$10$1rzjYbH1au6JAB4hrLHLi.gcW62RhQ84m6iXPu3xbgCNze5dec6cG', 'customer', 'member', 'active', 'Ellen', 'Joe', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (24, 'corin', 'corin@neweridu.com', '$2b$10$NYdOsCQ70jcaOlNbKXMg7eqtgUKeftlipYRm8qt6Q1W/4Tx.OjUd2', 'customer', 'member', 'active', 'Corin', 'Wickes', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (25, 'rina', 'rina@neweridu.com', '$2b$10$Cn77Y9QYWCHku0htt9O3se2NQommoNJSbWuoQklrPr3Ly00UouPMC', 'customer', 'member', 'active', 'Alexandrina', 'Sebastiane', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (26, 'lycaon', 'lycaon@neweridu.com', '$2b$10$9xlyTqr1eU1OxwuaJ8LJtO6Wawi/xgKIfr9v/6CpjrDkAOuy7M1MO', 'customer', 'member', 'active', 'Lycaon', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (27, 'soukaku', 'soukaku@neweridu.com', '$2b$10$PgWFQa2tIQ6t.Y11CI0PQO/uqNK9DBm5KhkFnyj1W4VQAaHdnGcCG', 'customer', 'member', 'active', 'Soukaku', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (28, 'miyabi', 'miyabi@neweridu.com', '$2b$10$EwyWQQS4zI3xXG6UfNFFQe5Craz9nOaVezY66W40sIe71FI.O6GGG', 'customer', 'member', 'active', 'Hoshimi', 'Miyabi', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (29, 'qingyi', 'qingyi@neweridu.com', '$2b$10$s2JDHHypItp4zFH5LnML3eJ1Z9FzdTC64FpuNZwjMmT2qNgVigzWW', 'customer', 'member', 'active', 'Qingyi', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (30, 'zhuyuan', 'zhuyuan@neweridu.com', '$2b$10$YnnPn884NyPsE1mWkboJgOdx9iirZUAOQOn4gVDvIWNkZW1PB32gC', 'customer', 'member', 'active', 'Zhu', 'Yuan', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (31, 'seth', 'seth@neweridu.com', '$2b$10$a5czxx4SsmK00BC49p1O0uePTAhhkAbGjAfrYxQTWJWHpLnn31/pS', 'customer', 'member', 'active', 'Seth', 'Lowell', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (32, 'jane', 'jane@neweridu.com', '$2b$10$i3BmNZ8rptf0pG3RaD37Quhf2FHUd5azqCePIaUo2Ns7iirwGKbHO', 'customer', 'member', 'active', 'Jane', 'Doe', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (33, 'caesar', 'caesar@neweridu.com', '$2b$10$j50N03hWAa2aQh.9Z/dOa..o3p/WZsfIaq1RZ//c3naWs3UZ12jT.', 'customer', 'member', 'active', 'Caesar', 'King', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (34, 'burnice', 'burnice@neweridu.com', '$2b$10$3s3GXJSNhLB79bVKgkCWneNcr2AOnAU6osoaXgNy0RLbpfAHYM8G.', 'customer', 'member', 'active', 'Burnice', 'White', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:19', '2026-05-15 05:41:19');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (35, 'piper', 'piper@neweridu.com', '$2b$10$SGbqpph33bsApFzT49qW/uZ4XrkPeOgvoE0Zh3/nhotu9W4TqH05m', 'customer', 'member', 'active', 'Piper', 'Wheel', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (36, 'lucy', 'lucy@neweridu.com', '$2b$10$J5cD5bx9XSmaAAqCjfGeZeGAdCsNqcr9Jm8OPSLt/ZlaTqj3vQEOu', 'customer', 'member', 'active', 'Lucy', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (37, 'lighter', 'lighter@neweridu.com', '$2b$10$6B4dFCYpQD5bgKC81VPsme3nj2nxgxqF8W4WpFBcrI8Vdv3iy2ILm', 'customer', 'member', 'active', 'Lighter', 'Customer', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `type`, `status`, `first_name`, `last_name`, `phone`, `location`, `mac_address`, `profile_picture`, `schedule`, `created_at`, `updated_at`) VALUES (38, 'harumasa', 'harumasa@neweridu.com', '$2b$10$I5nPufys0avGWjRi9sPk5uoKhHbjv21WhFv8e3nwPfa3KOaptWoFu', 'customer', 'member', 'active', 'Harumasa', 'Asaba', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:41:20', '2026-05-15 05:41:20');
 DROP TABLE IF EXISTS `wifi_extension_requests`;
 CREATE TABLE `wifi_extension_requests` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `requested_hours` int(11) NOT NULL,
-  `status` enum('pending','approved','declined') DEFAULT 'pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `wifi_extension_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`user_id` int(11) NOT NULL,
+`requested_hours` int(11) NOT NULL,
+`status` enum('pending','approved','declined') DEFAULT 'pending',
+`created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+PRIMARY KEY (`id`),
+KEY `user_id` (`user_id`),
+CONSTRAINT `wifi_extension_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Dumping data for table `wifi_extension_requests`
-

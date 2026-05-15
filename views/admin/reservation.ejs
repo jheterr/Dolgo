@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Reservations & Walk-ins' %>
 
 <%- contentFor('style') %>
@@ -200,7 +200,7 @@
       cursor: pointer;
     }
     
-    /* Payment Info Modal Styles */
+    /* payment info modal styles function */
     .payment-info-card {
       background: #f8fafc;
       border-radius: 20px;
@@ -264,7 +264,7 @@
       border-bottom: 2px solid #e2e8f0;
     }
     
-    /* MAC Address fields */
+    /* mac address fields function */
     .mac-fields-container {
       background: #f8fafc;
       padding: 12px;
@@ -298,7 +298,7 @@
       margin-top: 8px;
     }
     
-    /* Seat Layout inside Modal (Visual Floor Plan) */
+    /* seat layout inside modal (visual floor plan) function */
     .modal-seat-layout {
       background: #f8fafc;
       border-radius: 12px;
@@ -378,7 +378,7 @@
     .legend-item { display: inline-flex; align-items: center; gap: 4px; }
     .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
-    /* Section Header with Filter and Search */
+    /* section header with filter and search function */
     .section-header-with-filter {
       display: flex;
       justify-content: space-between;
@@ -435,7 +435,7 @@
     }
 
 
-    /* Data Table Styles */
+    /* data table styles function */
     .data-table { 
       width: 100%; 
       border-collapse: collapse; 
@@ -448,7 +448,7 @@
       vertical-align: top; 
     }
 
-    /* Responsive adjustments */
+    /* responsive adjustments function */
     @media (max-width: 768px) {
       .modal { padding: 20px; }
       .form-row { grid-template-columns: 1fr; }
@@ -488,7 +488,7 @@
       <button class="tab-btn" onclick="switchTab(event, 'tab-upgrade')"><i class="fa-solid fa-arrow-up"></i> Plan Upgrade</button>
     </div>
     
-    <!-- ========== TAB 1: RESERVATION ========== -->
+    <!-- tab 1: reservation function -->
     <div id="tab-reservation" class="tab-panel active">
       <div class="card">
         <div class="section-header-with-filter">
@@ -513,7 +513,7 @@
       </div>
     </div>
     
-    <!-- ========== TAB 2: WIFI EXTENSION ========== -->
+    <!-- tab 2: wifi extension function -->
     <div id="tab-wifi" class="tab-panel">
       <div class="card">
         <div class="section-header-with-filter">
@@ -537,7 +537,7 @@
       </div>
     </div>
     
-    <!-- ========== TAB 3: PLAN UPGRADE ========== -->
+    <!-- tab 3: plan upgrade function -->
     <div id="tab-upgrade" class="tab-panel">
       <div class="card">
         <div class="section-header-with-filter">
@@ -561,7 +561,7 @@
       </div>
     </div>
     
-    <!-- PAYMENT CONFIRMATION MODAL -->
+    <!-- payment confirmation modal function -->
     <div class="modal-overlay" id="paymentConfirmModal">
       <div class="modal">
         <div class="modal-header">
@@ -576,7 +576,7 @@
       </div>
     </div>
     
-    <!-- Add Reservation Modal -->
+    <!-- add reservation modal function -->
     <div class="modal-overlay" id="reservationModal">
       <div class="modal">
         <div class="modal-header">
@@ -615,7 +615,7 @@
       </div>
     </div>
 
-    <!-- Walk-in Modal with RFID SCAN button -->
+    <!-- walkin modal with rfid scan button function -->
     <div class="modal-overlay" id="walkinModal">
       <div class="modal">
         <div class="modal-header">
@@ -812,7 +812,7 @@
         c.map.appendChild(el);
       });
 
-      // Scale to fit modal
+      /* scale to fit modal function */
       const vWidth = c.view.clientWidth || 450;
       const vHeight = c.view.clientHeight || 300;
       const scale = Math.min(vWidth / 800, vHeight / 450) * 0.95;
@@ -904,7 +904,7 @@
     return name.includes(t) || email.includes(t) || seat.includes(t); 
   }
 
-  // ============ RESERVATIONS ============
+  /* reservations function */
   function renderReservations() {
     const filter = document.getElementById('reservationFilter').value;
     const search = document.getElementById('reservationSearch').value;
@@ -937,7 +937,7 @@
     }).join('');
   }
   
-  // ============ WIFI EXTENSIONS ============
+  /* wifi extensions function */
   function renderWifi() {
     const filter = document.getElementById('wifiFilter').value;
     const search = document.getElementById('wifiSearch').value;
@@ -966,7 +966,7 @@
     }).join('');
   }
   
-  // ============ PLAN UPGRADES ============
+  /* plan upgrades function */
   function renderUpgrade() {
     const filter = document.getElementById('upgradeFilter').value;
     const search = document.getElementById('upgradeSearch').value;
@@ -995,7 +995,7 @@
     }).join('');
   }
   
-  // ============ PAYMENT HANDLERS ============
+  /* payment handlers function */
   async function markGcashPaid(type, id) {
     if(!confirm("Mark as PAID?")) return;
     try {
@@ -1116,7 +1116,7 @@
         
         let body;
         if (currentModalContext === 'confirm') {
-            body = type === 'reservation' ? { status: 'confirmed', payment_status: 'unpaid' } : { status: 'unpaid' };
+            body = type === 'reservation' ? { status: 'confirmed', payment_status: 'paid' } : { status: 'paid' };
         } else {
             body = type === 'reservation' ? { status: 'confirmed', payment_status: 'paid' } : { status: 'paid' };
         }

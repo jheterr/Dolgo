@@ -345,9 +345,9 @@ router.post('/reserve', async (req, res) => {
         const amount = diffHrs * 50;
 
         await db.execute(
-            `INSERT INTO reservations (user_id, element_id, start_time, end_time, amount, status, payment_method, payment_image) 
-             VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)`,
-            [userId, elementId, start, end, amount, paymentMethod || 'gcash', paymentImage || null]
+            `INSERT INTO reservations (user_id, element_id, start_time, end_time, amount, status, payment_method) 
+             VALUES (?, ?, ?, ?, ?, 'pending', ?)`,
+            [userId, elementId, start, end, amount, paymentMethod || 'gcash']
         );
 
         console.log('Reservation saved for user:', userId);

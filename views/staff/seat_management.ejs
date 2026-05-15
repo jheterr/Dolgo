@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Staff' %>
 
 <%- contentFor('style') %>
@@ -124,7 +124,7 @@
             <div class="cust-list" id="custList"></div>
           </div>
 
-          <!-- Side Detail Panel (Figma Style) -->
+          <!-- side detail panel (figma style) function -->
           <div class="detail-panel" id="sideDetailPanel" style="display:none; margin:0; flex:none; position:relative; padding:24px; font-family:'Montserrat', sans-serif;">
             <button onclick="closeDetail()" style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.05); border:none; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#64748b; transition:0.2s; z-index:10;">
               <i class="fa-solid fa-xmark"></i>
@@ -137,7 +137,7 @@
             <div class="detail-name" id="detailName" style="font-family:'Poppins', sans-serif; font-size: 1.4rem; font-weight:700; color: var(--text); margin-bottom: 4px;"></div>
             <div id="detailStatusBadge" style="display:inline-block; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 24px; letter-spacing: 0.05em;">Available</div>
 
-            <!-- Selection Actions -->
+            <!-- selection actions function -->
             <div id="detailActions" style="display:flex; flex-direction:column; gap:12px;">
               <button class="btn btn-primary" id="btnAssign" onclick="showAssignForm()" style="width:100%; justify-content: center; padding:14px; border-radius:12px; font-weight:700;">
                 <i class="fa-solid fa-user-plus"></i> Assign User
@@ -147,7 +147,7 @@
               </button>
             </div>
 
-            <!-- Assignment Form (Hidden by default) -->
+            <!-- assignment form (hidden by default) function -->
             <div id="assignForm" style="display: none;">
               <div style="font-size: 11px; font-weight: 800; color: var(--orange); text-transform: uppercase; margin-bottom: 18px; letter-spacing:0.05em;">Customer Assignment</div>
               
@@ -164,7 +164,7 @@
                 </div>
                 
                 <div id="custResultsContainer" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 10px; background: white; padding: 4px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
-                  <!-- Results will be injected here -->
+                  <!-- results will be injected here function -->
                   <div style="padding: 10px; font-size: 12px; color: #94a3b8; text-align: center;">Start typing to find...</div>
                 </div>
                 <input type="hidden" id="assignCustId">
@@ -244,13 +244,13 @@ async function init() {
   await loadData();
   await loadTransferRequests();
   
-  // Set up live tracking interval (every 5 seconds)
+  /* set up live tracking interval (every 5 seconds) function */
   trackInterval = setInterval(() => {
     loadData();
     loadTransferRequests();
   }, 5000);
 
-  // Update timers every second
+  /* update timers every second function */
   setInterval(() => {
     renderTimers();
     updateCustListTimers();
@@ -288,7 +288,7 @@ async function fetchCustomersForSelect() {
     const data = await res.json();
     allCustomers = data.users || []; 
     
-    // Sort descending: active > pending > inactive
+    /* sort descending: active > pending > inactive function */
     const statusOrder = { 'active': 1, 'pending': 2, 'inactive': 3 };
     allCustomers.sort((a, b) => (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99));
 
@@ -301,7 +301,7 @@ function filterCustomers() {
   const typeFilter = document.getElementById('custTypeFilter').value;
   const container = document.getElementById('custResultsContainer');
   
-  // Show container while typing
+  /* show container while typing function */
   container.style.display = 'block';
 
   const filtered = allCustomers.filter(c => {
@@ -335,20 +335,20 @@ function filterCustomers() {
 }
 
 window.selectCustomerForAssign = function(id, name) {
-  // Clear previous selection highlight if any (could add a class)
+  /* clear previous selection highlight if any (could add a class) function */
   document.getElementById('assignCustId').value = id;
   document.getElementById('assignCustName').value = name;
   document.getElementById('custSearchInput').value = name;
   
-  // Hide container after selection
+  /* hide container after selection function */
   document.getElementById('custResultsContainer').style.display = 'none';
 
-  // Update button state
+  /* update button state function */
   const btn = document.getElementById('confirmAssignBtn');
   btn.disabled = false;
   btn.style.opacity = '1';
   
-  // Visual feedback on the search input
+  /* visual feedback on the search input function */
   document.getElementById('custSearchInput').style.borderColor = '#10b981';
   document.getElementById('custSearchInput').style.background = '#f0fdf4';
 };
@@ -401,17 +401,17 @@ function showDetail(name, seatLabel, time, isAvailable = false, elementId) {
   badge.style.background = isAvailable ? '#dcfce7' : '#fee2e2';
   badge.style.color = isAvailable ? '#16a34a' : '#ef4444';
 
-  // Toggle visibility of the side cards
+  /* toggle visibility of the side cards function */
   document.getElementById('activeCustCard').style.display = 'none';
   document.getElementById('sideDetailPanel').style.display = 'block';
   
-  // Reset form
+  /* reset form function */
   cancelAssignment();
   
-  // Only show assign button if available
+  /* only show assign button if available function */
   document.getElementById('btnAssign').style.display = isAvailable ? 'flex' : 'none';
   
-  // Pre-fetch customers for the select
+  /* prefetch customers for the select function */
   fetchCustomersForSelect();
 }
 
@@ -424,7 +424,7 @@ function cancelAssignment() {
   document.getElementById('assignForm').style.display = 'none';
   document.getElementById('detailActions').style.display = 'flex';
   
-  // Reset search fields
+  /* reset search fields function */
   document.getElementById('custSearchInput').value = '';
   document.getElementById('custSearchInput').style.borderColor = 'var(--border)';
   document.getElementById('custSearchInput').style.background = 'white';
@@ -696,7 +696,7 @@ function renderCanvas() {
 
 window.onload = init;
 
-// Close search results when clicking outside
+/* close search results when clicking outside function */
 window.addEventListener('click', function(e) {
   const container = document.getElementById('custResultsContainer');
   const searchInput = document.getElementById('custSearchInput');

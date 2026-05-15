@@ -1,11 +1,11 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster • Reserve History' %>
 
 <%- contentFor('style') %>
 <style>
 
 
-        /* Reserve History Page Specific Styles */
+        /* reserve history page specific styles function */
         .content {
             background-color: #f4f6f9;
             display: flex;
@@ -54,7 +54,7 @@
             border-bottom: 1px solid #e2e8f0;
         }
         
-        /* Fixed column widths */
+        /* fixed column widths function */
         .history-table th:nth-child(1), .history-table td:nth-child(1) { width: 25%; }
         .history-table th:nth-child(2), .history-table td:nth-child(2) { width: 25%; }
         .history-table th:nth-child(3), .history-table td:nth-child(3) { width: 20%; }
@@ -72,9 +72,9 @@
             font-weight: 600;
         }
 
-        /* Empty rows to fill height */
+        /* empty rows to fill height function */
         .empty-row td {
-            height: 65px; /* approximate height of a normal row */
+            height: 65px; /* approximate height of a normal row function */
         }
     
 </style>
@@ -112,7 +112,7 @@
                                 <td colspan="5" style="text-align: center; color: #64748b; padding: 40px;">No reservation history found.</td>
                             </tr>
                         <% } %>
-                        <!-- Empty rows to maintain layout if needed -->
+                        <!-- empty rows to maintain layout if needed function -->
                         <% if (reservations.length < 5) { %>
                             <% for(let i=0; i < (5 - reservations.length); i++) { %>
                                 <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td></tr>

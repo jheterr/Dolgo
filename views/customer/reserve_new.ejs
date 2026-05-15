@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster • Reserve New Time Slot' %>
 
 <%- contentFor('style') %>
@@ -21,7 +21,7 @@
         letter-spacing: -0.02em;
     }
 
-    /* Controls row */
+    /* controls row function */
     .controls-row {
         display: flex;
         gap: 24px;
@@ -71,7 +71,7 @@
         outline: none;
     }
 
-    /* Layout */
+    /* layout function */
     .main-layout {
         display: flex;
         gap: 24px;
@@ -105,7 +105,7 @@
         min-height: 600px;
     }
 
-    /* Map styling */
+    /* map styling function */
     .legend {
         display: flex;
         gap: 24px;
@@ -214,7 +214,7 @@
         font-size: 10px;
     }
 
-    /* Right panel details */
+    /* right panel details function */
     .room-image {
         width: 100%;
         height: 130px;
@@ -297,7 +297,7 @@
     .btn-confirm-booking:hover { background: #059669; transform: translateY(-2px); }
     .btn-confirm-booking:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
 
-    /* Modal Styles */
+    /* modal styles function */
     .modal-overlay {
         position: fixed;
         inset: 0;
@@ -368,7 +368,7 @@
         </div>
         
         <div class="main-layout">
-            <!-- Left: Map Section -->
+            <!-- left: map section function -->
             <div class="map-section">
                 <div class="legend">
                     <div class="legend-item"><div class="legend-dot dot-green"></div> Available</div>
@@ -382,7 +382,7 @@
                 </div>
             </div>
             
-            <!-- Right: Details Section -->
+            <!-- right: details section function -->
             <div class="details-section" id="detailsSection">
                 <div id="emptyDetails" class="empty-selection">
                     <i class="fa-solid fa-hand-pointer" style="font-size: 3rem; margin-bottom: 16px;"></i>
@@ -426,14 +426,14 @@
         </div>
     </main>
 
-    <!-- Payment Modal -->
+    <!-- payment modal function -->
     <div id="paymentModal" class="modal-overlay">
         <div class="modal-content" style="position: relative;">
             <i class="fa-solid fa-xmark" onclick="closePaymentModal()" style="position: absolute; top: 24px; right: 24px; font-size: 1.2rem; color: #1e293b; cursor: pointer;"></i>
             
             <h2 style="font-size: 1.3rem; font-family: 'Poppins', sans-serif; font-weight: 800; color: #1e293b; align-self: flex-start; margin-bottom: 24px;">Confirm & Pay</h2>
             
-            <!-- Payment Method Selection -->
+            <!-- payment method selection function -->
             <div style="display: flex; gap: 8px; margin-bottom: 24px; width: 100%; background: #f1f5f9; padding: 4px; border-radius: 12px;">
                 <button onclick="setPaymentMethod('gcash')" id="methodGcash" style="flex: 1; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; border: none; cursor: pointer; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); color: #2563eb;">GCash</button>
                 <button onclick="setPaymentMethod('cashier')" id="methodCashier" style="flex: 1; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; border: none; cursor: pointer; background: transparent; color: #64748b;">Pay at Counter</button>
@@ -491,12 +491,12 @@
         const end = endInput.value;
 
         try {
-            // 1. Always fetch base layout first
+            /* 1. always fetch base layout first function */
             const layoutRes = await fetch('/api/layout');
             const layoutData = await layoutRes.json();
             
             if (layoutData && layoutData.items) {
-                // Initial baseline: if booking for a future time, ignore current "taken/idle" hub states
+                /* initial baseline: if booking for a future time, ignore current "taken/idle" hub states function */
                 const isFuture = new Date(`${date} ${start}`) > new Date();
                 
                 allItems = layoutData.items.map(item => {
@@ -508,7 +508,7 @@
                 
                 renderCanvas(); 
                 
-                // 2. Fetch future availability
+                /* 2. fetch future availability function */
                 if (date && start && end) {
                     const availRes = await fetch(`/api/availability?date=${date}&startTime=${start}&endTime=${end}`);
                     const availData = await availRes.json();
@@ -527,7 +527,7 @@
                     }
                 }
                 
-                // 3. Keep selection in sync
+                /* 3. keep selection in sync function */
                 if (selectedItem) {
                     const currentItem = allItems.find(i => i.id === selectedItem.id);
                     if (currentItem) selectItem(currentItem);
@@ -579,7 +579,7 @@
                 visual.style.border = '2px solid #1e293b';
             } else if (item.type === 'room') {
                 const status = item.statuses ? item.statuses[0] : 'open';
-                // Premium glass/gradient look for rooms
+                /* premium glass/gradient look for rooms function */
                 if (status === 'open') {
                     visual.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
                     visual.style.boxShadow = 'inset 0 0 10px rgba(255,255,255,0.2)';
@@ -601,7 +601,7 @@
                 lbl.className = 'item-label' + (['chair', 'chair-sq'].includes(item.type) ? '' : ' center');
                 const status = item.statuses ? item.statuses[0] : 'open';
                 
-                // Readability fix: white for room labels
+                /* readability fix: white for room labels function */
                 lbl.style.color = (item.type === 'room' || status !== 'open') ? '#fff' : '#1e293b';
                 lbl.style.fontFamily = "'Poppins', sans-serif";
                 lbl.style.textShadow = item.type === 'room' ? '0 1px 3px rgba(0,0,0,0.3)' : 'none';
@@ -623,7 +623,7 @@
     }
 
     function selectItem(item) {
-        // Only allow selecting interactive items
+        /* only allow selecting interactive items function */
         if (!['chair', 'chair-sq', 'room'].includes(item.type)) return;
         
         selectedItem = item;
@@ -643,13 +643,13 @@
         
         document.getElementById('meetingRoomExtras').style.display = item.type === 'room' ? 'block' : 'none';
         
-        // Disable button if not open
+        /* disable button if not open function */
         document.getElementById('btnBook').disabled = (status !== 'open');
         document.getElementById('btnBook').innerHTML = (status === 'open') 
             ? '<i class="fa-solid fa-calendar-check"></i> Confirm Reservation' 
             : '<i class="fa-solid fa-lock"></i> Not Available';
 
-        // Sync date
+        /* sync date function */
         document.getElementById('reservationDate').value = document.getElementById('globalDatePicker').value;
     }
 
@@ -669,7 +669,7 @@
         
         document.getElementById('modalSummary').innerText = `${selectedItem.label} • ${date} • ${from}-${to}`;
         
-        // Calculate Price (Demo: 50 per hour)
+        /* calculate price (demo: 50 per hour) function */
         const h1 = parseInt(from.split(':')[0]);
         const h2 = parseInt(to.split(':')[0]);
         const diff = Math.max(1, h2 - h1);
@@ -773,7 +773,7 @@
         }
     }
 
-    // Segmented Control
+    /* segmented control function */
     document.querySelectorAll('.seg-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
@@ -783,7 +783,7 @@
         });
     });
 
-    // Global Date Sync & Re-check Availability
+    /* global date sync & recheck availability function */
     document.getElementById('globalDatePicker').addEventListener('change', (e) => {
         document.getElementById('reservationDate').value = e.target.value;
         loadLayout();
@@ -793,7 +793,7 @@
     document.getElementById('timeTo').addEventListener('change', loadLayout);
 
     window.addEventListener('DOMContentLoaded', () => {
-        // Initialize times with present time
+        /* initialize times with present time function */
         const now = new Date();
         const hh = String(now.getHours()).padStart(2, '0');
         const mm = String(now.getMinutes()).padStart(2, '0');

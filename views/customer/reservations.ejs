@@ -1,9 +1,9 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster • Reservations' %>
 
 <%- contentFor('style') %>
 <style>
-    /* Enforce only Poppins and Montserrat for this page */
+    /* enforce only poppins and montserrat for this page function */
     .content, .content * {
         font-family: 'Poppins', 'Montserrat', sans-serif !important;
     }
@@ -23,7 +23,7 @@
         letter-spacing: -0.02em;
     }
     
-    /* Approved Green Session Card */
+    /* approved green session card function */
     .active-session-card {
         background-color: #b7dbbf;
         border-radius: 12px;
@@ -101,7 +101,7 @@
         color: #d65c29;
     }
 
-    /* Modern Table Styling */
+    /* modern table styling function */
     .table-container {
         background: white;
         border-radius: 20px;
@@ -200,7 +200,7 @@
     <main class="content">
         <h1 class="page-title">My Bookings</h1>
         
-        <!-- Approved Active Session Card -->
+        <!-- approved active session card function -->
         <% if (session) { %>
             <div class="active-session-card">
                 <span class="badge-active"><%= session.is_paused ? 'Paused' : 'Active' %></span>
@@ -236,7 +236,7 @@
             </button>
         </div>
         
-        <!-- Modern Table Container -->
+        <!-- modern table container function -->
         <div class="table-container">
             <table class="reservations-table">
                 <thead>

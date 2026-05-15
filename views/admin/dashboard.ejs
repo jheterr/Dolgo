@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title='The Last Muster | Admin Dashboard' %>
 
   <%- contentFor('style') %>
@@ -59,7 +59,7 @@
         line-height: 1;
       }
 
-      /* Stat card backgrounds */
+      /* stat card backgrounds function */
       .sc-gold {
         background: linear-gradient(135deg, #8A8636, #b0ac4a);
       }
@@ -152,7 +152,7 @@
         box-shadow: var(--shadow);
       }
 
-      /* Dynamic Seat Map Styles */
+      /* dynamic seat map styles function */
       .seat-map-container {
         width: 100%;
         height: 380px;
@@ -347,7 +347,7 @@
     </style>
 
     <div class="app">
-      <!-- Sidebar -->
+      <!-- sidebar function -->
       <%- include('../partials/admin_sidebar', { active: 'Dashboard' }) %>
 
         <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
@@ -355,13 +355,13 @@
         <main class="content">
           <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
 
-          <!-- Welcome Banner -->
+          <!-- welcome banner function -->
           <div class="welcome-banner">
             <h2>Welcome back, <strong>Admin</strong> 👋</h2>
             <p>Manage daily operations, monitor seat status, and assist customers</p>
           </div>
 
-          <!-- Stats with backgrounds -->
+          <!-- stats with backgrounds function -->
           <div class="stat-grid">
             <div class="stat-card sc-gold">
               <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
@@ -385,7 +385,7 @@
             </div>
           </div>
 
-          <!-- Charts Row 1 -->
+          <!-- charts row 1 function -->
           <div class="charts-row">
             <div class="chart-card">
               <div class="chart-header">
@@ -411,7 +411,7 @@
             </div>
           </div>
 
-          <!-- Charts Row 2 -->
+          <!-- charts row 2 function -->
           <div class="charts-row">
             <div class="chart-card">
               <div class="chart-header">
@@ -438,7 +438,7 @@
             </div>
           </div>
 
-          <!-- Seat Map + Activity -->
+          <!-- seat map + activity function -->
           <div class="dash-bottom">
             <div class="card">
               <div class="chart-header">
@@ -463,7 +463,7 @@
             </div>
           </div>
 
-          <!-- Pending Payments -->
+          <!-- pending payments function -->
           <div class="payments-section">
             <div class="section-title" style="margin-bottom:16px;"><i class="fa-solid fa-credit-card"></i> Pending
               Payments
@@ -488,12 +488,12 @@
 
     <%- contentFor('script') %>
       <script>
-        // Sidebar functions
+        /* sidebar functions function */
         
         function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
         function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
 
-        // Pending Payments Data
+        /* pending payments data function */
         let pendingReservations = <%- JSON.stringify(pendingReservations) %>;
 
         let pendingWifiExtensions = [
@@ -509,7 +509,7 @@
         function formatPHP(amount) { return '₱' + amount.toLocaleString(); }
         function escapeHtml(str) { return String(str).replace(/[&<>]/g, function (m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
 
-        // Render Reservation Payments
+        /* render reservation payments function */
         function renderReservationPayments() {
           const container = document.getElementById('reservationPaymentsList');
           if (pendingReservations.length === 0) { container.innerHTML = '<div class="empty-payments">No pending payments</div>'; return; }
@@ -537,7 +537,7 @@
           alert('Payment marked as paid!');
         };
 
-        // Render Activity Feed
+        /* render activity feed function */
         function renderActivityFeed() {
           const activityFeed = <%- JSON.stringify(activities) %>;
           if (activityFeed.length === 0) {
@@ -547,7 +547,7 @@
           document.getElementById('activityFeed').innerHTML = activityFeed.map(a => `<div class="feed-item"><span class="feed-seat ${a.type}">${a.seat}</span><span class="feed-text">Seat ${a.action}</span><span class="feed-time">${a.time}</span></div>`).join('');
         }
 
-        // Chart data & instances
+        /* chart data & instances function */
         const trafficLabels = ['8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm'];
         const trafficData = [12, 24, 38, 52, 68, 84, 72, 58, 42, 28, 18, 10];
         let trafficChart, seatChart;
@@ -583,7 +583,7 @@
 
         let weeklyChart, customerTypeChart;
         function renderNewCharts() {
-          // Weekly Booking Trend (Bar)
+          /* weekly booking trend (bar) function */
           const ctxW = document.getElementById('weeklyChart').getContext('2d');
           if (weeklyChart) weeklyChart.destroy();
           weeklyChart = new Chart(ctxW, {
@@ -606,7 +606,7 @@
             }
           });
 
-          // Customer Type Distribution (Pie)
+          /* customer type distribution (pie) function */
           const ctxC = document.getElementById('customerTypeChart').getContext('2d');
           if (customerTypeChart) customerTypeChart.destroy();
           customerTypeChart = new Chart(ctxC, {
@@ -629,7 +629,7 @@
           });
         }
 
-        // Filter Handlers
+        /* filter handlers function */
         function filterTraffic(val) {
           if (val === 'yesterday') {
             trafficChart.data.datasets[0].data = [8, 15, 25, 45, 60, 75, 65, 50, 40, 25, 15, 5];
@@ -680,7 +680,7 @@
           customerTypeChart.update();
         }
 
-        // Dynamic Seat Map Rendering
+        /* dynamic seat map rendering function */
         async function renderLiveSeatMap() {
           const container = document.getElementById('dynamicSeatMap');
           const viewport = document.getElementById('seatMapViewport');
@@ -700,12 +700,12 @@
               return;
             }
 
-            // Update stat counter
+            /* update stat counter function */
             const chairs = items.filter(i => (i.type === 'chair' || i.type === 'chair-sq'));
             const openChairs = chairs.filter(i => !i.statuses || i.statuses[0] === 'open');
             document.getElementById('statAvailable').textContent = `${openChairs.length}/${chairs.length}`;
 
-            // Add click listener to navigate to management
+            /* add click listener to navigate to management function */
             container.onclick = () => {
               window.location.href = '/admin/seat-management';
             };
@@ -774,7 +774,7 @@
               container.appendChild(el);
             });
 
-            // Auto-scale to fit dashboard card
+            /* autoscale to fit dashboard card function */
             const rect = viewport.getBoundingClientRect();
             const vWidth = rect.width || viewport.clientWidth || viewport.offsetWidth || 600;
             const vHeight = rect.height || viewport.clientHeight || viewport.offsetHeight || 380;
@@ -789,12 +789,12 @@
           }
         }
 
-        // Handle Resize
+        /* handle resize function */
         window.addEventListener('resize', renderLiveSeatMap);
 
-        // Initialize All
+        /* initialize all function */
         function renderAll() {
-          // Chart.js defaults — set here so Chart.js is guaranteed loaded
+          /* chart.js defaults — set here so chart.js is guaranteed loaded function */
           Chart.defaults.font.family = "'Montserrat', sans-serif";
           Chart.defaults.color = "#1E2A38";
           Chart.defaults.plugins.tooltip.titleFont = { family: "'Poppins', sans-serif", weight: '700' };
@@ -807,7 +807,7 @@
           renderTrafficChart();
           renderSeatChart();
           renderNewCharts();
-          // Delay slightly to ensure viewport dimensions are ready
+          /* delay slightly to ensure viewport dimensions are ready function */
           setTimeout(renderLiveSeatMap, 100);
         }
 

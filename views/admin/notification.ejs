@@ -1,359 +1,458 @@
-<!-- Title passed to layout -->
-<% locals.title = 'The Last Muster | Notifications & Logs' %>
+<% locals.title='The Last Muster | Notifications & Logs' %>
 
-<%- contentFor('style') %>
-<style>
-    /* Layout Overrides */
-    .content {
-        gap: 24px;
-    }
+    <%- contentFor('style') %>
+        <style>
+            /* layout overrides function */
+            .content {
+                gap: 24px;
+            }
 
-    /* Tabs Styling */
-    .notif-tabs {
-        display: flex;
-        gap: 8px;
-        background: #f1f5f9;
-        padding: 6px;
-        border-radius: 12px;
-        width: fit-content;
-        margin-bottom: 8px;
-    }
-    .notif-tab {
-        padding: 8px 24px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 700;
-        color: #64748b;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .notif-tab.active {
-        background: white;
-        color: var(--orange);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
+            /* tabs styling function */
+            .notif-tabs {
+                display: flex;
+                gap: 8px;
+                background: #f1f5f9;
+                padding: 6px;
+                border-radius: 12px;
+                width: fit-content;
+                margin-bottom: 8px;
+            }
 
-    /* Filter Bar */
-    .filter-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        background: white;
-        padding: 16px 24px;
-        border-radius: 16px;
-        box-shadow: var(--shadow);
-        border: 1px solid #e2e8f0;
-        margin-bottom: 12px;
-    }
-    .search-input-group {
-        position: relative;
-        flex: 1;
-        max-width: 400px;
-    }
-    .search-input-group i {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94a3b8;
-        font-size: 14px;
-    }
-    .search-input {
-        padding-left: 40px !important;
-        border-radius: 10px !important;
-        background: #f8fafc !important;
-        border-color: #e2e8f0 !important;
-    }
-    .filter-group {
-        display: flex;
-        gap: 10px;
-    }
+            .notif-tab {
+                padding: 8px 24px;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 700;
+                color: #64748b;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
 
-    /* Notification Item */
-    .notif-feed {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-    .notif-card {
-        background: white;
-        border-radius: 16px;
-        padding: 18px 24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border: 1px solid #e2e8f0;
-        box-shadow: var(--shadow);
-        transition: all 0.2s;
-        position: relative;
-        overflow: hidden;
-    }
-    .notif-card:hover {
-        border-color: var(--orange);
-        transform: translateY(-2px);
-    }
-    .notif-card.unread::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: var(--orange);
-    }
-    .notif-card.unread {
-        background: #fffaf7;
-    }
-    .notif-icon-box {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 16px;
-        font-size: 16px;
-    }
-    .icon-security { background: #fee2e2; color: #ef4444; }
-    .icon-system { background: #eff6ff; color: #3b82f6; }
-    .icon-activity { background: #f0fdf4; color: #22c55e; }
-    
-    .notif-info { flex: 1; }
-    .notif-title { font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 2px; }
-    .notif-msg { font-size: 12px; color: #475569; line-height: 1.5; }
-    .notif-meta { font-size: 11px; color: #94a3b8; margin-top: 6px; display: flex; gap: 12px; }
+            .notif-tab.active {
+                background: white;
+                color: var(--orange);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
 
-    /* Audit Log Table */
-    .log-table-card {
-        background: white;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: var(--shadow);
-        border: 1px solid #e2e8f0;
-    }
-    .log-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .log-table th {
-        background: #f8fafc;
-        padding: 14px 20px;
-        text-align: left;
-        font-size: 11px;
-        font-weight: 700;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        border-bottom: 1px solid #e2e8f0;
-    }
-    .log-table td {
-        padding: 14px 20px;
-        border-bottom: 1px solid #f1f5f9;
-        font-size: 12px;
-        color: #1e293b;
-    }
-    .category-badge {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 10px;
-        font-weight: 800;
-    }
-    .cat-security { background: #fee2e2; color: #991b1b; }
-    .cat-system { background: #e0f2fe; color: #075985; }
-    .cat-activity { background: #dcfce7; color: #166534; }
+            /* filter bar function */
+            .filter-bar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                background: white;
+                padding: 16px 24px;
+                border-radius: 16px;
+                box-shadow: var(--shadow);
+                border: 1px solid #e2e8f0;
+                margin-bottom: 12px;
+            }
 
-    .status-pill {
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-size: 10px;
-        font-weight: 700;
-    }
-    .status-granted { background: #dcfce7; color: #16a34a; }
-    .status-denied { background: #fee2e2; color: #ef4444; }
-    .status-unlocked { background: #fef9c3; color: #854d0e; }
+            .search-input-group {
+                position: relative;
+                flex: 1;
+                max-width: 400px;
+            }
 
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 60px;
-        color: #94a3b8;
-    }
-    .empty-state i { font-size: 40px; margin-bottom: 16px; opacity: 0.5; }
+            .search-input-group i {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #94a3b8;
+                font-size: 14px;
+            }
 
-    @media (max-width: 768px) {
-        .filter-bar { flex-direction: column; align-items: stretch; }
-        .search-input-group { max-width: none; }
-        .notif-card { flex-direction: column; align-items: flex-start; gap: 12px; }
-        .notif-actions { width: 100%; display: flex; justify-content: flex-end; }
-    }
-</style>
+            .search-input {
+                padding-left: 40px !important;
+                border-radius: 10px !important;
+                background: #f8fafc !important;
+                border-color: #e2e8f0 !important;
+            }
 
-<div class="app">
-    <%- include('../partials/admin_sidebar', { active: 'Notification' }) %>
-    <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
-    
-    <main class="content">
-        <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+            .filter-group {
+                display: flex;
+                gap: 10px;
+            }
 
-        <div class="page-header">
-            <h1 class="page-title">Notifications & System Logs</h1>
-            <div style="display:flex;gap:10px">
-                <button class="btn btn-primary" onclick="openModal('announcementModal')"><i class="fa-solid fa-bullhorn"></i> Post Announcement</button>
-                <button class="btn btn-ghost" id="markAllReadBtn" onclick="markAllRead()"><i class="fa-solid fa-check-double"></i> Mark All Read</button>
-            </div>
-        </div>
+            /* notification item function */
+            .notif-feed {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
 
-        <div class="notif-tabs">
-            <div class="notif-tab active" onclick="switchTab('notifications')">Notifications</div>
-            <div class="notif-tab" onclick="switchTab('logs')">Audit Logs</div>
-        </div>
+            .notif-card {
+                background: white;
+                border-radius: 16px;
+                padding: 18px 24px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border: 1px solid #e2e8f0;
+                box-shadow: var(--shadow);
+                transition: all 0.2s;
+                position: relative;
+                overflow: hidden;
+            }
 
-        <div class="filter-bar">
-            <div class="search-input-group">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" class="form-control search-input" id="logSearch" placeholder="Search logs or notifications..." oninput="handleFilter()">
-            </div>
-            <div class="filter-group">
-                <select class="form-control" id="categoryFilter" style="width: auto;" onchange="handleFilter()">
-                    <option value="all">All Categories</option>
-                    <option value="Security">Security</option>
-                    <option value="System">System</option>
-                    <option value="Activity">User Activity</option>
-                </select>
-                <select class="form-control" id="statusFilter" style="width: auto;" onchange="handleFilter()">
-                    <option value="all">All Status</option>
-                    <option value="unread">Unread Only</option>
-                    <option value="read">Read Only</option>
-                </select>
-            </div>
-        </div>
+            .notif-card:hover {
+                border-color: var(--orange);
+                transform: translateY(-2px);
+            }
 
-        <!-- Notifications View -->
-        <div id="notificationsView" class="notif-feed">
-            <div class="empty-state">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                <p>Loading notifications...</p>
-            </div>
-        </div>
+            .notif-card.unread::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                background: var(--orange);
+            }
 
-        <!-- Audit Logs View -->
-        <div id="logsView" style="display: none;">
-            <div class="log-table-card">
-                <table class="log-table">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>User</th>
-                            <th>Action</th>
-                            <th>Category</th>
-                            <th>Status</th>
-                            <th>Detail</th>
-                        </tr>
-                    </thead>
-                    <tbody id="logsTableBody">
-                        <!-- Logs will be loaded here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            .notif-card.unread {
+                background: #fffaf7;
+            }
 
-        <!-- Announcement Modal -->
-        <div class="modal-overlay" id="announcementModal">
-            <div class="modal">
-                <div class="modal-header">
-                    <div class="modal-title"><i class="fa-solid fa-bullhorn"></i> Create Announcement</div>
-                    <button class="modal-close" onclick="closeModal('announcementModal')">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Title</label>
-                        <input class="form-control" id="ann-title" type="text" placeholder="e.g. System Maintenance">
+            .notif-icon-box {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 16px;
+                font-size: 16px;
+            }
+
+            .icon-security {
+                background: #fee2e2;
+                color: #ef4444;
+            }
+
+            .icon-system {
+                background: #eff6ff;
+                color: #3b82f6;
+            }
+
+            .icon-activity {
+                background: #f0fdf4;
+                color: #22c55e;
+            }
+
+            .notif-info {
+                flex: 1;
+            }
+
+            .notif-title {
+                font-size: 14px;
+                font-weight: 800;
+                color: #1e293b;
+                margin-bottom: 2px;
+            }
+
+            .notif-msg {
+                font-size: 12px;
+                color: #475569;
+                line-height: 1.5;
+            }
+
+            .notif-meta {
+                font-size: 11px;
+                color: #94a3b8;
+                margin-top: 6px;
+                display: flex;
+                gap: 12px;
+            }
+
+            /* audit log table function */
+            .log-table-card {
+                background: white;
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: var(--shadow);
+                border: 1px solid #e2e8f0;
+            }
+
+            .log-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .log-table th {
+                background: #f8fafc;
+                padding: 14px 20px;
+                text-align: left;
+                font-size: 11px;
+                font-weight: 700;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .log-table td {
+                padding: 14px 20px;
+                border-bottom: 1px solid #f1f5f9;
+                font-size: 12px;
+                color: #1e293b;
+            }
+
+            .category-badge {
+                padding: 4px 10px;
+                border-radius: 20px;
+                font-size: 10px;
+                font-weight: 800;
+            }
+
+            .cat-security {
+                background: #fee2e2;
+                color: #991b1b;
+            }
+
+            .cat-system {
+                background: #e0f2fe;
+                color: #075985;
+            }
+
+            .cat-activity {
+                background: #dcfce7;
+                color: #166534;
+            }
+
+            .status-pill {
+                padding: 2px 8px;
+                border-radius: 12px;
+                font-size: 10px;
+                font-weight: 700;
+            }
+
+            .status-granted {
+                background: #dcfce7;
+                color: #16a34a;
+            }
+
+            .status-denied {
+                background: #fee2e2;
+                color: #ef4444;
+            }
+
+            .status-unlocked {
+                background: #fef9c3;
+                color: #854d0e;
+            }
+
+            /* empty state function */
+            .empty-state {
+                text-align: center;
+                padding: 60px;
+                color: #94a3b8;
+            }
+
+            .empty-state i {
+                font-size: 40px;
+                margin-bottom: 16px;
+                opacity: 0.5;
+            }
+
+            @media (max-width: 768px) {
+                .filter-bar {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .search-input-group {
+                    max-width: none;
+                }
+
+                .notif-card {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 12px;
+                }
+
+                .notif-actions {
+                    width: 100%;
+                    display: flex;
+                    justify-content: flex-end;
+                }
+            }
+        </style>
+
+        <div class="app">
+            <%- include('../partials/admin_sidebar', { active: 'Notification' }) %>
+                <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
+                <main class="content">
+                    <button class="mobile-menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+
+                    <div class="page-header">
+                        <h1 class="page-title">Notifications & System Logs</h1>
+                        <div style="display:flex;gap:10px">
+                            <button class="btn btn-primary" onclick="openModal('announcementModal')"><i
+                                    class="fa-solid fa-bullhorn"></i> Post Announcement</button>
+                            <button class="btn btn-ghost" id="markAllReadBtn" onclick="markAllRead()"><i
+                                    class="fa-solid fa-check-double"></i> Mark All Read</button>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Message</label>
-                        <textarea class="form-control" id="ann-message" placeholder="Type your announcement here..."></textarea>
+
+                    <div class="notif-tabs">
+                        <div class="notif-tab active" onclick="switchTab('notifications')">Notifications</div>
+                        <div class="notif-tab" onclick="switchTab('logs')">Audit Logs</div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-ghost" onclick="closeModal('announcementModal')">Cancel</button>
-                    <button class="btn btn-primary" onclick="submitAnnouncement()">Post Announcement</button>
-                </div>
-            </div>
+
+                    <div class="filter-bar">
+                        <div class="search-input-group">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" class="form-control search-input" id="logSearch"
+                                placeholder="Search logs or notifications..." oninput="handleFilter()">
+                        </div>
+                        <div class="filter-group">
+                            <select class="form-control" id="categoryFilter" style="width: auto;"
+                                onchange="handleFilter()">
+                                <option value="all">All Categories</option>
+                                <option value="Security">Security</option>
+                                <option value="System">System</option>
+                                <option value="Activity">User Activity</option>
+                            </select>
+                            <select class="form-control" id="statusFilter" style="width: auto;"
+                                onchange="handleFilter()">
+                                <option value="all">All Status</option>
+                                <option value="unread">Unread Only</option>
+                                <option value="read">Read Only</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- notifications view function -->
+                    <div id="notificationsView" class="notif-feed">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            <p>Loading notifications...</p>
+                        </div>
+                    </div>
+
+                    <!-- audit logs view function -->
+                    <div id="logsView" style="display: none;">
+                        <div class="log-table-card">
+                            <table class="log-table">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>User</th>
+                                        <th>Action</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Detail</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logsTableBody">
+                                    <!-- logs will be loaded here function -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- announcement modal function -->
+                    <div class="modal-overlay" id="announcementModal">
+                        <div class="modal">
+                            <div class="modal-header">
+                                <div class="modal-title"><i class="fa-solid fa-bullhorn"></i> Create Announcement</div>
+                                <button class="modal-close" onclick="closeModal('announcementModal')">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label class="form-label">Title</label>
+                                    <input class="form-control" id="ann-title" type="text"
+                                        placeholder="e.g. System Maintenance">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Message</label>
+                                    <textarea class="form-control" id="ann-message"
+                                        placeholder="Type your announcement here..."></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-ghost" onclick="closeModal('announcementModal')">Cancel</button>
+                                <button class="btn btn-primary" onclick="submitAnnouncement()">Post
+                                    Announcement</button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
         </div>
-    </main>
-</div>
 
-<%- contentFor('script') %>
-<script>
-    let allNotifications = [];
-    let allLogs = [];
-    let activeTab = 'notifications';
+        <%- contentFor('script') %>
+            <script>
+                let allNotifications = [];
+                let allLogs = [];
+                let activeTab = 'notifications';
 
-    async function loadData() {
-        try {
-            const [notifRes, logRes] = await Promise.all([
-                fetch('/api/notifications').then(res => res.json()),
-                fetch('/api/audit-logs').then(res => res.json())
-            ]);
+                async function loadData() {
+                    try {
+                        const [notifRes, logRes] = await Promise.all([
+                            fetch('/api/notifications').then(res => res.json()),
+                            fetch('/api/audit-logs').then(res => res.json())
+                        ]);
 
-            allNotifications = notifRes.notifications || [];
-            allLogs = logRes.logs || [];
+                        allNotifications = notifRes.notifications || [];
+                        allLogs = logRes.logs || [];
 
-            renderView();
-        } catch (e) {
-            console.error('Error loading data:', e);
-            toast("Error loading notifications", "error");
-        }
-    }
+                        renderView();
+                    } catch (e) {
+                        console.error('Error loading data:', e);
+                        toast("Error loading notifications", "error");
+                    }
+                }
 
-    function switchTab(tab) {
-        activeTab = tab;
-        document.querySelectorAll('.notif-tab').forEach(t => {
-            t.classList.toggle('active', t.textContent.toLowerCase().includes(tab));
-        });
-        
-        document.getElementById('notificationsView').style.display = tab === 'notifications' ? 'flex' : 'none';
-        document.getElementById('logsView').style.display = tab === 'logs' ? 'block' : 'none';
-        
-        // Update status filter visibility
-        document.getElementById('statusFilter').style.display = tab === 'notifications' ? 'block' : 'none';
-        
-        renderView();
-    }
+                function switchTab(tab) {
+                    activeTab = tab;
+                    document.querySelectorAll('.notif-tab').forEach(t => {
+                        t.classList.toggle('active', t.textContent.toLowerCase().includes(tab));
+                    });
 
-    function handleFilter() {
-        renderView();
-    }
+                    document.getElementById('notificationsView').style.display = tab === 'notifications' ? 'flex' : 'none';
+                    document.getElementById('logsView').style.display = tab === 'logs' ? 'block' : 'none';
 
-    function renderView() {
-        if (activeTab === 'notifications') {
-            renderNotifications();
-        } else {
-            renderLogs();
-        }
-    }
+                    /* update status filter visibility function */
+                    document.getElementById('statusFilter').style.display = tab === 'notifications' ? 'block' : 'none';
 
-    function renderNotifications() {
-        const container = document.getElementById('notificationsView');
-        const searchTerm = document.getElementById('logSearch').value.toLowerCase();
-        const catFilter = document.getElementById('categoryFilter').value;
-        const statusFilter = document.getElementById('statusFilter').value;
+                    renderView();
+                }
 
-        const filtered = allNotifications.filter(n => {
-            const matchesSearch = n.title.toLowerCase().includes(searchTerm) || n.message.toLowerCase().includes(searchTerm);
-            const matchesStatus = statusFilter === 'all' ? true : (statusFilter === 'unread' ? !n.is_read : n.is_read);
-            return matchesSearch && matchesStatus;
-        });
+                function handleFilter() {
+                    renderView();
+                }
 
-        if (filtered.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-bell-slash"></i><p>No notifications found.</p></div>`;
-            return;
-        }
+                function renderView() {
+                    if (activeTab === 'notifications') {
+                        renderNotifications();
+                    } else {
+                        renderLogs();
+                    }
+                }
 
-        container.innerHTML = filtered.map(n => {
-            const time = new Date(n.created_at).toLocaleString();
-            return `
+                function renderNotifications() {
+                    const container = document.getElementById('notificationsView');
+                    const searchTerm = document.getElementById('logSearch').value.toLowerCase();
+                    const catFilter = document.getElementById('categoryFilter').value;
+                    const statusFilter = document.getElementById('statusFilter').value;
+
+                    const filtered = allNotifications.filter(n => {
+                        const matchesSearch = n.title.toLowerCase().includes(searchTerm) || n.message.toLowerCase().includes(searchTerm);
+                        const matchesStatus = statusFilter === 'all' ? true : (statusFilter === 'unread' ? !n.is_read : n.is_read);
+                        return matchesSearch && matchesStatus;
+                    });
+
+                    if (filtered.length === 0) {
+                        container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-bell-slash"></i><p>No notifications found.</p></div>`;
+                        return;
+                    }
+
+                    container.innerHTML = filtered.map(n => {
+                        const time = new Date(n.created_at).toLocaleString();
+                        return `
                 <div class="notif-card ${!n.is_read ? 'unread' : ''}">
                     <div style="display:flex; align-items:center;">
                         <div class="notif-icon-box icon-system">
@@ -373,33 +472,33 @@
                     </div>
                 </div>
             `;
-        }).join('');
-    }
+                    }).join('');
+                }
 
-    function renderLogs() {
-        const container = document.getElementById('logsTableBody');
-        const searchTerm = document.getElementById('logSearch').value.toLowerCase();
-        const catFilter = document.getElementById('categoryFilter').value;
+                function renderLogs() {
+                    const container = document.getElementById('logsTableBody');
+                    const searchTerm = document.getElementById('logSearch').value.toLowerCase();
+                    const catFilter = document.getElementById('categoryFilter').value;
 
-        const filtered = allLogs.filter(l => {
-            const matchesSearch = (l.action || '').toLowerCase().includes(searchTerm) || 
-                                (l.user_name || '').toLowerCase().includes(searchTerm) ||
-                                (l.detail || '').toLowerCase().includes(searchTerm);
-            const matchesCat = catFilter === 'all' ? true : l.category === catFilter;
-            return matchesSearch && matchesCat;
-        });
+                    const filtered = allLogs.filter(l => {
+                        const matchesSearch = (l.action || '').toLowerCase().includes(searchTerm) ||
+                            (l.user_name || '').toLowerCase().includes(searchTerm) ||
+                            (l.detail || '').toLowerCase().includes(searchTerm);
+                        const matchesCat = catFilter === 'all' ? true : l.category === catFilter;
+                        return matchesSearch && matchesCat;
+                    });
 
-        if (filtered.length === 0) {
-            container.innerHTML = `<tr><td colspan="6" class="empty-state">No logs found.</td></tr>`;
-            return;
-        }
+                    if (filtered.length === 0) {
+                        container.innerHTML = `<tr><td colspan="6" class="empty-state">No logs found.</td></tr>`;
+                        return;
+                    }
 
-        container.innerHTML = filtered.map(l => {
-            const time = new Date(l.timestamp).toLocaleString();
-            const catCls = `cat-${(l.category || '').toLowerCase()}`;
-            const statusCls = `status-${(l.status || '').toLowerCase()}`;
-            
-            return `
+                    container.innerHTML = filtered.map(l => {
+                        const time = new Date(l.timestamp).toLocaleString();
+                        const catCls = `cat-${(l.category || '').toLowerCase()}`;
+                        const statusCls = `status-${(l.status || '').toLowerCase()}`;
+
+                        return `
                 <tr>
                     <td style="white-space:nowrap; color:#64748b; font-size:11px;">${time}</td>
                     <td style="font-weight:700;">${escapeHtml(l.user_name || 'System')}</td>
@@ -409,68 +508,68 @@
                     <td style="color:#64748b;">${escapeHtml(l.detail || '')}</td>
                 </tr>
             `;
-        }).join('');
-    }
+                    }).join('');
+                }
 
-    async function markRead(id) {
-        try {
-            const res = await fetch('/api/notifications/mark-read', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id })
-            });
-            if ((await res.json()).success) {
+                async function markRead(id) {
+                    try {
+                        const res = await fetch('/api/notifications/mark-read', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id })
+                        });
+                        if ((await res.json()).success) {
+                            loadData();
+                        }
+                    } catch (e) { console.error(e); }
+                }
+
+                async function markAllRead() {
+                    try {
+                        const res = await fetch('/api/notifications/mark-read', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ all: true })
+                        });
+                        if ((await res.json()).success) {
+                            loadData();
+                        }
+                    } catch (e) { console.error(e); }
+                }
+
+                async function submitAnnouncement() {
+                    const title = document.getElementById('ann-title').value.trim();
+                    const message = document.getElementById('ann-message').value.trim();
+
+                    if (!title || !message) { alert("Please fill in both fields"); return; }
+
+                    try {
+                        const res = await fetch('/api/notifications/announcement', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ title, message })
+                        });
+                        if ((await res.json()).success) {
+                            toast("Announcement posted!", "success");
+                            closeModal('announcementModal');
+                            loadData();
+
+                            document.getElementById('ann-title').value = '';
+                            document.getElementById('ann-message').value = '';
+                        }
+                    } catch (e) { console.error(e); }
+                }
+
+                function openModal(id) { document.getElementById(id).classList.add('open'); }
+                function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+                function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+                function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+                function escapeHtml(s) { return s ? String(s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])) : ''; }
+
+                function toast(msg, type = "info") {
+                    alert(msg); // Placeholder for a real toast if available
+                }
+
                 loadData();
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    async function markAllRead() {
-        try {
-            const res = await fetch('/api/notifications/mark-read', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ all: true })
-            });
-            if ((await res.json()).success) {
-                loadData();
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    async function submitAnnouncement() {
-        const title = document.getElementById('ann-title').value.trim();
-        const message = document.getElementById('ann-message').value.trim();
-        
-        if (!title || !message) { alert("Please fill in both fields"); return; }
-        
-        try {
-            const res = await fetch('/api/notifications/announcement', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, message })
-            });
-            if ((await res.json()).success) {
-                toast("Announcement posted!", "success");
-                closeModal('announcementModal');
-                loadData();
-                
-                document.getElementById('ann-title').value = '';
-                document.getElementById('ann-message').value = '';
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    function openModal(id) { document.getElementById(id).classList.add('open'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-    function openSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
-    function closeSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
-    function escapeHtml(s) { return s ? String(s).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])) : ''; }
-    
-    function toast(msg, type="info") {
-        alert(msg); // Placeholder for a real toast if available
-    }
-
-    loadData();
-    setInterval(loadData, 30000); // Auto refresh every 30s
-</script>
+                setInterval(loadData, 30000); // Auto refresh every 30s
+            </script>

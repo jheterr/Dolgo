@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Staff' %>
 
 <%- contentFor('style') %>
@@ -200,7 +200,7 @@
       cursor: pointer;
     }
     
-    /* Payment Info Modal Styles */
+    /* payment info modal styles function */
     .payment-info-card {
       background: #f8fafc;
       border-radius: 20px;
@@ -264,7 +264,7 @@
       border-bottom: 2px solid #e2e8f0;
     }
     
-    /* MAC Address fields */
+    /* mac address fields function */
     .mac-fields-container {
       background: #f8fafc;
       padding: 12px;
@@ -298,7 +298,7 @@
       margin-top: 8px;
     }
     
-    /* Seat Layout inside Modal */
+    /* seat layout inside modal function */
     .modal-seat-layout {
       background: #f8fafc;
       border-radius: 20px;
@@ -366,7 +366,7 @@
     }
     .legend span { display: inline-flex; align-items: center; gap: 4px; }
 
-    /* Section Header with Filter and Search */
+    /* section header with filter and search function */
     .section-header-with-filter {
       display: flex;
       justify-content: space-between;
@@ -423,7 +423,7 @@
     }
 
 
-    /* Data Table Styles */
+    /* data table styles function */
     .data-table { 
       width: 100%; 
       border-collapse: collapse; 
@@ -436,7 +436,7 @@
       vertical-align: top; 
     }
 
-    /* Responsive adjustments */
+    /* responsive adjustments function */
     @media (max-width: 768px) {
       .modal { padding: 20px; }
       .form-row { grid-template-columns: 1fr; }
@@ -473,7 +473,7 @@
       <button class="tab-btn" onclick="switchTab(event, 'tab-upgrade')"><i class="fa-solid fa-arrow-up"></i> Plan Upgrade</button>
     </div>
     
-    <!-- ========== TAB 1: RESERVATION ========== -->
+    <!-- tab 1: reservation function -->
     <div id="tab-reservation" class="tab-panel active">
       <div class="card">
         <div class="section-header-with-filter">
@@ -497,7 +497,7 @@
       </div>
     </div>
     
-    <!-- ========== TAB 2: WIFI EXTENSION ========== -->
+    <!-- tab 2: wifi extension function -->
     <div id="tab-wifi" class="tab-panel">
       <div class="card">
         <div class="section-header-with-filter">
@@ -521,7 +521,7 @@
       </div>
     </div>
     
-    <!-- ========== TAB 3: PLAN UPGRADE ========== -->
+    <!-- tab 3: plan upgrade function -->
     <div id="tab-upgrade" class="tab-panel">
       <div class="card">
         <div class="section-header-with-filter">
@@ -545,7 +545,7 @@
       </div>
     </div>
     
-    <!-- PAYMENT CONFIRMATION MODAL -->
+    <!-- payment confirmation modal function -->
     <div class="modal-overlay" id="paymentConfirmModal">
       <div class="modal">
         <div class="modal-header">
@@ -560,7 +560,7 @@
       </div>
     </div>
     
-    <!-- Walk-in Modal with RFID SCAN button -->
+    <!-- walkin modal with rfid scan button function -->
     <div class="modal-overlay" id="walkinModal">
       <div class="modal">
         <div class="modal-header">
@@ -617,7 +617,7 @@
   let currentPaymentType = null;
   let currentModalContext = null;
 
-  // --- API FETCHERS ---
+  /* api fetchers function */
   async function loadAllData() {
     try {
       const [resRes, wifiRes, planRes, layoutRes] = await Promise.all([
@@ -670,7 +670,7 @@
     }
   }
 
-  // --- RENDERING ---
+  /* rendering function */
   function formatPHP(amount) { return '₱' + (amount || 0).toLocaleString(); }
   function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m)); }
   
@@ -793,7 +793,7 @@
     }).join('');
   }
 
-  // --- SEAT LAYOUT MODAL ---
+  /* seat layout modal function */
   function renderModalSeatLayout() {
     const container = document.getElementById('modalSeatLayout');
     if (!container) return;
@@ -838,7 +838,7 @@
     renderModalSeatLayout();
   };
 
-  // --- RFID & MAC ---
+  /* rfid & mac function */
   function simulateRFIDScan() {
     const mockRFID = "RFID_" + Math.random().toString(36).substring(2, 10).toUpperCase();
     document.getElementById('wi-rfid').value = mockRFID;
@@ -863,7 +863,7 @@
     if (currentMacCount >= 3) document.getElementById('addMacBtn').style.display = 'none';
   }
 
-  // --- PAYMENT CONFIRMATION ---
+  /* payment confirmation function */
   function openCashierConfirmModal(type, id) {
     let item, amount, detailText, label;
     if (type === 'reservation') { 
@@ -933,7 +933,7 @@
     
     let success = false;
     if (currentModalContext === 'confirm') {
-      success = await updateStatus(currentPaymentType, currentPaymentItem.id, 'confirmed', 'unpaid');
+      success = await updateStatus(currentPaymentType, currentPaymentItem.id, 'confirmed', 'paid');
     } else if (currentModalContext === 'payment') {
       success = await updateStatus(currentPaymentType, currentPaymentItem.id, 'confirmed', 'paid');
     }
@@ -953,7 +953,7 @@
     }
   }
 
-  // --- WALK-IN HANDLER ---
+  /* walkin handler function */
   async function addWalkin() {
     const email = document.getElementById('wi-email').value.trim();
     const firstName = document.getElementById('wi-firstname').value.trim();
@@ -967,7 +967,7 @@
     }
 
     try {
-      // 1. Add/Find User
+      /* 1. add/find user function */
       const userRes = await fetch('/api/users/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -982,7 +982,7 @@
 
       const userId = userData.userId;
 
-      // 2. Start Session
+      /* 2. start session function */
       const sessionRes = await fetch('/api/session/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1003,7 +1003,7 @@
     }
   }
 
-  // --- INITIALIZATION ---
+  /* initialization function */
   function renderAll() {
     renderReservations();
     renderWifi();
@@ -1037,8 +1037,8 @@
 
   document.getElementById('addMacBtn').addEventListener('click', addNewMacField);
   
-  // Initial Load
+  /* initial load function */
   loadAllData();
-  // Auto-refresh every 30 seconds
+  /* autorefresh every 30 seconds function */
   setInterval(loadAllData, 30000);
 </script>

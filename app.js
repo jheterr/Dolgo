@@ -74,3 +74,18 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
+// Start server if run directly
+if (require.main === module) {
+  const http = require('http');
+  const port = process.env.PORT || 3000;
+  app.set('port', port);
+
+  const server = http.createServer(app);
+  server.listen(port, () => {
+    console.log('\x1b[36m%s\x1b[0m', '---------------------------------------');
+    console.log('\x1b[36m%s\x1b[0m', '🛡️  Dolgo Management System');
+    console.log('\x1b[36m%s\x1b[0m', `🌐 Server: http://localhost:${port}`);
+    console.log('\x1b[36m%s\x1b[0m', '---------------------------------------');
+  });
+}

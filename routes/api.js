@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const PDFDocument = require('pdfkit');
+const path = require('path');
+const fs = require('fs');
+
 
 // Auto-cleanup for expired sessions/reservations
 async function autoCleanup() {
@@ -422,11 +426,33 @@ router.post('/reservations/add', async (req, res) => {
         const diffHrs = Math.max(1, diffMs / (1000 * 60 * 60));
         const amount = diffHrs * 50;
 
-        await db.query(
-            'INSERT INTO reservations (user_id, element_id, start_time, end_time, amount, status, payment_method, payment_status) VALUES (?, ?, ?, ?, ?, "confirmed", "cashier", "unpaid")',
+        const [result] = await db.query(
+            'INSERT INTO reservations (user_id, element_id, start_time, end_time, amount, status, payment_method, payment_status) VALUES (?, ?, ?, ?, ?, "confirmed", "cashier", "paid")',
             [userId, elementId, start, end, amount]
         );
-        res.json({ success: true });
+
+        // Mark seat as taken
+        await db.query('UPDATE floor_elements SET status = "taken" WHERE id = ?', [elementId]);
+
+        // Start active session for the customer
+        const startDt = new Date(start);
+        const endDt   = new Date(end);
+        const remainingSecs = Math.max(0, Math.floor((endDt - startDt) / 1000));
+
+        // End existing
+        await db.query(
+            'UPDATE active_sessions SET status = "completed" WHERE user_id = ? AND status = "active"',
+            [userId]
+        );
+
+        // Insert new active session
+        await db.query(
+            `INSERT INTO active_sessions (user_id, start_time, end_time, status, is_paused, remaining_seconds)
+             VALUES (?, ?, ?, 'active', 0, ?)`,
+            [userId, start, end, remainingSecs]
+        );
+
+        res.json({ success: true, reservationId: result.insertId });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, error: 'Database error' });
@@ -439,19 +465,52 @@ router.post('/reservations/:id/status', async (req, res) => {
     try {
         console.log(`Updating reservation ${req.params.id} to status: ${status}`);
 
-        // 1. Get the reservation to find the element_id
-        const [rows] = await db.query('SELECT element_id FROM reservations WHERE id = ?', [req.params.id]);
+        // 1. Get the full reservation details
+        const [rows] = await db.query(
+            'SELECT user_id, element_id, start_time, end_time, status as old_status FROM reservations WHERE id = ?',
+            [req.params.id]
+        );
+
         if (rows.length > 0) {
-            const elementId = rows[0].element_id;
+            const { user_id, element_id, start_time, end_time, old_status } = rows[0];
 
-            // 2. Update reservation
-            await db.query('UPDATE reservations SET status = ?, payment_status = ? WHERE id = ?', [status, payment_status, req.params.id]);
+            // 2. Update reservation status & payment_status
+            await db.query(
+                'UPDATE reservations SET status = ?, payment_status = ? WHERE id = ?',
+                [status, payment_status, req.params.id]
+            );
 
-            // 3. Update floor element status if applicable
-            if (status === 'confirmed') {
-                await db.query('UPDATE floor_elements SET status = "taken" WHERE id = ?', [elementId]);
+            if (status === 'confirmed' && old_status !== 'confirmed') {
+                // 3a. Mark seat as taken
+                await db.query('UPDATE floor_elements SET status = "taken" WHERE id = ?', [element_id]);
+
+                // 3b. Create an active session for the customer so timer starts
+                const startDt = new Date(start_time);
+                const endDt   = new Date(end_time);
+                const remainingSecs = Math.max(0, Math.floor((endDt - startDt) / 1000));
+
+                // End any existing active session for this user first
+                await db.query(
+                    'UPDATE active_sessions SET status = "completed" WHERE user_id = ? AND status = "active"',
+                    [user_id]
+                );
+
+                // Insert new active session
+                await db.query(
+                    `INSERT INTO active_sessions (user_id, start_time, end_time, status, is_paused, remaining_seconds)
+                     VALUES (?, ?, ?, 'active', 0, ?)`,
+                    [user_id, start_time, end_time, remainingSecs]
+                );
+
+                console.log(`Active session created for user ${user_id}, seat element ${element_id}`);
+
             } else if (status === 'cancelled' || status === 'completed') {
-                await db.query('UPDATE floor_elements SET status = "open" WHERE id = ?', [elementId]);
+                // 3c. Free the seat and close the session
+                await db.query('UPDATE floor_elements SET status = "open" WHERE id = ?', [element_id]);
+                await db.query(
+                    'UPDATE active_sessions SET status = "completed" WHERE user_id = ? AND status = "active"',
+                    [user_id]
+                );
             }
         }
 
@@ -914,13 +973,18 @@ router.get('/analytics', async (req, res) => {
             SELECT 
                 DATE(start_time) as date,
                 COUNT(*) as count,
-                SUM(amount) as income
+                SUM(IF(payment_status = 'paid', amount, 0)) as income
             FROM reservations
-            WHERE status = 'completed'
+            WHERE status IN ('completed', 'confirmed')
             GROUP BY DATE(start_time)
             ORDER BY DATE(start_time) DESC
             LIMIT 30
         `);
+
+        // Occupied seats right now
+        const [[{ occupiedSeats }]] = await db.query(
+            `SELECT COUNT(*) as occupiedSeats FROM active_sessions WHERE status = 'active'`
+        );
 
         // 3. Customer Type Breakdown
         const [[typeBreakdown]] = await db.query(`
@@ -979,9 +1043,10 @@ router.get('/analytics', async (req, res) => {
             SELECT 
                 HOUR(start_time) as hour,
                 COUNT(*) as count,
-                SUM(amount) as income
+                SUM(IF(payment_status = 'paid', amount, 0)) as income
             FROM reservations
-            WHERE DATE(start_time) = CURDATE() AND status = 'completed'
+            WHERE DATE(start_time) = CURDATE()
+            AND status IN ('completed', 'confirmed')
             GROUP BY HOUR(start_time)
             ORDER BY HOUR(start_time)
         `);
@@ -1012,7 +1077,8 @@ router.get('/analytics', async (req, res) => {
             hourlyStats,
             weeklySummary,
             wifiCount,
-            planCount
+            planCount,
+            occupiedSeats
         });
     } catch (error) {
         console.error('Analytics API Error:', error);
@@ -1020,5 +1086,375 @@ router.get('/analytics', async (req, res) => {
     }
 });
 
+// Server-side PDF Export
+router.post('/export/pdf', async (req, res) => {
+    const { filters, chartImages } = req.body;
+    const { start, end, includeIncome, includeTrans, includeActivity, includeCustomers } = filters;
+
+    try {
+        const doc = new PDFDocument({ margin: 50, size: 'A4', bufferPages: true });
+
+        // Register custom fonts
+        const fontsDir = path.join(__dirname, '..', 'public', 'fonts');
+        try {
+            doc.registerFont('Poppins', path.join(fontsDir, 'Poppins-Regular.ttf'));
+            doc.registerFont('Poppins-Bold', path.join(fontsDir, 'Poppins-Bold.ttf'));
+            doc.registerFont('Poppins-SemiBold', path.join(fontsDir, 'Poppins-SemiBold.ttf'));
+            doc.registerFont('Montserrat', path.join(fontsDir, 'Montserrat-Regular.ttf'));
+        } catch (fontErr) {
+            console.warn('Custom font load failed, using defaults:', fontErr.message);
+        }
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=TheLastMuster_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+        doc.pipe(res);
+
+        // Helper: draw section header bar
+        function sectionHeader(title) {
+            doc.save();
+            doc.roundedRect(50, doc.y, 495, 28, 4).fill('#CF6322');
+            doc.font('Poppins-Bold').fontSize(12).fillColor('#ffffff').text(title, 60, doc.y + 7, { width: 475 });
+            doc.restore();
+            doc.y += 38;
+        }
+
+        // Helper: table header row
+        function tableHeader(cols) {
+            const y = doc.y;
+            doc.font('Poppins-SemiBold').fontSize(8).fillColor('#64748b');
+            cols.forEach(c => doc.text(c.label, c.x, y, { width: c.w || 100, align: c.align || 'left' }));
+            doc.moveTo(50, y + 14).lineTo(545, y + 14).strokeColor('#e2e8f0').lineWidth(0.5).stroke();
+            doc.y = y + 20;
+        }
+
+        // Helper: check page break
+        function checkPage(rowY) {
+            if (rowY > 720) { doc.addPage(); return 60; }
+            return rowY;
+        }
+
+        // ===== PAGE 1: COVER =====
+        // Logo
+        const logoPath = path.join(__dirname, '..', 'public', 'images', 'The_Last_Muster_logo1.png');
+        if (fs.existsSync(logoPath)) {
+            doc.image(logoPath, 50, 45, { width: 60 });
+        }
+
+        // Title block (right of logo)
+        doc.font('Montserrat').fontSize(22).fillColor('#CF6322').text('THE LAST MUSTER', 120, 50);
+        doc.font('Poppins').fontSize(10).fillColor('#64748b').text('Analytics & Operational Report', 120);
+        doc.font('Poppins').fontSize(9).fillColor('#94a3b8').text(`Period: ${new Date(start).toLocaleDateString()} — ${new Date(end).toLocaleDateString()}`, 120);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 120);
+
+        doc.moveTo(50, 120).lineTo(545, 120).strokeColor('#CF6322').lineWidth(2).stroke();
+        doc.y = 135;
+
+        // ===== CHARTS SECTION =====
+        if (chartImages) {
+            sectionHeader('Visual Overview \u2014 Charts & Graphs');
+
+            if (chartImages.traffic) {
+                try {
+                    const b64 = chartImages.traffic.replace(/^data:image\/\w+;base64,/, '');
+                    doc.font('Poppins-SemiBold').fontSize(9).fillColor('#475569').text('Daily Traffic & Revenue Trend', 50, doc.y);
+                    doc.moveDown(0.3);
+                    
+                    const buf = Buffer.from(b64, 'base64');
+                    const img = doc.openImage(buf);
+                    const targetWidth = 495;
+                    const scaledHeight = img.height * (targetWidth / img.width);
+                    
+                    if (doc.y + scaledHeight > 750) { doc.addPage(); }
+                    doc.image(img, 50, doc.y, { width: targetWidth });
+                    doc.y += scaledHeight + 25;
+                } catch (e) { console.error('Traffic chart error:', e.message); }
+            }
+
+            if (chartImages.income) {
+                try {
+                    const b64 = chartImages.income.replace(/^data:image\/\w+;base64,/, '');
+                    const buf = Buffer.from(b64, 'base64');
+                    const img = doc.openImage(buf);
+                    const targetWidth = 495;
+                    const scaledHeight = img.height * (targetWidth / img.width);
+                    
+                    if (doc.y + scaledHeight > 720) { doc.addPage(); }
+                    doc.font('Poppins-SemiBold').fontSize(9).fillColor('#475569').text('Income Overview', 50, doc.y);
+                    doc.moveDown(0.3);
+                    doc.image(img, 50, doc.y, { width: targetWidth });
+                    doc.y += scaledHeight + 25;
+                } catch (e) { console.error('Income chart error:', e.message); }
+            }
+
+            if (chartImages.type) {
+                try {
+                    const b64 = chartImages.type.replace(/^data:image\/\w+;base64,/, '');
+                    const buf = Buffer.from(b64, 'base64');
+                    const img = doc.openImage(buf);
+                    const targetWidth = 300;
+                    const scaledHeight = img.height * (targetWidth / img.width);
+                    
+                    if (doc.y + scaledHeight > 720) { doc.addPage(); }
+                    doc.font('Poppins-SemiBold').fontSize(9).fillColor('#475569').text('Customer Type Breakdown', 50, doc.y);
+                    doc.moveDown(0.3);
+                    doc.image(img, (595 - targetWidth) / 2, doc.y, { width: targetWidth });
+                    doc.y += scaledHeight + 25;
+                } catch (e) { console.error('Type chart error:', e.message); }
+            }
+        }
+
+        // ===== FINANCIAL SUMMARY =====
+        if (includeIncome) {
+            doc.addPage();
+            sectionHeader('Financial Summary');
+
+            const [incomeLogs] = await db.query(`
+                SELECT DATE(start_time) as period, SUM(amount) as totalIncome,
+                       SUM(IF(payment_status='paid', amount, 0)) as paidAmount,
+                       SUM(IF(payment_status='unpaid', amount, 0)) as unpaidAmount
+                FROM reservations WHERE start_time BETWEEN ? AND ?
+                GROUP BY DATE(start_time) ORDER BY DATE(start_time) DESC
+            `, [start, end]);
+
+            tableHeader([
+                { label: 'Date', x: 50 }, { label: 'Total Income', x: 180, w: 100, align: 'right' },
+                { label: 'Paid', x: 300, w: 100, align: 'right' }, { label: 'Unpaid', x: 420, w: 100, align: 'right' }
+            ]);
+
+            let rowY = doc.y;
+            incomeLogs.forEach((log, i) => {
+                rowY = checkPage(rowY);
+                const bg = i % 2 === 0;
+                if (bg) { doc.save(); doc.rect(50, rowY - 2, 495, 16).fill('#f8fafc'); doc.restore(); }
+                doc.font('Poppins').fontSize(8).fillColor('#1e293b');
+                doc.text(new Date(log.period).toLocaleDateString(), 50, rowY);
+                doc.text(`Php ${Number(log.totalIncome).toLocaleString()}`, 180, rowY, { width: 100, align: 'right' });
+                doc.fillColor('#166534').text(`Php ${Number(log.paidAmount).toLocaleString()}`, 300, rowY, { width: 100, align: 'right' });
+                doc.fillColor('#991b1b').text(`Php ${Number(log.unpaidAmount).toLocaleString()}`, 420, rowY, { width: 100, align: 'right' });
+                rowY += 18;
+            });
+        }
+
+        // ===== TRANSACTIONS =====
+        if (includeTrans) {
+            doc.addPage();
+            sectionHeader('Transaction Details');
+
+            const [trans] = await db.query(`
+                SELECT r.*, u.first_name, u.last_name FROM reservations r
+                JOIN users u ON r.user_id = u.id
+                WHERE r.start_time BETWEEN ? AND ? ORDER BY r.start_time DESC LIMIT 200
+            `, [start, end]);
+
+            tableHeader([
+                { label: 'Date', x: 50, w: 120 }, { label: 'Customer', x: 175, w: 150 },
+                { label: 'Amount', x: 350, w: 80, align: 'right' }, { label: 'Status', x: 450, w: 80, align: 'center' }
+            ]);
+
+            let rowY = doc.y;
+            trans.forEach((t, i) => {
+                rowY = checkPage(rowY);
+                if (i % 2 === 0) { doc.save(); doc.rect(50, rowY - 2, 495, 14).fill('#f8fafc'); doc.restore(); }
+                doc.font('Poppins').fontSize(7.5).fillColor('#1e293b');
+                doc.text(new Date(t.start_time).toLocaleString(), 50, rowY, { width: 120 });
+                doc.text(`${t.first_name} ${t.last_name}`, 175, rowY, { width: 150 });
+                doc.text(`Php ${Number(t.amount).toLocaleString()}`, 350, rowY, { width: 80, align: 'right' });
+                const statusColor = t.payment_status === 'paid' ? '#166534' : '#991b1b';
+                doc.fillColor(statusColor).text(t.payment_status.toUpperCase(), 450, rowY, { width: 80, align: 'center' });
+                rowY += 14;
+            });
+        }
+
+        // ===== ACTIVITY LOGS =====
+        if (includeActivity) {
+            doc.addPage();
+            sectionHeader('Activity & Access Logs');
+
+            const [logs] = await db.query(`
+                SELECT dl.*, u.first_name, u.last_name FROM door_access_logs dl
+                JOIN users u ON dl.user_id = u.id
+                WHERE dl.access_time BETWEEN ? AND ? ORDER BY dl.access_time DESC LIMIT 200
+            `, [start, end]);
+
+            tableHeader([
+                { label: 'Timestamp', x: 50, w: 120 }, { label: 'User', x: 175, w: 140 },
+                { label: 'Location', x: 320, w: 110 }, { label: 'Status', x: 445, w: 80, align: 'center' }
+            ]);
+
+            let rowY = doc.y;
+            logs.forEach((l, i) => {
+                rowY = checkPage(rowY);
+                if (i % 2 === 0) { doc.save(); doc.rect(50, rowY - 2, 495, 14).fill('#f8fafc'); doc.restore(); }
+                doc.font('Poppins').fontSize(7.5).fillColor('#1e293b');
+                doc.text(new Date(l.access_time).toLocaleString(), 50, rowY, { width: 120 });
+                doc.text(`${l.first_name} ${l.last_name}`, 175, rowY, { width: 140 });
+                doc.text(l.door_name || 'N/A', 320, rowY, { width: 110 });
+                const sColor = l.status === 'granted' ? '#166534' : '#991b1b';
+                doc.fillColor(sColor).text(l.status.toUpperCase(), 445, rowY, { width: 80, align: 'center' });
+                rowY += 14;
+            });
+        }
+
+        // ===== CUSTOMER ANALYTICS =====
+        if (includeCustomers) {
+            doc.addPage();
+            sectionHeader('Customer Analytics');
+
+            const [topCustomers] = await db.query(`
+                SELECT u.first_name, u.last_name, u.type,
+                       SUM(TIMESTAMPDIFF(HOUR, r.start_time, r.end_time)) as total_hours
+                FROM users u JOIN reservations r ON u.id = r.user_id
+                WHERE r.start_time BETWEEN ? AND ?
+                GROUP BY u.id ORDER BY total_hours DESC LIMIT 20
+            `, [start, end]);
+
+            const members = topCustomers.filter(c => c.type === 'member');
+            const walkins = topCustomers.filter(c => c.type === 'walkin');
+
+            // Members sub-section
+            doc.font('Poppins-SemiBold').fontSize(10).fillColor('#CF6322').text('Top Members (by usage hours)');
+            doc.moveDown(0.5);
+            tableHeader([{ label: '#', x: 50, w: 30 }, { label: 'Name', x: 85, w: 250 }, { label: 'Hours', x: 400, w: 100, align: 'right' }]);
+            let rowY = doc.y;
+            members.forEach((m, i) => {
+                rowY = checkPage(rowY);
+                if (i % 2 === 0) { doc.save(); doc.rect(50, rowY - 2, 495, 15).fill('#f8fafc'); doc.restore(); }
+                doc.font('Poppins').fontSize(8).fillColor('#1e293b');
+                doc.text(`${i + 1}`, 50, rowY, { width: 30 });
+                doc.text(`${m.first_name} ${m.last_name}`, 85, rowY, { width: 250 });
+                doc.font('Poppins-SemiBold').text(`${m.total_hours} hrs`, 400, rowY, { width: 100, align: 'right' });
+                rowY += 16;
+            });
+
+            doc.y = rowY + 15;
+
+            // Walk-ins sub-section
+            doc.font('Poppins-SemiBold').fontSize(10).fillColor('#8A8636').text('Top Walk-ins (by usage hours)');
+            doc.moveDown(0.5);
+            tableHeader([{ label: '#', x: 50, w: 30 }, { label: 'Name', x: 85, w: 250 }, { label: 'Hours', x: 400, w: 100, align: 'right' }]);
+            rowY = doc.y;
+            walkins.forEach((w, i) => {
+                rowY = checkPage(rowY);
+                if (i % 2 === 0) { doc.save(); doc.rect(50, rowY - 2, 495, 15).fill('#f8fafc'); doc.restore(); }
+                doc.font('Poppins').fontSize(8).fillColor('#1e293b');
+                doc.text(`${i + 1}`, 50, rowY, { width: 30 });
+                doc.text(`${w.first_name} ${w.last_name}`, 85, rowY, { width: 250 });
+                doc.font('Poppins-SemiBold').text(`${w.total_hours} hrs`, 400, rowY, { width: 100, align: 'right' });
+                rowY += 16;
+            });
+        }
+
+        // ===== FOOTER on every page =====
+        const pages = doc.bufferedPageRange();
+        for (let i = 0; i < pages.count; i++) {
+            doc.switchToPage(i);
+            // Divider line
+            doc.moveTo(50, 770).lineTo(545, 770).strokeColor('#e2e8f0').lineWidth(0.5).stroke();
+            doc.font('Poppins').fontSize(7).fillColor('#94a3b8');
+            doc.text(`Page ${i + 1} of ${pages.count}`, 50, 775, { width: 495, align: 'left' });
+            doc.text('Generated by MustBerryFi', 50, 775, { width: 495, align: 'right' });
+        }
+
+        doc.end();
+
+    } catch (error) {
+        console.error('PDF Export Error:', error);
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Failed to generate PDF: ' + error.message });
+        }
+    }
+});
+
+// Server-side CSV Export
+router.post('/export/csv', async (req, res) => {
+    const { filters } = req.body;
+    const { start, end, includeIncome, includeTrans, includeActivity, includeCustomers } = filters;
+
+    try {
+        let csv = "\uFEFF"; // BOM
+        csv += "THE LAST MUSTER - ANALYTICS REPORT\n";
+        csv += `Generated: ${new Date().toLocaleString()}\n`;
+        csv += `Range: ${new Date(start).toLocaleDateString()} to ${new Date(end).toLocaleDateString()}\n\n`;
+
+        if (includeIncome) {
+            csv += "FINANCIAL SUMMARY\n";
+            csv += "Date,Total Income,Paid,Unpaid\n";
+            const [income] = await db.query(`
+                SELECT DATE(start_time) as period, SUM(amount) as totalIncome, 
+                       SUM(IF(payment_status = 'paid', amount, 0)) as paidAmount,
+                       SUM(IF(payment_status = 'unpaid', amount, 0)) as unpaidAmount
+                FROM reservations
+                WHERE start_time BETWEEN ? AND ?
+                GROUP BY DATE(start_time)
+                ORDER BY DATE(start_time) DESC
+            `, [start, end]);
+            income.forEach(row => {
+                csv += `"${new Date(row.period).toLocaleDateString()}",${row.totalIncome},${row.paidAmount},${row.unpaidAmount}\n`;
+            });
+            csv += "\n";
+        }
+
+        if (includeTrans) {
+            csv += "TRANSACTION DETAILS\n";
+            csv += "Date,Customer,Amount,Status\n";
+            const [trans] = await db.query(`
+                SELECT r.*, u.first_name, u.last_name
+                FROM reservations r
+                JOIN users u ON r.user_id = u.id
+                WHERE r.start_time BETWEEN ? AND ?
+                ORDER BY r.start_time DESC
+            `, [start, end]);
+            trans.forEach(t => {
+                csv += `"${new Date(t.start_time).toLocaleString()}","${t.first_name} ${t.last_name}",${t.amount},"${t.payment_status.toUpperCase()}"\n`;
+            });
+            csv += "\n";
+        }
+
+        if (includeActivity) {
+            csv += "ACTIVITY & ACCESS LOGS\n";
+            csv += "Timestamp,User,Location,Method,Status\n";
+            const [logs] = await db.query(`
+                SELECT dl.*, u.first_name, u.last_name
+                FROM door_access_logs dl
+                JOIN users u ON dl.user_id = u.id
+                WHERE dl.access_time BETWEEN ? AND ?
+                ORDER BY dl.access_time DESC
+            `, [start, end]);
+            logs.forEach(l => {
+                csv += `"${new Date(l.access_time).toLocaleString()}","${l.first_name} ${l.last_name}","${l.door_name}","${l.method}","${l.status.toUpperCase()}"\n`;
+            });
+            csv += "\n";
+        }
+
+        if (includeCustomers) {
+            csv += "CUSTOMER ANALYTICS - TOP USERS\n";
+            csv += "Type,Name,Total Usage Hours\n";
+            const [top] = await db.query(`
+                SELECT u.first_name, u.last_name, u.type,
+                       SUM(TIMESTAMPDIFF(HOUR, r.start_time, r.end_time)) as total_hours
+                FROM users u
+                JOIN reservations r ON u.id = r.user_id
+                WHERE r.start_time BETWEEN ? AND ?
+                GROUP BY u.id
+                ORDER BY total_hours DESC
+            `, [start, end]);
+            top.forEach(c => {
+                csv += `"${c.type.toUpperCase()}","${c.first_name} ${c.last_name}",${c.total_hours}\n`;
+            });
+            csv += "\n";
+        }
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename=TheLastMuster_Report_${new Date().toISOString().split('T')[0]}.csv`);
+        res.send(csv);
+
+    } catch (error) {
+        console.error('CSV Export Error:', error);
+        res.status(500).json({ error: 'Failed to generate CSV' });
+    }
+});
+
 module.exports = router;
+
+
 

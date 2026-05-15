@@ -1,4 +1,4 @@
-<!-- Title passed to layout -->
+<!-- title passed to layout function -->
 <% locals.title = 'The Last Muster | Messages' %>
 
 <%- contentFor('style') %>
@@ -10,7 +10,7 @@
       gap: 20px;
     }
 
-    /* Recipient Modal */
+    /* recipient modal function */
     .recipient-modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.5);
       display: none; align-items: center; justify-content: center; z-index: 1000;
@@ -74,7 +74,7 @@
 
 <div class="app">
 
-  <!-- Consistent Sidebar (Same as Door & Seat) -->
+  <!-- consistent sidebar (same as door & seat) function -->
   <%- include('../partials/admin_sidebar', { active: 'Message' }) %>
 
   <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
@@ -89,7 +89,7 @@
     </div>
 
     <div class="msg-layout">
-      <!-- Send Message -->
+      <!-- send message function -->
       <div class="card">
         <div class="card-title">Send Message</div>
         <div style="display:flex;flex-direction:column;gap:16px;">
@@ -122,7 +122,7 @@
         </div>
       </div>
 
-      <!-- History -->
+      <!-- history function -->
       <div class="card">
         <div class="card-title">Sent Messages History</div>
         <div class="table-wrap">
@@ -138,7 +138,7 @@
   </main>
 </div>
 
-<!-- Recipient Modal -->
+<!-- recipient modal function -->
 <div class="recipient-modal-overlay" id="recipientModal">
   <div class="recipient-modal">
     <div class="recipient-modal-header">
@@ -268,7 +268,7 @@ async function sendToSpecificRecipients() {
 
 async function sendMessage(subject, body, audience, recipients) {
   try {
-      // 1. Save to DB history and send internal notifications
+      /* 1. save to db history and send internal notifications function */
       const res = await fetch('/api/messages', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -278,10 +278,10 @@ async function sendMessage(subject, body, audience, recipients) {
 
       if (data.success) {
           alert('Message sent successfully to user accounts!');
-          // 2. Update local state
+          /* 2. update local state function */
           loadInitialData();
 
-          // Clear inputs
+          /* clear inputs function */
           document.getElementById('msg-subject').value = '';
           document.getElementById('msg-body').value = '';
           document.getElementById('msg-recipients').value = '';
